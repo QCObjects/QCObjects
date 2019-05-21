@@ -1,0 +1,18 @@
+{
+  "name": "qcobjects-cli",
+  "version": "0.0.1",
+  "description": "qcobjects cli command line tool",
+  "main": "cli.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "qcobjects": "^2.1.122"
+  },
+  "author": "Jean Machuca",
+  "license": "LGPL-3.0-or-later",
+  "bin": {
+    "say-hello": "./cli.js"
+  },
+  "devDependencies": {}
+}
