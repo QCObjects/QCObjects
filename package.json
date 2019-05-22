@@ -7,12 +7,41 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "handlebars": "^4.1.2",
     "qcobjects": "^2.1.122"
   },
-  "author": "Jean Machuca",
-  "license": "LGPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/api/v4/projects/12435344/repository/archive?private_token=Wys-MPRmB1sSFn3eeX84"
+  },
+  "keywords": [
+    "node",
+    "quickcorp",
+    "javascript",
+    "pure",
+    "mvc",
+    "objects",
+    "sdk",
+    "middleware",
+    "framework",
+    "quick",
+    "components",
+    "web",
+    "webcomponents",
+    "cli",
+    "qcobjects"
+  ],
+  "author": "Jean Machuca <correojean@gmail.com>",
+  "license": "LGPL-3.0",
+  "bugs": {
+    "url": "https://gitlab.com/api/v4/projects/12435344/issues?private_token=Wys-MPRmB1sSFn3eeX84"
+  },
+  "homepage": "https://qcobjects.dev",
   "bin": {
-    "say-hello": "./cli.js"
+    "qco": "./qcobjects-cli.js",
+    "qcobjects": "./qcobjects-cli.js",
+    "qcobjects-cli": "./qcobjects-cli.js",
+    "qcobjects-server": "./qcobjects-http2-server.js"
   },
   "devDependencies": {}
 }
