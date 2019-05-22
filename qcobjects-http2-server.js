@@ -78,8 +78,7 @@ Package('org.quickcorp.qcobjects.main.http2.server',[
       });
 
     }
-  }),
-  Class('')
+  })
 ]);
 
 
