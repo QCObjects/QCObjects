@@ -12,7 +12,7 @@ Import(templatePath+'spa-local');
 
 
 Class('Main',{
-  _new_:()=>{
+  _new_:(o)=>{
     let template = New(AppTemplate,{
       compileAndSave:true
     });
