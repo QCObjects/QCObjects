@@ -42,7 +42,8 @@
     "qco": "./qcobjects-cli.js",
     "qcobjects": "./qcobjects-cli.js",
     "qcobjects-cli": "./qcobjects-cli.js",
-    "qcobjects-server": "./qcobjects-http2-server.js"
+    "qcobjects-server": "./qcobjects-http2-server.js",
+    "qcobjects-shell": "./qcobjects-shell.js"
   },
   "devDependencies": {}
 }
