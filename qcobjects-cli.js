@@ -3,7 +3,7 @@
 "use strict";
 const path = require('path');
 const absolutePath = path.resolve( __dirname, "./" );
-const templatePath = path.resolve( __dirname, "./templates/apps/" )+'/'
+const templatePath = path.resolve( __dirname, "./templates/apps/" )+'/';
 
 require('qcobjects');
 logger.debugEnabled=false;
