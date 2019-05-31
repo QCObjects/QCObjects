@@ -19,6 +19,7 @@ CONFIG.set('serverPort',443);
 CONFIG.set('private-key-pem','localhost-privkey.pem');
 CONFIG.set('private-cert-pem','localhost-cert.pem');
 CONFIG.set('allowHTTP1',true);
+CONFIG.set('useTemplate',false);
 
 'use strict';
 Package('org.quickcorp.qcobjects.main.http2.server',[
@@ -50,7 +51,7 @@ Package('org.quickcorp.qcobjects.main.http2.server',[
       return this.filename.substr(this.filename.indexOf("."));
     },
     isTemplate:function (){
-      return this.file_extension()=='.html' || this.file_extension() == '.tpl.html';
+      return CONFIG.get('useTemplate') && (this.file_extension()=='.html' || this.file_extension() == '.tpl.html');
     },
     _done:function (){
       var appTemplateInstance = this;
