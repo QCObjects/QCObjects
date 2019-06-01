@@ -1,7 +1,13 @@
 'use strict';
 const path = require('path');
-const fs = require('fs');
+const absolutePath = path.resolve( __dirname, "./" );
 const Handlebars = require('handlebars');
+
+const http2 = require('http2');
+const fs = require('fs');
+const mime = require("mime");
+
+Import('org.quickcorp.qcobjects.main.file');
 
 Package('org.quickcorp.cli.templates.app.spa_local',[
   Class('AppTemplate',{

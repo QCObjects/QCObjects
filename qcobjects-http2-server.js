@@ -16,6 +16,7 @@ CONFIG.set('private-cert-pem','localhost-cert.pem');
 CONFIG.set('allowHTTP1',true);
 CONFIG.set('useTemplate',false);
 
+Import(absolutePath+'/org.quickcorp.qcobjects.main.file');
 Import(absolutePath+'/org.quickcorp.qcobjects.main.http2.server');
 
 Class('Main',{

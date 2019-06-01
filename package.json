@@ -9,7 +9,8 @@
   "dependencies": {
     "handlebars": "^4.1.2",
     "mime": "^2.4.3",
-    "qcobjects": "^2.1.122"
+    "qcobjects": "^2.1.122",
+    "commander": "^2.20.0"
   },
   "repository": {
     "type": "git",
