@@ -64,6 +64,13 @@ Package('org.quickcorp.qcobjects.cli',[
         var swContent = swTemplate({appName: appName,filelist:"\n\t\""+filelist.join("\",\n\t\"")+"\""});
         fs.writeFile('./sw.js', swContent, err => {
           logger.info("Service Worker Generated");
+          console.log('')
+          console.log('Now simply put:');
+          console.log('CONFIG.set(\'serviceWorkerURI\',\'/sw.js\');');
+          console.log(' In your init.js file ');
+          console.log('')
+
+          process.exit(0);
         });
       });
     },
