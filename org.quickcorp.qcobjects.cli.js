@@ -124,8 +124,12 @@ Package('org.quickcorp.qcobjects.cli',[
         });
       });
       map_files(CONFIG.get('qcobjectsnewapp_path'),(filename)=>{
-        logger.debug('Creating file: '+relativePath(filename));
-        copyTemplateFile(filename,relativePath(filename));
+        if (!['./package.json',
+              './package-lock.json',
+              './sw.js'].includes(relativePath(filename))){
+          logger.info('Creating file: '+relativePath(filename));
+          copyTemplateFile(filename,relativePath(filename));
+        }
       });
 
     },
@@ -148,14 +152,16 @@ Package('org.quickcorp.qcobjects.cli',[
           let createAppCommandPWA = "echo \"{\\\"name\\\": \\\""+appName.toLowerCase()+"\\\",\\\"repository\\\": {\\\"type\\\": \\\"git\\\",\\\"url\\\": \\\""+giturl+"\\\"},\\\"description\\\":\\\".\\\",\\\"license\\\": \\\"LGPL-3.0-or-later\\\",\\\"dependencies\\\":{\\\"qcobjectsnewapp\\\":\\\"latest\\\",\\\"qcobjects\\\":\\\"latest\\\"}}\" > package.json";
           let createAppCommandAMP = "echo \"{\\\"name\\\": \\\""+appName.toLowerCase()+"\\\",\\\"repository\\\": {\\\"type\\\": \\\"git\\\",\\\"url\\\": \\\""+giturl+"\\\"},\\\"description\\\":\\\".\\\",\\\"license\\\": \\\"LGPL-3.0-or-later\\\",\\\"dependencies\\\":{\\\"qcobjects-ecommerce-amp\\\":\\\"latest\\\",\\\"qcobjects\\\":\\\"latest\\\"}}\" > package.json";
           let createAppCommand;
+          let appTemplateName;
 
           if (options.createAmp){
-            CONFIG.set('qcobjectsnewapp_path',CONFIG.get('node_modules_path')+'/qcobjects-ecommerce-amp');
+            appTemplateName = 'qcobjects-ecommerce-amp';
             createAppCommand = createAppCommandAMP;
           } else {
-            CONFIG.set('qcobjectsnewapp_path',CONFIG.get('node_modules_path')+'/qcobjectsnewapp');
+            appTemplateName = 'qcobjectsnewapp';
             createAppCommand = createAppCommandPWA;
           }
+          CONFIG.set('qcobjectsnewapp_path',CONFIG.get('node_modules_path')+'/'+appTemplateName);
 
           logger.debug(createAppCommand);
           exec(createAppCommand, (err, stdout, stderr) => {
@@ -164,20 +170,13 @@ Package('org.quickcorp.qcobjects.cli',[
               console.log(stdout);
               Promise.resolve(switchCommander.copyTemplate()).then(()=>{
                 logger.info('Good! Your application is getting done. You can play with QCObjects now!');
-                logger.info('In five second your server will start...');
+                logger.info('In about five seconds your server will start...');
                 exec("qcobjects-createcert",(err,stdout,stderr)=>{
                   logger.info("Test certificates generated");
-                  switchCommander.generateServiceWorker(appName);
-
-                });
-                setTimeout(()=>{
-                  exec("qcobjects-server",(err,stdout,stderr)=>{
-                    logger.info("Bye.");
+                  exec("npm uninstall "+appTemplateName+" --save && npm cache verify",(err,stdout,stderr)=>{
+                    switchCommander.generateServiceWorker(appName);
                   });
-                },5000);
-                setTimeout(()=>{
-                  execSync("open -a \"google chrome\" https://localhost");
-                },6000);
+                });
               });
             });
           });
@@ -215,6 +214,19 @@ Package('org.quickcorp.qcobjects.cli',[
         .description('Generates the service worker  <appname>')
         .action(function(args, options){
             switchCommander.choiceOption.generateSw.call(switchCommander,args,options);
+        });
+      this.program.command('launch <appname>')
+        .description('Launches the application')
+        .action(function (args,options){
+          setTimeout(()=>{
+            exec("qcobjects-server",(err,stdout,stderr)=>{
+              logger.info("Launching...");
+            });
+          },5000);
+//          setTimeout(()=>{
+//            execSync("open -a \"google chrome\" https://localhost");
+//          },6000);
+
         });
 
         this.program.on('--help', function(){
