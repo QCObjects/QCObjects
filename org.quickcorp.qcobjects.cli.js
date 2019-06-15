@@ -33,12 +33,6 @@ const { exec,execSync } = require('child_process');
 const Handlebars = require('handlebars');
 
 
-const readline = require('readline');
-
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
 logger.debugEnabled=false;
 CONFIG.set('node_modules_path','./node_modules/');
 CONFIG.set('qcobjectsnewapp_path',CONFIG.get('node_modules_path')+'/qcobjectsnewapp');
@@ -144,6 +138,13 @@ Package('org.quickcorp.qcobjects.cli',[
         let switchCommander = this;
         let appName = (typeof _appName ==='undefined' || _appName === true)?('MyAppName'):(_appName);
 
+        const readline = require('readline');
+
+        const rl = readline.createInterface({
+          input: process.stdin,
+          output: process.stdout
+        });
+
         rl.question('Please tell me your git repository url: \n', (answer) => {
           logger.info(`your git repository url is ${answer}`);
           rl.close();
@@ -190,57 +191,71 @@ Package('org.quickcorp.qcobjects.cli',[
     },
     initCommand: function (){
       let switchCommander = this;
-      this.program
-        .version(package_config.version);
-      this.program
-        .command('create <appname>')
-        .description('Creates an app with <appname>')
-        .option('--pwa, --create-pwa', 'Creates the progressive web app assets')
-        .option('--amp, --create-amp', 'Creates the accelerated mobile pages assets')
-        .option('--tests, --create-tests', 'Creates the test suite')
-        .action(function(args, options){
-            switchCommander.choiceOption.create.call(switchCommander,args,options);
-        });
-      this.program.command('publish <appname>')
-        .description('Publishes an app with <appname>')
-        .option('--pwa, --create-pwa', 'Publishes the progressive web app assets')
-        .option('--amp, --create-amp', 'Publishes the accelerated mobile pages assets')
-        .option('--tests, --create-tests', 'Publishes the test suite')
-        .action(function(args, options){
-            switchCommander.choiceOption.publish.call(switchCommander,args,options);
-        });
+      if (process.argv.length>1){
 
-      this.program.command('generate-sw  <appname>')
-        .description('Generates the service worker  <appname>')
-        .action(function(args, options){
-            switchCommander.choiceOption.generateSw.call(switchCommander,args,options);
-        });
-      this.program.command('launch <appname>')
-        .description('Launches the application')
-        .action(function (args,options){
-          setTimeout(()=>{
-            exec("qcobjects-server",(err,stdout,stderr)=>{
-              logger.info("Launching...");
-            });
-          },5000);
-//          setTimeout(()=>{
-//            execSync("open -a \"google chrome\" https://localhost");
-//          },6000);
+        this.program
+          .version(package_config.version);
+        this.program
+          .command('create <appname>')
+          .description('Creates an app with <appname>')
+          .option('--pwa, --create-pwa', 'Creates the progressive web app assets')
+          .option('--amp, --create-amp', 'Creates the accelerated mobile pages assets')
+          .option('--tests, --create-tests', 'Creates the test suite')
+          .action(function(args, options){
+              switchCommander.choiceOption.create.call(switchCommander,args,options);
+          });
+        this.program.command('publish <appname>')
+          .description('Publishes an app with <appname>')
+          .option('--pwa, --create-pwa', 'Publishes the progressive web app assets')
+          .option('--amp, --create-amp', 'Publishes the accelerated mobile pages assets')
+          .option('--tests, --create-tests', 'Publishes the test suite')
+          .action(function(args, options){
+              switchCommander.choiceOption.publish.call(switchCommander,args,options);
+          });
 
-        });
+        this.program.command('generate-sw  <appname>')
+          .description('Generates the service worker  <appname>')
+          .action(function(args, options){
+              switchCommander.choiceOption.generateSw.call(switchCommander,args,options);
+          });
+        this.program.command('launch <appname>')
+          .description('Launches the application')
+          .action(function (args,options){
+            logger.info("Launching...");
+            setTimeout(()=>{
+              logger.info("Go to the browser and open https://localhost ");
+              logger.info("Press Ctrl-C to stop serving ");
+              exec("qcobjects-server",(err,stdout,stderr)=>{
+              });
+            },5000);
+  //          setTimeout(()=>{
+  //            execSync("open -a \"google chrome\" https://localhost");
+  //          },6000);
 
-        this.program.on('--help', function(){
+          });
+
+          this.program.on('--help', function(){
+            console.log('')
+            console.log('Use:');
+            console.log('  $ qcobjects-cli [command] --help');
+            console.log('  For detailed information of a command ');
+            console.log('')
+            process.exit(0);
+          });
+          this.program.on('command:*', function () {
+            console.error('Invalid command: %s\nSee --help for a list of available commands.', program.args.join(' '));
+            process.exit(1);
+          });
+          this.program.parse(process.argv);
+        } else {
           console.log('')
           console.log('Use:');
           console.log('  $ qcobjects-cli [command] --help');
           console.log('  For detailed information of a command ');
           console.log('')
-        });
-        this.program.on('command:*', function () {
-          console.error('Invalid command: %s\nSee --help for a list of available commands.', program.args.join(' '));
-          process.exit(1);
-        });
-        this.program.parse(process.argv);
+          process.exit(0);
+
+        }
 
     }
   })
