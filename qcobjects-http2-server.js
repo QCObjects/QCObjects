@@ -24,6 +24,9 @@ try {
   for (var k in _config){
     CONFIG.set(k,_config[k]);
   }
+  if (typeof CONFIG.get('backend') != 'undefined'){
+    global.set('backendAvailable',true);
+  }
 }catch (e){
   logger.debug('No config.json file in your project');
 }

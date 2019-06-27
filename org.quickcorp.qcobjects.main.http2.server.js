@@ -178,11 +178,14 @@ Package('org.quickcorp.qcobjects.main.http2.server',[
       });
 
       server.on('stream', (stream, headers, flags) => {
+
         stream.session.altsvc('h2=":8000"', stream.id);
         stream.session.altsvc('https=":443"', stream.id);
-        this.request = Object.assign(New(HTTP2ServerRequest),require('url').parse(headers[':path']));
+        let request = Object.assign(New(HTTP2ServerRequest),require('url').parse(headers[':path']));
+        this.request = request;
         this.request.method = headers[':method'];
         this.request.path = headers[':path'];
+
 
         if (this.request.pathname.indexOf('.')<0){
             this.request.scriptname = CONFIG.get('documentRootFileIndex');
@@ -193,12 +196,37 @@ Package('org.quickcorp.qcobjects.main.http2.server',[
 
         logger.debug(PipeLog.pipe(this.request));
 
-        // ...
+        if (global.get('backendAvailable')){
+          logger.info('Backend Microservices Available');
+          let routes = CONFIG.get('backend').routes;
+          let selectedRoute = routes.filter(route=>{return route.path==request.path});
+          if (selectedRoute.length>0){
+            selectedRoute.map(route=>{
+              Import (route.microservice);
+              let response = New(Microservice,{
+                route:route,
+                request:request,
+                stream:stream,
+                request:request
+              });
+            });
+          } else {
+            this.response = New(HTTP2ServerResponse,{
+              stream:stream,
+              request:this.request
+            });
+          }
 
-        this.response = New(HTTP2ServerResponse,{
-          stream:stream,
-          request:this.request
-        });
+        } else {
+          // ...
+
+          this.response = New(HTTP2ServerResponse,{
+            stream:stream,
+            request:this.request
+          });
+
+        }
+
       });
 
     }
