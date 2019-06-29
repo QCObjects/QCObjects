@@ -145,6 +145,17 @@ Package('org.quickcorp.qcobjects.main.http2.server',[
     response:'',
     server:null,
     scriptname:'',
+    showIPAddress:function (){
+      var _ret_ = '';
+      var os = require('os');
+      var ifaces = os.networkInterfaces();
+      Object.keys(ifaces).forEach(function (iface){
+        ifaces[iface].map(function (ipGroup){
+          _ret_ += iface +': ' + PipeLog.pipe(ipGroup)+'\n';
+        });
+      });
+      return _ret_;
+    },
     start:function (){
       var server = this.server;
 
@@ -161,6 +172,7 @@ Package('org.quickcorp.qcobjects.main.http2.server',[
       server.listen(CONFIG.get('serverPortHTTPS'));
     },
     _new_:function (){
+      logger.info(this.showIPAddress());
       this.server = http2.createSecureServer({
         key: fs.readFileSync(CONFIG.get('private-key-pem')),
         cert: fs.readFileSync(CONFIG.get('private-cert-pem')),
