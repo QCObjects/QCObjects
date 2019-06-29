@@ -64,7 +64,10 @@ Package('org.quickcorp.qcobjects.cli',[
           console.log('CONFIG.set(\'serviceWorkerURI\',\'/sw.js\');');
           console.log(' In your init.js file ');
           console.log('')
-
+          console.log('To start your app in a local server ');
+          console.log('Execute the command: ');
+          console.log('> qcobjects launch <appname>');
+          console.log('')
           process.exit(0);
         });
       });
@@ -226,6 +229,8 @@ Package('org.quickcorp.qcobjects.cli',[
               logger.info("Go to the browser and open https://localhost ");
               logger.info("Press Ctrl-C to stop serving ");
               exec("qcobjects-server",(err,stdout,stderr)=>{
+              }).stdout.on('data', function(data) {
+                  console.log(data);
               });
             },5000);
   //          setTimeout(()=>{
