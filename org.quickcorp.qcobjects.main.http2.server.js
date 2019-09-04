@@ -179,7 +179,7 @@ Package('org.quickcorp.qcobjects.main.http2.server',[
       console.log(logo);
       console.log(instructions);
       logger.info(this.showIPAddress());
-      
+
       this.server = http2.createSecureServer({
         key: fs.readFileSync(CONFIG.get('private-key-pem')),
         cert: fs.readFileSync(CONFIG.get('private-cert-pem')),
@@ -222,9 +222,8 @@ Package('org.quickcorp.qcobjects.main.http2.server',[
           if (selectedRoute.length>0){
             selectedRoute.map(route=>{
               Import (route.microservice);
-              let response = New(Microservice,{
+              this.response = New(Microservice,{
                 route:route,
-                request:request,
                 stream:stream,
                 request:request
               });
