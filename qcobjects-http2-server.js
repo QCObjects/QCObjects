@@ -26,11 +26,20 @@ try {
   }
   if (typeof CONFIG.get('backend') != 'undefined'){
     global.set('backendAvailable',true);
+
+    if (typeof CONFIG.get('basePath') != 'undefined'){
+      logger.debug(`Changing the current directory: ${process.cwd()}`);
+      try {
+        process.chdir(CONFIG.get('basePath'));
+        logger.debug(`New directory: ${process.cwd()}`);
+      } catch (err) {
+        logger.warn(`It was impossible to change the current chdir: ${err}`);
+      }
+    }
   }
 }catch (e){
   logger.debug('No config.json file in your project');
 }
-
 require(absolutePath+'/org.quickcorp.qcobjects.main.http2.server.js');
 
 Class('Main',{
