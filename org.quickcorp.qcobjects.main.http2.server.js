@@ -223,6 +223,9 @@ Package('org.quickcorp.qcobjects.main.http2.server',[
             selectedRoute.map(route=>{
               Import (route.microservice);
               this.response = New(Microservice,{
+                domain:CONFIG.get('domain'),
+                basePath:CONFIG.get('basePath'),
+                projectPath:CONFIG.get('projectPath'),
                 route:route,
                 stream:stream,
                 request:request
