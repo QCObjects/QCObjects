@@ -218,7 +218,7 @@ Package('org.quickcorp.qcobjects.main.http2.server',[
         if (global.get('backendAvailable')){
           logger.info('Backend Microservices Available');
           let routes = CONFIG.get('backend').routes;
-          let selectedRoute = routes.filter(route=>{return route.path==request.path});
+          let selectedRoute = routes.filter(route=>{return (new RegExp(route.path,'g')).test(request.path)});
           if (selectedRoute.length>0){
             selectedRoute.map(route=>{
               Import (route.microservice);
