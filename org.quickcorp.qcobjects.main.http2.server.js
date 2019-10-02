@@ -127,6 +127,8 @@ Package('org.quickcorp.qcobjects.main.http2.server',[
     path:'',
     method:'',
     url:'',
+    headers:null,
+    flags:null,
     protocol: null,
     slashes: null,
     auth: null,
@@ -201,6 +203,8 @@ Package('org.quickcorp.qcobjects.main.http2.server',[
         stream.session.altsvc('h2=":8000"', stream.id);
         stream.session.altsvc('https=":443"', stream.id);
         let request = Object.assign(New(HTTP2ServerRequest),require('url').parse(headers[':path']));
+        request.headers = headers;
+        request.flags = flags;
         this.request = request;
         this.request.method = headers[':method'];
         this.request.path = headers[':path'];
