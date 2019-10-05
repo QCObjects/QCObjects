@@ -185,7 +185,8 @@ Package('org.quickcorp.qcobjects.main.http2.server',[
       this.server = http2.createSecureServer({
         key: fs.readFileSync(CONFIG.get('private-key-pem')),
         cert: fs.readFileSync(CONFIG.get('private-cert-pem')),
-        allowHTTP1:CONFIG.get('allowHTTP1')
+        allowHTTP1:CONFIG.get('allowHTTP1'),
+        origins:['https://'+CONFIG.get('domain'),'http://'+CONFIG.get('domain')]
       });
       var server = this.server;
 
@@ -193,15 +194,17 @@ Package('org.quickcorp.qcobjects.main.http2.server',[
 
       server.on('session', (session) => {
         // Set altsvc for origin https://example.org:80
-        session.altsvc('h2=":8000"', 'http://'+CONFIG.get('domain'));
-        session.altsvc('https=":443"','http://'+CONFIG.get('domain'))
-        session.origin('http://'+CONFIG.get('domain'));
+        session.altsvc('h2=":8000"', 'https://'+CONFIG.get('domain'));
+        session.altsvc('https=":'+CONFIG.get('serverPortHTTPS')+'"','https://'+CONFIG.get('domain'));
+        session.altsvc('http=":'+CONFIG.get('serverPortHTTP')+'"','http://'+CONFIG.get('domain'));
+        session.origin('https://'+CONFIG.get('domain'),'http://'+CONFIG.get('domain'));
       });
 
       server.on('stream', (stream, headers, flags) => {
 
         stream.session.altsvc('h2=":8000"', stream.id);
-        stream.session.altsvc('https=":443"', stream.id);
+        stream.session.altsvc('https=":'+CONFIG.get('serverPortHTTPS')+'"', stream.id);
+        stream.session.altsvc('http=":'+CONFIG.get('serverPortHTTP')+'"',stream.id);
         let request = Object.assign(New(HTTP2ServerRequest),require('url').parse(headers[':path']));
         request.headers = headers;
         request.flags = flags;
