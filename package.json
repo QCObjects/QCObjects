@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "commander": "^2.20.0",
-    "handlebars": "^4.4.0",
+    "handlebars": "^4.5.3",
     "mime": "^2.4.4",
     "qcobjects": "latest"
   },
