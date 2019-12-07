@@ -2,6 +2,39 @@
 
 Learn more about QCObjects framework in [https://qcobjects.dev](https://qcobjects.dev)
 
+To start, use:
+```shell
+> su - qcobjects
+```
+and go to the path ~/projects/mynewapp
+
+To create a new progressive web app type:
+```shell
+> qcobjects create mynewapp --pwa
+```
+
+To create an accelerated mobile page type:
+```shell
+> qcobjects create mynewapp --pwa
+```
+
+The QCObjects HTTP2 Server Settings file is in:
+```shell
+/etc/qcobjects/config.json
+```
+
+To check the status of the service:
+```shell
+> service qcobjects status
+```
+
+To start|stop|prestart the service:
+```shell
+> service qcobjects start
+> service qcobjects stop
+> service qcobjects restart
+```
+
 ```shell
    .d88888b.  .d8888b.  .d88888b. 888       d8b                888
   d88P" "Y88bd88P  Y88bd88P" "Y88b888       Y8P                888
@@ -31,23 +64,4 @@ Learn more about QCObjects framework in [https://qcobjects.dev](https://qcobject
     $ qcobjects-cli [command] --help
     For detailed information of a command
 
-  To start, use: su - qcobjects
-  and go to the path ~/projects/mynewapp
-
-  To create a new progressive web app type:
-  > qcobjects create mynewapp --pwa
-
-  To create an accelerated mobile page type:
-  > qcobjects create mynewapp --pwa
-
-  The QCObjects HTTP2 Server Settings file is in:
-  /etc/qcobjects/config.json
-
-  To check the status of the service:
-  > service qcobjects status
-
-  To start|stop|prestart the service:
-  > service qcobjects start
-  > service qcobjects stop
-  > service qcobjects restart
 ```
