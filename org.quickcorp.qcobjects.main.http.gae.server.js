@@ -115,7 +115,7 @@ Package('org.quickcorp.qcobjects.main.http.gae.server',[
       return _o.join(' ');
     }
   }),
-  Class('HTTP2ServerResponse',{
+  Class('HTTPServerResponse',{
     headers:{
       ':status': 200,
       'content-type': 'text/html'
@@ -127,6 +127,7 @@ Package('org.quickcorp.qcobjects.main.http.gae.server',[
       // read and send file content in the stream
 
       try {
+        console.log('trying to read '+ fileName);
         const fd = fs.openSync(fileName, "r");
         const stat = fs.fstatSync(fd);
         const headers = {
@@ -134,12 +135,29 @@ Package('org.quickcorp.qcobjects.main.http.gae.server',[
           "last-modified": stat.mtime.toUTCString(),
           "content-type": mime.getType(fileName)
         };
-        stream.respondWithFD(fd, headers);
-        stream.on("close", () => {
-          console.log("closing file", fileName);
-          fs.closeSync(fd);
+        console.log("closing file", fileName);
+        fs.closeSync(fd);
+        stream.setHeader("content-length", headers['content-length']);
+        stream.setHeader("last-modified", headers['last-modified']);
+        stream.setHeader("content-type", headers['content-type']);
+
+        // This line opens the file as a readable stream
+        var readStream = fs.createReadStream(fileName);
+
+        // This will wait until we know the readable stream is actually valid before piping
+        readStream.on('open', function () {
+          // This just pipes the read stream to the response object (which goes to the client)
+          readStream.pipe(stream);
         });
-        stream.end();
+
+        readStream.on('end',function (){
+          stream.end();
+        });
+
+        // This catches any errors that happen while creating the readable stream (usually invalid names)
+        readStream.on('error', function(err) {
+          stream.end(err);
+        });
 
       } catch (e){
         if (e.errno==-2){
@@ -164,14 +182,16 @@ Package('org.quickcorp.qcobjects.main.http.gae.server',[
           response.headers = headers;
           var stream = response.stream;
           if (isTemplate){
+            logger.debug('TEMPLATE')
             response.body = body;
-            stream.respond(response.headers);
+//            stream.respond(response.headers);
             stream.write(response.body);
             stream.end();
           } else if (headers[':status']==200){
             response.sendFile(stream,templateURI);
           } else {
-            stream.respond(response.headers);
+            logger.debug('NONE ')
+//          stream.respond(response.headers);
             stream.end();
           }
         }
@@ -186,7 +206,7 @@ Package('org.quickcorp.qcobjects.main.http.gae.server',[
 
     }
   }),
-  Class('HTTP2ServerRequest',{
+  Class('HTTPServerRequest',{
     scriptname:'',
     path:'',
     method:'',
@@ -224,10 +244,10 @@ Package('org.quickcorp.qcobjects.main.http.gae.server',[
     },
     start:function (){
       var server = this.server;
-
       server.listen(process.env.PORT || CONFIG.get('serverPortHTTP'));
     },
     _new_:function (){
+      let oHTTPServer = this;
       const welcometo = 'Welcome to \n';
       const instructions = 'QCObjects GAE HTTPServer \n';
       const logo = ' .d88888b.  .d8888b.  .d88888b. 888       d8b                888            \r\nd88P\" \"Y88bd88P  Y88bd88P\" \"Y88b888       Y8P                888            \r\n888     888888    888888     888888                          888            \r\n888     888888       888     88888888b.  8888 .d88b.  .d8888b888888.d8888b  \r\n888     888888       888     888888 \"88b \"888d8P  Y8bd88P\"   888   88K      \r\n888 Y8b 888888    888888     888888  888  88888888888888     888   \"Y8888b. \r\nY88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r\n \"Y888888\"  \"Y8888P\"  \"Y88888P\" 88888P\"   888 \"Y8888  \"Y8888P \"Y888 88888P\' \r\n       Y8b                                888                               \r\n                                         d88P                               \r\n                                       888P\"   ';
@@ -235,27 +255,24 @@ Package('org.quickcorp.qcobjects.main.http.gae.server',[
       console.log(logo);
       console.log(instructions);
       logger.info(this.showIPAddress());
+      logger.info('Listening in PORT: ');
+      logger.info(CONFIG.get('serverPortHTTP'));
 
       const http = require('http');
 
-      this.server = http.createServer((req, res) => {
-      });
+      this.server = http.createServer((req, res) => {});
 
       var server = this.server;
 
       server.on('error', (err) => console.error(err));
 
-      server.on('stream', (stream, headers, flags) => {
+      server.on('request', (req, res) => {
 
-        stream.session.altsvc('h2=":8000"', stream.id);
-        stream.session.altsvc('https=":'+CONFIG.get('serverPortHTTPS')+'"', stream.id);
-        stream.session.altsvc('http=":'+CONFIG.get('serverPortHTTP')+'"',stream.id);
-        let request = Object.assign(New(HTTP2ServerRequest),require('url').parse(headers[':path']));
-        request.headers = headers;
-        request.flags = flags;
+        let request = Object.assign(New(HTTPServerRequest),require('url').parse(req.url));
+        request.headers = req.headers;
         this.request = request;
-        this.request.method = headers[':method'];
-        this.request.path = headers[':path'];
+        this.request.method = req.method;
+        this.request.path = req.url;
 
 
         if (this.request.pathname.indexOf('.')<0){
@@ -268,7 +285,7 @@ Package('org.quickcorp.qcobjects.main.http.gae.server',[
         logger.debug(PipeLog.pipe(this.request));
 
         if (global.get('backendAvailable')){
-          logger.info('Backend Microservices Available');
+          logger.info('Backend GAE Microservices Available');
           let routes = CONFIG.get('backend').routes;
           let selectedRoute = routes.filter(route=>{return (new RegExp(route.path,'g')).test(request.path)});
           if (selectedRoute.length>0){
@@ -279,13 +296,15 @@ Package('org.quickcorp.qcobjects.main.http.gae.server',[
                 basePath:CONFIG.get('basePath'),
                 projectPath:CONFIG.get('projectPath'),
                 route:route,
-                stream:stream,
+                server:server,
+                stream:res,
                 request:request
               });
             });
           } else {
-            this.response = New(HTTP2ServerResponse,{
-              stream:stream,
+            this.response = New(HTTPServerResponse,{
+              server:server,
+              stream:res,
               request:this.request
             });
           }
@@ -293,8 +312,9 @@ Package('org.quickcorp.qcobjects.main.http.gae.server',[
         } else {
           // ...
 
-          this.response = New(HTTP2ServerResponse,{
-            stream:stream,
+          this.response = New(HTTPServerResponse,{
+            server:server,
+            stream:res,
             request:this.request
           });
 
