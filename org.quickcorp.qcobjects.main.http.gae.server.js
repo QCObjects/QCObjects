@@ -34,6 +34,70 @@ const mime = require("mime");
 require(absolutePath+'/org.quickcorp.qcobjects.main.file.js');
 
 Package('org.quickcorp.qcobjects.main.http.gae.server',[
+  Class('BackendMicroservice',Object,{
+    domain:CONFIG.get('domain'),
+    basePath:CONFIG.get('basePath'),
+    body:null,
+    stream:null,
+    server:null,
+    request:null,
+    _new_:function (o){
+      logger.debug('Executing GAE HTTP BackendMicroservice ');
+      let microservice = this;
+      let server = microservice.server;
+      let request = microservice.request;
+      server.on('data', (data) => {
+        // data from POST, GET
+        var requestMethod = request.method.toLowerCase();
+        var supportedMethods = {'post':microservice.post,
+                              };
+        if (supportedMethods.hasOwnProperty(requestMethod)) {
+          supportedMethods[requestMethod].call(microservice,data);
+        }
+      });
+
+      // data from POST, GET
+      var requestMethod = request.method.toLowerCase();
+      var supportedMethods = {'get':microservice.get,
+                              'head':microservice.head,
+                              'put':microservice.put,
+                              'delete':microservice.delete,
+                              'connect':microservice.connect,
+                              'options':microservice.options,
+                              'trace':microservice.trace,
+                              'patch':microservice.patch
+                            };
+      if (supportedMethods.hasOwnProperty(requestMethod)) {
+        supportedMethods[requestMethod].call(microservice);
+      }
+
+    },
+    head:function (formData){this.done()},
+    post:function (formData){this.done()},
+    put:function (formData){this.done()},
+    delete:function (formData){this.done()},
+    connect:function (formData){this.done()},
+    options:function (formData){this.done()},
+    trace:function (formData){this.done()},
+    patch:function (formData){this.done()},
+    finishWithBody:function (stream){
+      try {
+        stream.write(JSON.stringify(this.body));
+        stream.end();
+      } catch (e){
+        logger.debug('Something wrong writing the response for microservice'+e.toString());
+      }
+    },
+    done: function(){
+      var microservice = this;
+      var stream = microservice.stream;
+//      stream.respond(microservice.headers);
+      stream.writeHead(200, {'Content-Type': 'text/plain'});
+      if (microservice.body != null){
+        microservice.finishWithBody.call(microservice,stream);
+      }
+    }
+  }),
   Class('PipeLog',{
     pipe:(o)=>{
       var _o = [];
