@@ -45,7 +45,8 @@
     "qcobjects-cli": "./qcobjects-cli.js",
     "qcobjects-server": "./qcobjects-http2-server.js",
     "qcobjects-shell": "./qcobjects-shell.js",
-    "qcobjects-createcert": "./qcobjects-createcert.js"
+    "qcobjects-createcert": "./qcobjects-createcert.js",
+    "qcobjects-gae-server": "./qcobjects-gae-http-server.js"
   },
   "devDependencies": {}
 }
