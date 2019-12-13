@@ -10,7 +10,8 @@
     "commander": "^2.20.3",
     "handlebars": "^4.5.3",
     "mime": "^2.4.4",
-    "qcobjects": "latest"
+    "qcobjects": "latest",
+    "qcobjects-sdk":"latest"
   },
   "repository": {
     "type": "git",
