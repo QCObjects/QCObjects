@@ -148,50 +148,44 @@ Package('org.quickcorp.qcobjects.cli',[
           output: process.stdout
         });
 
-        let installSDKCommand = "npm -y init && npm i qcobjects-sdk --save";
+        rl.question('Please tell me your git repository url: \n', (answer) => {
+          logger.info(`your git repository url is ${answer}`);
+          rl.close();
+          let giturl = answer;
 
-        exec(installSDKCommand, (err, stdout, stderr) => {
-          rl.question('Please tell me your git repository url: \n', (answer) => {
-            logger.info(`your git repository url is ${answer}`);
-            rl.close();
-            let giturl = answer;
+          let createAppCommandPWA = "echo \"{\\\"name\\\": \\\""+appName.toLowerCase()+"\\\",\\\"repository\\\": {\\\"type\\\": \\\"git\\\",\\\"url\\\": \\\""+giturl+"\\\"},\\\"description\\\":\\\".\\\",\\\"license\\\": \\\"LGPL-3.0-or-later\\\",\\\"dependencies\\\":{\\\"qcobjectsnewapp\\\":\\\"latest\\\",\\\"qcobjects\\\":\\\"latest\\\"}}\" > package.json";
+          let createAppCommandAMP = "echo \"{\\\"name\\\": \\\""+appName.toLowerCase()+"\\\",\\\"repository\\\": {\\\"type\\\": \\\"git\\\",\\\"url\\\": \\\""+giturl+"\\\"},\\\"description\\\":\\\".\\\",\\\"license\\\": \\\"LGPL-3.0-or-later\\\",\\\"dependencies\\\":{\\\"qcobjects-ecommerce-amp\\\":\\\"latest\\\",\\\"qcobjects\\\":\\\"latest\\\"}}\" > package.json";
+          let createAppCommand;
+          let appTemplateName;
 
-            let createAppCommandPWA = "echo \"{\\\"name\\\": \\\""+appName.toLowerCase()+"\\\",\\\"repository\\\": {\\\"type\\\": \\\"git\\\",\\\"url\\\": \\\""+giturl+"\\\"},\\\"description\\\":\\\".\\\",\\\"license\\\": \\\"LGPL-3.0-or-later\\\",\\\"dependencies\\\":{\\\"qcobjectsnewapp\\\":\\\"latest\\\",\\\"qcobjects\\\":\\\"latest\\\"}}\" > package.json";
-            let createAppCommandAMP = "echo \"{\\\"name\\\": \\\""+appName.toLowerCase()+"\\\",\\\"repository\\\": {\\\"type\\\": \\\"git\\\",\\\"url\\\": \\\""+giturl+"\\\"},\\\"description\\\":\\\".\\\",\\\"license\\\": \\\"LGPL-3.0-or-later\\\",\\\"dependencies\\\":{\\\"qcobjects-ecommerce-amp\\\":\\\"latest\\\",\\\"qcobjects\\\":\\\"latest\\\"}}\" > package.json";
-            let createAppCommand;
-            let appTemplateName;
+          if (options.createAmp){
+            appTemplateName = 'qcobjects-ecommerce-amp';
+            createAppCommand = createAppCommandAMP;
+          } else {
+            appTemplateName = 'qcobjectsnewapp';
+            createAppCommand = createAppCommandPWA;
+          }
+          CONFIG.set('qcobjectsnewapp_path',CONFIG.get('node_modules_path')+'/'+appTemplateName);
 
-            if (options.createAmp){
-              appTemplateName = 'qcobjects-ecommerce-amp';
-              createAppCommand = createAppCommandAMP;
-            } else {
-              appTemplateName = 'qcobjectsnewapp';
-              createAppCommand = createAppCommandPWA;
-            }
-            CONFIG.set('qcobjectsnewapp_path',CONFIG.get('node_modules_path')+'/'+appTemplateName);
-
-            logger.debug(createAppCommand);
-            exec(createAppCommand, (err, stdout, stderr) => {
+          logger.debug(createAppCommand);
+          exec(createAppCommand, (err, stdout, stderr) => {
+            console.log(stdout);
+            exec("npm cache verify && npm i --save-dev ", (err, stdout, stderr) => {
               console.log(stdout);
-              exec("npm cache verify && npm i --save-dev ", (err, stdout, stderr) => {
-                console.log(stdout);
-                Promise.resolve(switchCommander.copyTemplate()).then(()=>{
-                  logger.info('Good! Your application is getting done. You can play with QCObjects now!');
-                  logger.info('In about five seconds your server will start...');
-                  exec("qcobjects-createcert",(err,stdout,stderr)=>{
-                    logger.info("Test certificates generated");
-                    exec("npm uninstall "+appTemplateName+" --save && npm cache verify",(err,stdout,stderr)=>{
-                      switchCommander.generateServiceWorker(appName);
-                    });
+              Promise.resolve(switchCommander.copyTemplate()).then(()=>{
+                logger.info('Good! Your application is getting done. You can play with QCObjects now!');
+                logger.info('In about five seconds your server will start...');
+                exec("qcobjects-createcert",(err,stdout,stderr)=>{
+                  logger.info("Test certificates generated");
+                  exec("npm uninstall "+appTemplateName+" --save && npm cache verify",(err,stdout,stderr)=>{
+                    switchCommander.generateServiceWorker(appName);
                   });
                 });
               });
             });
-
           });
 
         });
-
 
       },
       publish:function (_appName){
