@@ -4,7 +4,10 @@
   "description": "qcobjects cli command line tool",
   "main": "qcobjects-cli.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jasmine",
+    "preversion": "npm test",
+    "version": "npm i --upgrade",
+    "postversion": "git push && git push --tags && npm publish"
   },
   "dependencies": {
     "commander": "^2.20.3",
@@ -49,5 +52,7 @@
     "qcobjects-createcert": "./qcobjects-createcert.js",
     "qcobjects-gae-server": "./qcobjects-gae-http-server.js"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "jasmine": "^3.5.0"
+  }
 }
