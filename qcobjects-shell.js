@@ -33,8 +33,12 @@ const path = require('path');
 const absolutePath = path.resolve( __dirname, "./" );
 
 const package_config = require(absolutePath+'/package.json');
+
 const vm = require('vm');
 require('qcobjects');
+const qcobjects_pkg_config = require('qcobjects/package.json');
+const qcobjects_sdk_pkg_config = require('qcobjects-sdk/package.json');
+
 let sandbox = {
   require:require,
   module:module,
@@ -74,7 +78,7 @@ if (process.stdin.isTTY)
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
-  prompt: 'QCObjects v'+package_config.version+'> '
+  prompt: 'QCObjects v'+qcobjects_pkg_config.version+', SDK: v'+qcobjects_sdk_pkg_config.version+', CLI: v'+package_config.version+'> '
 });
 
 const protected_symbols = [ 'clearInterval',
