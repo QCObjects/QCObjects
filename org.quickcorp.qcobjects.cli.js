@@ -275,7 +275,7 @@ Package('org.quickcorp.qcobjects.cli',[
             process.exit(0);
           });
           this.program.on('command:*', function () {
-            console.error('Invalid command: %s\nSee --help for a list of available commands.', program.args.join(' '));
+            console.error('Invalid command: %s\nSee --help for a list of available commands.', switchCommander.program.args.join(' '));
             process.exit(1);
           });
           this.program.parse(process.argv);
