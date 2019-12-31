@@ -193,7 +193,9 @@ Package('org.quickcorp.qcobjects.cli',[
             createAppCommand = createAppCommandPWA;
           }
           CONFIG.set('qcobjectsnewapp_path',CONFIG.get('node_modules_path')+'/'+appTemplateName);
-
+          if (!process.platform.toLowerCase().startsWith('win')){
+            createAppCommand = createAppCommand.replace(/(")/g, String.fromCharCode(92)+`\"`);
+          }
           logger.debug(createAppCommand);
           exec(createAppCommand, (err, stdout, stderr) => {
             console.log(stdout);
