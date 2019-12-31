@@ -153,8 +153,35 @@ Package('org.quickcorp.qcobjects.cli',[
           rl.close();
           let giturl = answer;
 
-          let createAppCommandPWA = "echo \"{\\\"name\\\": \\\""+appName.toLowerCase()+"\\\",\\\"repository\\\": {\\\"type\\\": \\\"git\\\",\\\"url\\\": \\\""+giturl+"\\\"},\\\"description\\\":\\\".\\\",\\\"license\\\": \\\"LGPL-3.0-or-later\\\",\\\"dependencies\\\":{\\\"qcobjectsnewapp\\\":\\\"latest\\\",\\\"qcobjects\\\":\\\"latest\\\"}}\" > package.json";
-          let createAppCommandAMP = "echo \"{\\\"name\\\": \\\""+appName.toLowerCase()+"\\\",\\\"repository\\\": {\\\"type\\\": \\\"git\\\",\\\"url\\\": \\\""+giturl+"\\\"},\\\"description\\\":\\\".\\\",\\\"license\\\": \\\"LGPL-3.0-or-later\\\",\\\"dependencies\\\":{\\\"qcobjects-ecommerce-amp\\\":\\\"latest\\\",\\\"qcobjects\\\":\\\"latest\\\"}}\" > package.json";
+          let createAppCommandPWA = `echo \
+{ \
+      "name": "`+appName.toLowerCase()+`", \
+      "repository": { \
+              "type": "git", \
+              "url": "`+giturl+`" \
+      }, \
+      "description": ".", \
+      "license": "LGPL-3.0-or-later", \
+      "dependencies": { \
+              "qcobjectsnewapp": "latest", \
+              "qcobjects": "latest" \
+      } \
+} > package.json`;
+
+          let createAppCommandAMP = `echo \
+{ \
+      "name": "`+appName.toLowerCase()+`", \
+      "repository": { \
+              "type": "git", \
+              "url": "`+giturl+`" \
+      }, \
+      "description": ".", \
+      "license": "LGPL-3.0-or-later", \
+      "dependencies": { \
+              "qcobjects-ecommerce-amp": "latest", \
+              "qcobjects": "latest" \
+      } \
+} > package.json`;
           let createAppCommand;
           let appTemplateName;
 

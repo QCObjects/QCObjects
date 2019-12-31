@@ -4,6 +4,7 @@
   "description": "qcobjects cli command line tool",
   "main": "qcobjects-cli.js",
   "scripts": {
+    "sync": "git add . && git commit -am ",
     "test": "jasmine",
     "preversion": "npm test",
     "version": "npm i --upgrade",
