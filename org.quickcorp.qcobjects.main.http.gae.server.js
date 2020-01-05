@@ -267,7 +267,7 @@ Package('org.quickcorp.qcobjects.main.http.gae.server',[
       console.log(welcometo);
       console.log(logo);
       console.log(instructions);
-      logger.info(this.showIPAddress());
+      logger.debug(this.showIPAddress());
       logger.info('Listening on HTTP PORT: '+CONFIG.get('serverPortHTTP').toString());
       logger.info('Go to: \n'+this.showPossibleURL());
 

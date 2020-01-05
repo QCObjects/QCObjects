@@ -194,7 +194,7 @@ Package('org.quickcorp.qcobjects.main.http2.server',[
       console.log(welcometo);
       console.log(logo);
       console.log(instructions);
-      logger.info(this.showIPAddress());
+      logger.debug(this.showIPAddress());
       logger.info('Listening on HTTP PORT: '+CONFIG.get('serverPortHTTP').toString());
       logger.info('Listening on HTTPS PORT: '+CONFIG.get('serverPortHTTPS').toString());
       logger.info('Go to: \n'+this.showPossibleURL());

@@ -40,8 +40,6 @@ console.log(welcometo);
 console.log(logo);
 console.log(instructions);
 
-logger.debugEnabled=true;
-
 require(absolutePath+'/org.quickcorp.qcobjects.cli');
 
 let switchCommander;
