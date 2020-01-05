@@ -206,29 +206,37 @@ Package('org.quickcorp.qcobjects.main.http2.server',[
         CONFIG.set('backendTimeout',CONFIG.get('backendTimeout') || 20000);
         stream.session.setTimeout(CONFIG.get('backendTimeout'));
         stream.session.setMaxListeners(9999999999);
-        stream.session.on('timeout', () => {
+        var timeoutHandler = () => {
           // end the stream on timeout
           try {
             if (!stream.destroyed){
               logger.info('A timeout occurred... '+CONFIG.get('backendTimeout').toString());
               logger.info('Killing session...');
               stream.respond([{
-                ':status': 408,
+                ':status': 500,
                 'content-type': 'text/html'
               }]);
-              stream.write('<h1>408 - REQUEST TIMEOUT</h1>');
+              stream.on('error',()=>{});
+              stream.write('<h1>500 - INTERNAL SERVER ERROR (TIMEOUT)</h1>');
               stream.end();
             } else {
               logger.debug('Session was normally finishing...');
             }
           }catch(e){
-            logger.info('An unhandled error occurred during timeout catching...');
-            logger.info(e.message);
+            logger.debug('An unhandled error occurred during timeout catching...');
+            logger.debug(e.message);
           }
 
-        });
+          if (!stream.destroyed){
+            stream.session.removeListener('timeout',timeoutHandler);
+          } else {
+            server.removeListener('timeout',timeoutHandler);
+          }
 
-
+        };
+        if (!stream.destroyed){
+          stream.session.on('timeout', timeoutHandler );
+        }
 
         stream.session.altsvc('h2=":8000"', stream.id);
         stream.session.altsvc('https=":'+CONFIG.get('serverPortHTTPS')+'"', stream.id);
@@ -262,6 +270,7 @@ Package('org.quickcorp.qcobjects.main.http2.server',[
                 basePath:CONFIG.get('basePath'),
                 projectPath:CONFIG.get('projectPath'),
                 route:route,
+                server:server,
                 stream:stream,
                 request:request
               });

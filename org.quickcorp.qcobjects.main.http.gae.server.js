@@ -275,22 +275,32 @@ Package('org.quickcorp.qcobjects.main.http.gae.server',[
         this.request.path = req.url;
         server.setMaxListeners(9999999999);
         CONFIG.set('backendTimeout',CONFIG.get('backendTimeout') || 20000);
-        server.setTimeout(CONFIG.get('backendTimeout'), ()=>{
+        var timeoutHandler = ()=>{
           // end the stream on timeout
           try {
-            logger.info('A timeout occurred...' + CONFIG.get('backendTimeout').toString());
-            logger.info('Killing session...');
-            res.respond([{
-              ':status': 408,
-              'content-type': 'text/html'
-            }]);
-            res.write('<h1>408 - REQUEST TIMEOUT</h1>');
-            res.end();
+            if (!res.destroyed){
+              logger.info('A timeout occurred...' + CONFIG.get('backendTimeout').toString());
+              logger.info('Killing session...');
+
+              res.writeHeader( 500, {
+                'content-type': 'text/html'
+              });
+              res.on('error',()=>{});
+              res.write('<h1>500 - INTERNAL SERVER ERROR (TIMEOUT)</h1>');
+              res.end();
+            } else {
+              logger.debug('Session was normally finishing...');
+            }
           }catch (e){
             logger.debug('An unhandled error occurred during timeout catching...');
             logger.debug(e.message);
           }
-        });
+          server.removeListener('timeout',timeoutHandler);
+
+        };
+        if (!res.destroyed){
+          server.setTimeout(CONFIG.get('backendTimeout'), timeoutHandler);
+        }
 
         if (this.request.pathname.indexOf('.')<0){
             this.request.scriptname = CONFIG.get('documentRootFileIndex');
