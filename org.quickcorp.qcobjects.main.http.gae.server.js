@@ -273,7 +273,24 @@ Package('org.quickcorp.qcobjects.main.http.gae.server',[
         this.request = request;
         this.request.method = req.method;
         this.request.path = req.url;
-
+        server.setMaxListeners(9999999999);
+        CONFIG.set('backendTimeout',CONFIG.get('backendTimeout') || 20000);
+        server.setTimeout(CONFIG.get('backendTimeout'), ()=>{
+          // end the stream on timeout
+          try {
+            logger.info('A timeout occurred...' + CONFIG.get('backendTimeout').toString());
+            logger.info('Killing session...');
+            res.respond([{
+              ':status': 408,
+              'content-type': 'text/html'
+            }]);
+            res.write('<h1>408 - REQUEST TIMEOUT</h1>');
+            res.end();
+          }catch (e){
+            logger.debug('An unhandled error occurred during timeout catching...');
+            logger.debug(e.message);
+          }
+        });
 
         if (this.request.pathname.indexOf('.')<0){
             this.request.scriptname = CONFIG.get('documentRootFileIndex');
