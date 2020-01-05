@@ -158,6 +158,20 @@ Package('org.quickcorp.qcobjects.main.http2.server',[
       });
       return _ret_;
     },
+    showPossibleURL: function (){
+      var _ret_ = '';
+      var os = require('os');
+      var ifaces = os.networkInterfaces();
+      Object.keys(ifaces).forEach(function (iface){
+        ifaces[iface].map(function (ipGroup){
+          if (ipGroup['family'].toLowerCase()=='ipv4'){
+            _ret_ += 'http://'+ipGroup['address']+':'+CONFIG.get('serverPortHTTP').toString()+'/\n';
+            _ret_ += 'https://'+ipGroup['address']+':'+CONFIG.get('serverPortHTTPS').toString()+'/\n';
+          }
+        });
+      });
+      return _ret_;
+    },
     start:function (){
       var server = this.server;
 
@@ -181,6 +195,9 @@ Package('org.quickcorp.qcobjects.main.http2.server',[
       console.log(logo);
       console.log(instructions);
       logger.info(this.showIPAddress());
+      logger.info('Listening on HTTP PORT: '+CONFIG.get('serverPortHTTP').toString());
+      logger.info('Listening on HTTPS PORT: '+CONFIG.get('serverPortHTTPS').toString());
+      logger.info('Go to: \n'+this.showPossibleURL());
 
       this.server = http2.createSecureServer({
         key: fs.readFileSync(CONFIG.get('private-key-pem')),

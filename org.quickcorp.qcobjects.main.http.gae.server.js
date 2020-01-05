@@ -242,6 +242,19 @@ Package('org.quickcorp.qcobjects.main.http.gae.server',[
       });
       return _ret_;
     },
+    showPossibleURL: function (){
+      var _ret_ = '';
+      var os = require('os');
+      var ifaces = os.networkInterfaces();
+      Object.keys(ifaces).forEach(function (iface){
+        ifaces[iface].map(function (ipGroup){
+          if (ipGroup['family'].toLowerCase()=='ipv4'){
+            _ret_ += 'http://'+ipGroup['address']+':'+CONFIG.get('serverPortHTTP').toString()+'/\n';
+          }
+        });
+      });
+      return _ret_;
+    },
     start:function (){
       var server = this.server;
       server.listen(process.env.PORT || CONFIG.get('serverPortHTTP'));
@@ -255,8 +268,8 @@ Package('org.quickcorp.qcobjects.main.http.gae.server',[
       console.log(logo);
       console.log(instructions);
       logger.info(this.showIPAddress());
-      logger.info('Listening in PORT: ');
-      logger.info(CONFIG.get('serverPortHTTP'));
+      logger.info('Listening on HTTP PORT: '+CONFIG.get('serverPortHTTP').toString());
+      logger.info('Go to: \n'+this.showPossibleURL());
 
       const http = require('http');
 
