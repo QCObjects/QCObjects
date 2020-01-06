@@ -229,10 +229,10 @@ Package('org.quickcorp.qcobjects.main.http2.server',[
             if (!stream.destroyed){
               logger.info('A timeout occurred... '+CONFIG.get('backendTimeout').toString());
               logger.info('Killing session...');
-              stream.respond([{
+              stream.respond({
                 ':status': 500,
                 'content-type': 'text/html'
-              }]);
+              });
               stream.on('error',()=>{});
               stream.write('<h1>500 - INTERNAL SERVER ERROR (TIMEOUT)</h1>');
               stream.end();
