@@ -28,22 +28,29 @@ const os = require('os');
 const { exec,execSync } = require('child_process');
 // MY_ENV_VAR="HELLO WORLD" php -f index.php
 
+let fixWinCmd = function (commandline){
+  if (!process.platform.toLowerCase().startsWith('win')){
+    commandline = commandline.replace(/(")/g, String.fromCharCode(92)+`\"`);
+  }
+  return commandline;
+}
+
 Package('org.quickcorp.backend.php',[
   Class('PHPMicroservice',BackendMicroservice,{
     body:null,
     tempFileName: '',
     get_php_headers_list:function (){
       var phpheaders = {
-        "QUERY_STRING":this.request.query,
-        "REDIRECT_STATUS":"200",
-        "REQUEST_METHOD":this.request.method,
-        "SCRIPT_FILENAME":this.request.scriptname,
-        "SCRIPT_NAME":this.request.scriptname,
-        "PATH_INFO":this.request.path,
-        "SERVER_NAME":this.request.hostname,
-        "SERVER_PROTOCOL":"HTTP/2",
-        "REQUEST_URI":this.request.href,
-        "HTTP_HOST":"localhost"
+        "QUERY_STRING":`${this.request.query}`,
+        "REDIRECT_STATUS":`200`,
+        "REQUEST_METHOD":`${this.request.method}`,
+        "SCRIPT_FILENAME":`${this.request.scriptname}`,
+        "SCRIPT_NAME":`${this.request.scriptname}`,
+        "PATH_INFO":`${this.request.path}`,
+        "SERVER_NAME":`${this.request.hostname}`,
+        "SERVER_PROTOCOL":`HTTP/2`,
+        "REQUEST_URI":`${this.request.href}`,
+        "HTTP_HOST":`${this.domain}`
       };
       function fixedEncodeURIComponent (str) {
         return encodeURIComponent(str).replace(/[!'()]/g, escape).replace(/\*/g, "%2A");
@@ -52,7 +59,7 @@ Package('org.quickcorp.backend.php',[
         if (!headername.startsWith(':')){
           var phpheadername = headername.toUpperCase().replace(new RegExp('-','g'),'_');
           var headervalue = this.request.headers[headername];
-          phpheaders['HTTP_'+phpheadername] = fixedEncodeURIComponent(headervalue);
+          phpheaders['HTTP_'+phpheadername] = `${fixedEncodeURIComponent(headervalue)}`;
         }
       }
 
@@ -79,15 +86,25 @@ Package('org.quickcorp.backend.php',[
           process.chdir(CONFIG.get('documentRoot')+microservice.request.pathname.slice(1));
         } catch (e){}
 
-        var commandline = microservice.get_php_headers_list()+' php -r \' \
-$_tmptransferfile = \''+microservice.tempFileName+'\'; \
-$_payload = file_get_contents(sys_get_temp_dir().$_tmptransferfile); \
-foreach ($_SERVER as $_k => $_v) {if ( substr($_k, 0, strlen(\'HTTP_\')) == \'HTTP_\' ){$_SERVER[$_k]=urldecode($_v);}} \
-@parse_str(parse_url("?".$_payload, PHP_URL_QUERY), $_REQUEST); \
-@parse_str(parse_url("?".$_payload, PHP_URL_QUERY), $_GET); \
-unlink(sys_get_temp_dir().$_tmptransferfile); \
-@include_once("'+microservice.request.scriptname+'");\' qcobjects=1';
-        logger.debug(commandline);
+        var scriptFileName = (microservice.route.hasOwnProperty('redirect_to')
+          && microservice.route.redirect_to !== '')?(microservice.route.redirect_to):(microservice.request.scriptname);
+
+        var commandline = microservice.get_php_headers_list()+` php -q <<- 'EOF'
+<?php
+$_payload = file_get_contents(sys_get_temp_dir().'${microservice.tempFileName}');
+foreach ($_SERVER as $_k => $_v) {
+  if ( substr($_k, 0, strlen('HTTP_')) == 'HTTP_' ){
+    $_SERVER[$_k]=urldecode($_v);
+  }
+}
+@parse_str(parse_url('?'.$_payload, PHP_URL_QUERY), $_REQUEST);
+@parse_str(parse_url('?'.$_payload, PHP_URL_QUERY), $_GET);
+unlink(sys_get_temp_dir().'${microservice.tempFileName}');
+@include_once('${scriptFileName}');
+?>
+EOF`
+        commandline = fixWinCmd(commandline);
+//        logger.debug(commandline);
         try {
           microservice.body = execSync(commandline).toString();
         } catch (ex){
@@ -110,15 +127,27 @@ unlink(sys_get_temp_dir().$_tmptransferfile); \
         try {
           process.chdir(CONFIG.get('documentRoot')+microservice.request.pathname.slice(1));
         } catch (e){}
-        var commandline = microservice.get_php_headers_list()+' php -r \' \
-$_tmptransferfile = \''+microservice.tempFileName+'\'; \
-$_payload = file_get_contents(sys_get_temp_dir().$_tmptransferfile); \
-foreach ($_SERVER as $_k => $_v) {if ( substr($_k, 0, strlen(\'HTTP_\')) == \'HTTP_\' ){$_SERVER[$_k]=urldecode($_v);}} \
-@parse_str(parse_url("?".$_payload, PHP_URL_QUERY), $_REQUEST); \
-@parse_str(parse_url("?".$_payload, PHP_URL_QUERY), $_POST); \
-unlink(sys_get_temp_dir().$_tmptransferfile); \
-@include_once("'+microservice.request.scriptname+'");\' qcobjects=1';
-        logger.debug(commandline);
+
+        var scriptFileName = (microservice.route.hasOwnProperty('redirect_to')
+          && microservice.route.redirect_to !== '')?(microservice.route.redirect_to):(microservice.request.scriptname);
+
+        var commandline = microservice.get_php_headers_list()+` php -q <<- 'EOF'
+<?php
+$_payload = file_get_contents(sys_get_temp_dir().'${microservice.tempFileName}');
+foreach ($_SERVER as $_k => $_v) {
+  if ( substr($_k, 0, strlen('HTTP_')) == 'HTTP_' ){
+    $_SERVER[$_k]=urldecode($_v);
+  }
+}
+@parse_str(parse_url('?'.$_payload, PHP_URL_QUERY), $_REQUEST);
+@parse_str(parse_url('?'.$_payload, PHP_URL_QUERY), $_POST);
+unlink(sys_get_temp_dir().'${microservice.tempFileName}');
+@include_once('${scriptFileName}');
+?>
+EOF`
+        commandline = fixWinCmd(commandline);
+//        logger.debug(commandline);
+
         try {
           microservice.body = execSync(commandline).toString();
         } catch (ex){

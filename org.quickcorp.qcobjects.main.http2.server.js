@@ -33,6 +33,15 @@ const fs = require('fs');
 const mime = require("mime");
 require(absolutePath+'/org.quickcorp.qcobjects.main.file.js');
 
+let ImportMicroservice = function (microservicePackage){
+  var standardPath = findPackageNodePath(microservicePackage);
+  if (standardPath !== null){
+    Import (microservicePackage);
+  } else {
+    Import (absolutePath+'/backend/'+microservicePackage);
+  }
+}
+
 Package('org.quickcorp.qcobjects.main.http2.server',[
   Class('PipeLog',{
     pipe:(o)=>{
@@ -281,10 +290,7 @@ Package('org.quickcorp.qcobjects.main.http2.server',[
           let selectedRoute = routes.filter(route=>{return (new RegExp(route.path,'g')).test(request.path)});
           if (selectedRoute.length>0){
             selectedRoute.map(route=>{
-              Import (route.microservice);
-              if (typeof Package(route.microservice) == 'undefined' ){
-                Import (absolutePath+'/backend/'+route.microservice);
-              }
+              ImportMicroservice (route.microservice);
               var microServiceClassFactory = ClassFactory(route.microservice+'.Microservice');
               this.response = New(microServiceClassFactory,{
                 domain:CONFIG.get('domain'),
