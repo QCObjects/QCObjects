@@ -77,6 +77,15 @@ Package('org.quickcorp.backend.php',[
       this.tempFileName = 'temp' + Date.now().toString();
       return this.tempFileName;
     },
+    trimSlash:function (pathname){
+      if (pathname.startsWith('/')){
+        pathname = pathname.slice(1);
+      }
+      if (pathname.endsWith('/')){
+        pathname = pathname.slice(0,-1);
+      }
+      return pathname.replace('//','/');
+    },
     get:function (){
       var microservice = this;
       microservice.generateTempFileName();
@@ -88,8 +97,28 @@ Package('org.quickcorp.backend.php',[
 
         var scriptFileName = (microservice.route.hasOwnProperty('redirect_to')
           && microservice.route.redirect_to !== '')?(microservice.route.redirect_to):(microservice.request.scriptname);
+        var pathname = this.trimSlash(microservice.request.pathname);
+        var documentRoot = CONFIG.get('documentRoot','');
+        if (documentRoot == './'){
+          documentRoot = '';
+        }
 
-        var commandline = microservice.get_php_headers_list()+` php -q <<- 'EOF'
+        var scriptFilePath;
+        if (documentRoot !== ''){
+          scriptFilePath = `${documentRoot}/${pathname}/${scriptFileName}`;
+        } else {
+          scriptFilePath = `${pathname}/${scriptFileName}`;
+        }
+
+        scriptFilePath = scriptFilePath.replace('//','/');
+        if (scriptFilePath.startsWith('/') && !documentRoot.startsWith('/')){
+          scriptFilePath = scriptFilePath.slice(1);
+        }
+
+        logger.debug(`Loading PHP file: ${scriptFilePath}`);
+        var PHPIncludePath = `.:${CONFIG.get('documentRoot')}:${CONFIG.get('projectPath')}`;
+
+        var commandline = microservice.get_php_headers_list()+` php -d include_path="${PHPIncludePath}" -q <<- 'EOF'
 <?php
 $_payload = file_get_contents(sys_get_temp_dir().'${microservice.tempFileName}');
 foreach ($_SERVER as $_k => $_v) {
@@ -100,11 +129,11 @@ foreach ($_SERVER as $_k => $_v) {
 @parse_str(parse_url('?'.$_payload, PHP_URL_QUERY), $_REQUEST);
 @parse_str(parse_url('?'.$_payload, PHP_URL_QUERY), $_GET);
 unlink(sys_get_temp_dir().'${microservice.tempFileName}');
-@include_once('${scriptFileName}');
+include('${scriptFilePath}');
 ?>
 EOF`
         commandline = fixWinCmd(commandline);
-//        logger.debug(commandline);
+        logger.debug(commandline);
         try {
           microservice.body = execSync(commandline).toString();
         } catch (ex){
@@ -130,8 +159,28 @@ EOF`
 
         var scriptFileName = (microservice.route.hasOwnProperty('redirect_to')
           && microservice.route.redirect_to !== '')?(microservice.route.redirect_to):(microservice.request.scriptname);
+        var pathname = this.trimSlash(microservice.request.pathname);
+        var documentRoot = CONFIG.get('documentRoot','');
+        if (documentRoot == './'){
+          documentRoot = '';
+        }
 
-        var commandline = microservice.get_php_headers_list()+` php -q <<- 'EOF'
+        var scriptFilePath;
+        if (documentRoot !== ''){
+          scriptFilePath = `${documentRoot}/${pathname}/${scriptFileName}`;
+        } else {
+          scriptFilePath = `${pathname}/${scriptFileName}`;
+        }
+
+        scriptFilePath = scriptFilePath.replace('//','/');
+        if (scriptFilePath.startsWith('/') && !documentRoot.startsWith('/')){
+          scriptFilePath = scriptFilePath.slice(1);
+        }
+
+        logger.debug(`Loading PHP file: ${scriptFilePath}`);
+        var PHPIncludePath = `.:${CONFIG.get('documentRoot')}:${CONFIG.get('projectPath')}`;
+
+        var commandline = microservice.get_php_headers_list()+` php -d include_path="${PHPIncludePath}" -q <<- 'EOF'
 <?php
 $_payload = file_get_contents(sys_get_temp_dir().'${microservice.tempFileName}');
 foreach ($_SERVER as $_k => $_v) {
@@ -142,7 +191,7 @@ foreach ($_SERVER as $_k => $_v) {
 @parse_str(parse_url('?'.$_payload, PHP_URL_QUERY), $_REQUEST);
 @parse_str(parse_url('?'.$_payload, PHP_URL_QUERY), $_POST);
 unlink(sys_get_temp_dir().'${microservice.tempFileName}');
-@include_once('${scriptFileName}');
+@include('${scriptFilePath}');
 ?>
 EOF`
         commandline = fixWinCmd(commandline);
