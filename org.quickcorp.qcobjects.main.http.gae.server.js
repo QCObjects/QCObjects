@@ -331,6 +331,9 @@ Package('org.quickcorp.qcobjects.main.http.gae.server',[
           if (selectedRoute.length>0){
             selectedRoute.map(route=>{
               Import (route.microservice);
+              if (typeof Package(route.microservice) == 'undefined' ){
+                Import (absolutePath+'/backend/'+route.microservice);
+              }
               var microServiceClassFactory = ClassFactory(route.microservice+'.Microservice');
               this.response = New(microServiceClassFactory,{
                 domain:CONFIG.get('domain'),
