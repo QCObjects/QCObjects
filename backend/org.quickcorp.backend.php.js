@@ -44,10 +44,10 @@ Package('org.quickcorp.backend.php',[
         "QUERY_STRING":`${this.request.query}`,
         "REDIRECT_STATUS":`200`,
         "REQUEST_METHOD":`${this.request.method}`,
-        "SCRIPT_FILENAME":`${this.request.scriptname}`,
-        "SCRIPT_NAME":`${this.request.scriptname}`,
+        "SCRIPT_FILENAME":`${this.scriptFilePath}`,
+        "SCRIPT_NAME":`${this.scriptFilePath.toString()}`,
         "PATH_INFO":`${this.request.path}`,
-        "SERVER_NAME":`${this.request.hostname}`,
+        "SERVER_NAME":`${this.domain}`,
         "SERVER_PROTOCOL":`HTTP/2`,
         "REQUEST_URI":`${this.request.href}`,
         "HTTP_HOST":`${this.domain}`
@@ -59,7 +59,10 @@ Package('org.quickcorp.backend.php',[
         if (!headername.startsWith(':')){
           var phpheadername = headername.toUpperCase().replace(new RegExp('-','g'),'_');
           var headervalue = this.request.headers[headername];
-          phpheaders['HTTP_'+phpheadername] = `${fixedEncodeURIComponent(headervalue)}`;
+          if (typeof headervalue != 'string'){
+            headervalue = JSON.stringify(headervalue);
+          }
+          phpheaders['HTTP_'+phpheadername] = fixedEncodeURIComponent(headervalue);
         }
       }
 
@@ -118,10 +121,15 @@ Package('org.quickcorp.backend.php',[
         logger.debug(`Loading PHP file: ${scriptFilePath}`);
         var PHPIncludePath = `.:${CONFIG.get('documentRoot')}:${CONFIG.get('projectPath')}`;
 
+        microservice.scriptFilePath = scriptFilePath;
+
         var commandline = microservice.get_php_headers_list()+` php -d include_path="${PHPIncludePath}" -q <<- 'EOF'
 <?php
 $_payload = file_get_contents(sys_get_temp_dir().'${microservice.tempFileName}');
 foreach ($_SERVER as $_k => $_v) {
+  if (array_key_exists($_k,$_ENV)){
+    $_SERVER[$_k] = $_ENV[$_k];
+  }
   if ( substr($_k, 0, strlen('HTTP_')) == 'HTTP_' ){
     $_SERVER[$_k]=urldecode($_v);
   }
@@ -180,10 +188,15 @@ EOF`
         logger.debug(`Loading PHP file: ${scriptFilePath}`);
         var PHPIncludePath = `.:${CONFIG.get('documentRoot')}:${CONFIG.get('projectPath')}`;
 
+        microservice.scriptFilePath = scriptFilePath;
+
         var commandline = microservice.get_php_headers_list()+` php -d include_path="${PHPIncludePath}" -q <<- 'EOF'
 <?php
 $_payload = file_get_contents(sys_get_temp_dir().'${microservice.tempFileName}');
 foreach ($_SERVER as $_k => $_v) {
+  if (array_key_exists($_k,$_ENV)){
+    $_SERVER[$_k] = $_ENV[$_k];
+  }
   if ( substr($_k, 0, strlen('HTTP_')) == 'HTTP_' ){
     $_SERVER[$_k]=urldecode($_v);
   }
