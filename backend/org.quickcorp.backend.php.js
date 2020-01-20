@@ -145,7 +145,7 @@ EOF`
         try {
           microservice.body = execSync(commandline).toString();
         } catch (ex){
-          microservice.body = '';
+          microservice.body = '500 - INTERNAL ERROR';
           logger.debug(ex.toString());
           console.log(ex);
         }
@@ -213,7 +213,7 @@ EOF`
         try {
           microservice.body = execSync(commandline).toString();
         } catch (ex){
-          microservice.body = '';
+          microservice.body = '500 - INTERNAL ERROR';
           logger.debug(ex.toString());
         }
         microservice.done();
