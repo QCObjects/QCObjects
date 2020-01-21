@@ -230,7 +230,11 @@ EOF`
     done: function(){
       var microservice = this;
       var stream = microservice.stream;
-      stream.respond(microservice.headers);
+      try {
+        stream.respond(microservice.headers);
+      } catch (e){
+        // 
+      }
       if (microservice.body != null){
         microservice.finishWithBody.call(microservice,stream);
       }
