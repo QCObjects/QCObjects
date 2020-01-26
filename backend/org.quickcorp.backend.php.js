@@ -143,13 +143,17 @@ EOF`
         commandline = fixWinCmd(commandline);
         logger.debug(commandline);
         try {
-          microservice.body = execSync(commandline).toString();
+          let php = exec(commandline,(err,stdout,stderr)=>{
+            microservice.body = stdout;
+            console.log(stderr);
+            microservice.done();
+          });
         } catch (ex){
           microservice.body = '500 - INTERNAL ERROR';
           logger.debug(ex.toString());
           console.log(ex);
+          microservice.done();
         }
-        microservice.done();
 
       });
 
@@ -233,7 +237,7 @@ EOF`
       try {
         stream.respond(microservice.headers);
       } catch (e){
-        // 
+        //
       }
       if (microservice.body != null){
         microservice.finishWithBody.call(microservice,stream);
