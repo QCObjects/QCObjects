@@ -123,7 +123,7 @@ Package('org.quickcorp.backend.php',[
 
         microservice.scriptFilePath = scriptFilePath;
 
-        var commandline = microservice.get_php_headers_list()+` php -d include_path="${PHPIncludePath}" -q <<- 'EOF'
+        var commandline = `echo $(cat ${os.tmpdir()}${microservice.tempFileName}) |` + microservice.get_php_headers_list()+` php -d include_path="${PHPIncludePath}" -q <<- 'EOF'
 <?php
 $_payload = file_get_contents(sys_get_temp_dir().'${microservice.tempFileName}');
 foreach ($_SERVER as $_k => $_v) {
@@ -194,7 +194,7 @@ EOF`
 
         microservice.scriptFilePath = scriptFilePath;
 
-        var commandline = microservice.get_php_headers_list()+` php -d include_path="${PHPIncludePath}" -q <<- 'EOF'
+        var commandline = `echo $(cat ${os.tmpdir()}${microservice.tempFileName}) |` + microservice.get_php_headers_list()+` php -d include_path="${PHPIncludePath}" -q <<- 'EOF'
 <?php
 $_payload = file_get_contents(sys_get_temp_dir().'${microservice.tempFileName}');
 foreach ($_SERVER as $_k => $_v) {
