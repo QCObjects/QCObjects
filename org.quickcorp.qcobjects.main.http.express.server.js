@@ -33,7 +33,7 @@ const fs = require('fs');
 const mime = require("mime");
 require(absolutePath+'/org.quickcorp.qcobjects.main.file.js');
 let ImportMicroservice = function (microservicePackage){
-  var standardPath = findPackageNodePath(microservicePackage);
+  var standardPath = findPackageNodePath(microservicePackage) || findPackageNodePath(microservicePackage+'.js');
   if (standardPath !== null){
     Import (microservicePackage);
   } else {
