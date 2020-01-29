@@ -289,8 +289,8 @@ Package('org.quickcorp.qcobjects.main.http2.server',[
           let routes = CONFIG.get('backend').routes;
           let selectedRoute = routes.filter(route=>{return (new RegExp(route.path,'g')).test(request.path)});
           if (selectedRoute.length>0){
-            let selectedRouteParams = {...[...request.path.matchAll((new RegExp( route.path ,'g')))][0]['groups']};
             selectedRoute.map(route=>{
+              let selectedRouteParams = {...[...request.path.matchAll((new RegExp( route.path ,'g')))][0]['groups']};
               ImportMicroservice (route.microservice);
               var microServiceClassFactory = ClassFactory(route.microservice+'.Microservice');
               this.response = New(microServiceClassFactory,{
