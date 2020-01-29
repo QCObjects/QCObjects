@@ -337,6 +337,7 @@ Package('org.quickcorp.qcobjects.main.http.gae.server',[
           let routes = CONFIG.get('backend').routes;
           let selectedRoute = routes.filter(route=>{return (new RegExp(route.path,'g')).test(request.path)});
           if (selectedRoute.length>0){
+            let selectedRouteParams = {...[...request.path.matchAll((new RegExp( route.path ,'g')))][0]['groups']};
             selectedRoute.map(route=>{
               ImportMicroservice (route.microservice);
               var microServiceClassFactory = ClassFactory(route.microservice+'.Microservice');
@@ -345,6 +346,7 @@ Package('org.quickcorp.qcobjects.main.http.gae.server',[
                 basePath:CONFIG.get('basePath'),
                 projectPath:CONFIG.get('projectPath'),
                 route:route,
+                routeParams:selectedRouteParams,
                 server:server,
                 stream:res,
                 request:request
