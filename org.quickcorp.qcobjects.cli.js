@@ -160,7 +160,8 @@ Package('org.quickcorp.qcobjects.cli',[
               "type": "git", \
               "url": "`+giturl+`" \
       }, \
-      "description": ".", \
+      "description": "Awesome PWA application that will help you achieve your dreams.", \
+      "main": "js/init.js", \
       "license": "LGPL-3.0-or-later", \
       "dependencies": { \
               "qcobjectsnewapp": "latest", \
@@ -175,19 +176,48 @@ Package('org.quickcorp.qcobjects.cli',[
               "type": "git", \
               "url": "`+giturl+`" \
       }, \
-      "description": ".", \
+      "description": "Awesome AMP application that will help you achieve your dreams.", \
+      "main": "js/init.js", \
       "license": "LGPL-3.0-or-later", \
       "dependencies": { \
               "qcobjects-ecommerce-amp": "latest", \
               "qcobjects": "latest" \
       } \
 } > package.json`;
+
+          let createAppCommandPHP = `echo \
+{ \
+      "name": "${appName.toLowerCase()}", \
+      "repository": {\
+          "type": "git",\
+          "url": "${giturl}"\
+      },\
+      "description": "Awesome PHP application that will help you achieve your dreams.",\
+      "main": "js/init.js",\
+      "license": "LGPL-3.0-or-later",\
+      "devDependencies": {\
+        "jasmine": "latest",\
+        "qcobjects-cli": "latest"\
+      },\
+      "dependencies": {\
+        "qcobjectsnewphp": "latest",\
+        "qcobjects": "latest",\
+        "qcobjects-sdk": "latest"\
+      }\
+} > package.json`;
+
           let createAppCommand;
           let appTemplateName;
 
           if (options.createAmp){
             appTemplateName = 'qcobjects-ecommerce-amp';
             createAppCommand = createAppCommandAMP;
+          } else if (options.createPwa){
+            appTemplateName = 'qcobjectsnewapp';
+            createAppCommand = createAppCommandPWA;
+          } else if (options.createPhp){
+            appTemplateName = 'qcobjectsnewphp';
+            createAppCommand = createAppCommandPHP;
           } else {
             appTemplateName = 'qcobjectsnewapp';
             createAppCommand = createAppCommandPWA;
@@ -232,6 +262,7 @@ Package('org.quickcorp.qcobjects.cli',[
           .description('Creates an app with <appname>')
           .option('--pwa, --create-pwa', 'Creates the progressive web app assets')
           .option('--amp, --create-amp', 'Creates the accelerated mobile pages assets')
+          .option('--php, --create-php', 'Creates the PWA PHP assets')
           .option('--tests, --create-tests', 'Creates the test suite')
           .action(function(args, options){
               switchCommander.choiceOption.create.call(switchCommander,args,options);
@@ -240,6 +271,7 @@ Package('org.quickcorp.qcobjects.cli',[
           .description('Publishes an app with <appname>')
           .option('--pwa, --create-pwa', 'Publishes the progressive web app assets')
           .option('--amp, --create-amp', 'Publishes the accelerated mobile pages assets')
+          .option('--php, --create-php', 'Creates the PWA PHP assets')
           .option('--tests, --create-tests', 'Publishes the test suite')
           .action(function(args, options){
               switchCommander.choiceOption.publish.call(switchCommander,args,options);
