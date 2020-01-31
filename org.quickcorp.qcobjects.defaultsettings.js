@@ -36,25 +36,20 @@ CONFIG.set('allowHTTP1',true);
 CONFIG.set('useTemplate',false);
 CONFIG.set('domain','localhost');
 
-try {
-  const _config = require(CONFIG.get('projectPath')+'config.json');
-  logger.debug('Loading settings from your config.json');
-  for (var k in _config){
-    CONFIG.set(k,_config[k]);
-  }
-  if (typeof CONFIG.get('devmode') !== 'undefined'){
+let setDevMode = function (devmode){
+  if (typeof devmode !== 'undefined'){
     switch (true) {
-      case CONFIG.get('devmode')=='debug':
+      case devmode=='debug':
         logger.debugEnabled = true;
         logger.warnEnabled = true;
         logger.infoEnabled = true;
         break;
-      case CONFIG.get('devmode')=='warn':
+      case devmode=='warn':
         logger.debugEnabled = false;
         logger.warnEnabled = true;
         logger.infoEnabled = true;
         break;
-      case CONFIG.get('devmode')=='info':
+      case devmode=='info':
         logger.debugEnabled = false;
         logger.warnEnabled = false;
         logger.infoEnabled = true;
@@ -71,6 +66,24 @@ try {
     logger.warnEnabled = false;
     logger.infoEnabled = false;
   }
+
+}
+
+try {
+  var _config = require(CONFIG.get('projectPath')+'config.json');
+  logger.debug('Loading settings from your config.json');
+
+  let _secretKey = (_config.hasOwnProperty('domain'))?(_config['domain']):('_secret_');
+
+  if (_config.hasOwnProperty('__encoded__')) {
+    _config = JSON.parse(_Crypt.decrypt(_config.__encoded__, _secretKey));
+  }
+  for (var k in _config){
+    CONFIG.set(k,_config[k]);
+  }
+
+  setDevMode(CONFIG.get('devmode',''));
+
   if (typeof CONFIG.get('backend') !== 'undefined'){
     global.set('backendAvailable',true);
 
