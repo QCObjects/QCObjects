@@ -153,6 +153,23 @@ Package('org.quickcorp.qcobjects.cli',[
           rl.close();
           let giturl = answer;
 
+          let createAppCommandCustom = `echo \
+{ \
+      "name": "`+appName.toLowerCase()+`", \
+      "repository": { \
+              "type": "git", \
+              "url": "`+giturl+`" \
+      }, \
+      "description": "This is a custom NPM template app from ${options.createCustom} generated with QCObjects.", \
+      "main": "js/init.js", \
+      "license": "LGPL-3.0-or-later", \
+      "dependencies": { \
+              "${options.createCustom}": "latest", \
+              "qcobjects": "latest" \
+      } \
+} > package.json`;
+
+
           let createAppCommandPWA = `echo \
 { \
       "name": "`+appName.toLowerCase()+`", \
@@ -218,6 +235,9 @@ Package('org.quickcorp.qcobjects.cli',[
           } else if (options.createPhp){
             appTemplateName = 'qcobjectsnewphp';
             createAppCommand = createAppCommandPHP;
+          } else if (options.createCustom){
+            appTemplateName = options.createCustom;
+            createAppCommand = createAppCommandCustom;
           } else {
             appTemplateName = 'qcobjectsnewapp';
             createAppCommand = createAppCommandPWA;
@@ -263,6 +283,7 @@ Package('org.quickcorp.qcobjects.cli',[
           .option('--pwa, --create-pwa', 'Creates the progressive web app assets')
           .option('--amp, --create-amp', 'Creates the accelerated mobile pages assets')
           .option('--php, --create-php', 'Creates the PWA PHP assets')
+          .option('--custom, --create-custom <templateappname>', 'Creates an App from any NPM package template')
           .option('--tests, --create-tests', 'Creates the test suite')
           .action(function(args, options){
               switchCommander.choiceOption.create.call(switchCommander,args,options);
@@ -272,6 +293,7 @@ Package('org.quickcorp.qcobjects.cli',[
           .option('--pwa, --create-pwa', 'Publishes the progressive web app assets')
           .option('--amp, --create-amp', 'Publishes the accelerated mobile pages assets')
           .option('--php, --create-php', 'Creates the PWA PHP assets')
+          .option('--custom, --create-custom', 'Creates an App from any NPM package template')
           .option('--tests, --create-tests', 'Publishes the test suite')
           .action(function(args, options){
               switchCommander.choiceOption.publish.call(switchCommander,args,options);
