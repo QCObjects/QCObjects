@@ -15,7 +15,8 @@
     "handlebars": "^4.5.3",
     "mime": "^2.4.4",
     "qcobjects": "latest",
-    "qcobjects-sdk": "latest"
+    "qcobjects-sdk": "latest",
+    "yaml": "^1.8.0"
   },
   "repository": {
     "type": "git",
