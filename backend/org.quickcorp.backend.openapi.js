@@ -69,7 +69,7 @@ Package('org.quickcorp.backend.openapi.json',[
           var openapipath = {};
           if (route.supported_methods){
             route.supported_methods.map(function (supportedmethod){
-              openapipath[supportedmethod] = {
+              openapipath[supportedmethod.toLowerCase()] = {
                 "summary" : route.name,
                 "description" : route.description,
                 "parameters" : openapiparams,
