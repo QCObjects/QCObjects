@@ -66,8 +66,23 @@ Package('org.quickcorp.backend.openapi.json',[
             }
           });
 
-          var openapipath = {
-            "get" : {
+          var openapipath = {};
+          if (route.supported_methods){
+            route.supported_methods.map(function (supportedmethod){
+              openapipath[supportedmethod] = {
+                "summary" : route.name,
+                "description" : route.description,
+                "parameters" : openapiparams,
+                "responses" : {
+                  "200" : {
+                    "description" : "OK"
+                  }
+                },
+                "security" : [ "read", "write" ]
+              };
+            });
+          } else {
+            openapipath["get"] = {
               "summary" : route.name,
               "description" : route.description,
               "parameters" : openapiparams,
@@ -76,9 +91,10 @@ Package('org.quickcorp.backend.openapi.json',[
                   "description" : "OK"
                 }
               },
-              "security" : [ ]
-            }
-          };
+              "security" : [ "read", "write" ]
+            };
+          }
+
           openapipaths[openapipathname] = openapipath;
         }
       );
