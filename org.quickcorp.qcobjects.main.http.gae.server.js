@@ -339,7 +339,8 @@ Package('org.quickcorp.qcobjects.main.http.gae.server',[
           let selectedRoute = routes.filter(route=>{return (new RegExp(route.path,'g')).test(request.path)});
           if (selectedRoute.length>0){
             selectedRoute.map(route=>{
-              let selectedRouteParams = {...[...request.path.matchAll((new RegExp( route.path ,'g')))][0]['groups']};
+              let standardRoutePath = route.path.replace(/{(.*?)}/g,'\(\?\<$1\>\.\*\)'); //allowing {param}
+              let selectedRouteParams = {...[...request.path.matchAll((new RegExp( standardRoutePath ,'g')))][0]['groups']};
               ImportMicroservice (route.microservice);
               var microServiceClassFactory = ClassFactory(route.microservice+'.Microservice');
               this.response = New(microServiceClassFactory,{
