@@ -287,10 +287,11 @@ Package('org.quickcorp.qcobjects.main.http2.server',[
         if (global.get('backendAvailable')){
           logger.info('Backend Microservices Available');
           let routes = CONFIG.get('backend').routes;
-          let selectedRoute = routes.filter(route=>{return (new RegExp(route.path,'g')).test(request.path)});
+          let selectedRoute = routes.filter(route=>{let standardRoutePath = route.path.replace(/{(.*?)}/g,'\(\?\<$1\>\.\*\)');return (new RegExp(standardRoutePath,'g')).test(request.path)});
           if (selectedRoute.length>0){
             selectedRoute.map(route=>{
               let standardRoutePath = route.path.replace(/{(.*?)}/g,'\(\?\<$1\>\.\*\)'); //allowing {param}
+              console.log(standardRoutePath);
               let selectedRouteParams = {...[...request.path.matchAll((new RegExp( standardRoutePath ,'g')))][0]['groups']};
               ImportMicroservice (route.microservice);
               var microServiceClassFactory = ClassFactory(route.microservice+'.Microservice');

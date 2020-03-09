@@ -335,7 +335,7 @@ Package('org.quickcorp.qcobjects.main.http.gae.server',[
         if (global.get('backendAvailable')){
           logger.info('Backend GAE Microservices Available');
           let routes = CONFIG.get('backend').routes;
-          let selectedRoute = routes.filter(route=>{return (new RegExp(route.path,'g')).test(request.path)});
+          let selectedRoute = routes.filter(route=>{let standardRoutePath = route.path.replace(/{(.*?)}/g,'\(\?\<$1\>\.\*\)');return (new RegExp(standardRoutePath,'g')).test(request.path)});
           if (selectedRoute.length>0){
             selectedRoute.map(route=>{
               let standardRoutePath = route.path.replace(/{(.*?)}/g,'\(\?\<$1\>\.\*\)'); //allowing {param}
