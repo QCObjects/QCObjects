@@ -29,14 +29,6 @@ const path = require('path');
 const absolutePath = path.resolve( __dirname, "./" );
 
 const { exec,execSync } = require('child_process');
-// MY_ENV_VAR="HELLO WORLD" php -f index.php
-
-let fixWinCmd = function (commandline){
-  if (!process.platform.toLowerCase().startsWith('win')){
-    commandline = commandline.replace(/(")/g, String.fromCharCode(92)+`\"`);
-  }
-  return commandline;
-}
 
 Import (absolutePath + '/org.quickcorp.backend.openapi');
 

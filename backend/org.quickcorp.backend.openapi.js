@@ -26,16 +26,8 @@
 const fs = require('fs');
 const os = require('os');
 const { exec,execSync } = require('child_process');
-// MY_ENV_VAR="HELLO WORLD" php -f index.php
 
-let fixWinCmd = function (commandline){
-  if (!process.platform.toLowerCase().startsWith('win')){
-    commandline = commandline.replace(/(")/g, String.fromCharCode(92)+`\"`);
-  }
-  return commandline;
-}
-
-Package('org.quickcorp.backend.openapi.json',[
+Package('org.quickcorp.backend.openapi',[
   Class('OpenAPIMicroservice',BackendMicroservice,{
     body:null,
     tempFileName: '',
@@ -107,12 +99,12 @@ Package('org.quickcorp.backend.openapi.json',[
         },
         "servers" : [
           {
-            "url" : `http://${CONFIG.get('domain')}/`,
-            "description" : "QCObjects Open API V3 HTTP"
-          },
-          {
             "url" : `https://${CONFIG.get('domain')}/`,
             "description" : "QCObjects Open API V3 HTTPS"
+          },
+          {
+            "url" : `http://${CONFIG.get('domain')}/`,
+            "description" : "QCObjects Open API V3 HTTP"
           }
        ],
         "security" : [ {

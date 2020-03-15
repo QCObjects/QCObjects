@@ -25,36 +25,46 @@
 "use strict";
 const fs = require('fs');
 const os = require('os');
-const path = require('path');
-const absolutePath = path.resolve( __dirname, "./" );
-const yaml = require('yaml');
 const { exec,execSync } = require('child_process');
 
-Import (absolutePath + '/org.quickcorp.backend.openapi');
 
-Package('org.quickcorp.backend.openapi.yaml',[
-  Class('OpenAPIYAMLMicroservice',OpenAPIMicroservice,{
+Package('org.quickcorp.backend.mockup',[
+  Class('MockupMicroservice',BackendMicroservice,{
     body:null,
-    done: function(){
+    tempFileName: '',
+    get:function (){
       var microservice = this;
-      var stream = microservice.stream;
+      microservice.headers = microservice.route.responseHeaders;
+      microservice.body = microservice.route.response;
+      microservice.done();
+    },
+    post:function (data){
+      var microservice = this;
+      microservice.headers = microservice.route.responseHeaders;
+      microservice.body = microservice.route.response;
+      microservice.done();
+    },
+    finishWithBody: function(stream) {
       try {
-        stream.respond(microservice.headers);
-      } catch (e){
-        //
-      }
-      if (microservice.body != null){
-        microservice.finishWithBody.call(microservice,stream);
+        if (typeof this.body == 'string'){
+          stream.write(this.body);
+        } else {
+          stream.write(_DataStringify(this.body));
+        }
+        stream.end();
+      } catch (e) {
+        logger.debug('Something wrong writing the response for microservice' + e.toString());
       }
     },
-    finishWithBody:function (stream){
-      try {
-        stream.write(yaml.stringify(this.body));
-        stream.end();
-      } catch (e){
-        logger.debug('Something wrong writing the response for microservice'+e.toString());
+    done: function() {
+      var microservice = this;
+      var stream = microservice.stream;
+      stream.respond(microservice.headers);
+      if (microservice.body != null) {
+        microservice.finishWithBody.call(microservice, stream);
       }
     }
+
   }),
-  Class('Microservice',OpenAPIYAMLMicroservice)
+  Class('Microservice',MockupMicroservice)
 ]);
