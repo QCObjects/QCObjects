@@ -53,9 +53,7 @@ Package('org.quickcorp.qcobjects.cli',[
     },
     generateServiceWorker: function (appName){
       var filelist = ["/"].concat(this.fileListRecursive('./'));
-      filelist = filelist.filter(function (fl){return
-          (fl !== "sw.js" && !fl.startsWith('node_modules/'))
-        });
+      filelist = filelist.filter(function (fl){return fl !== "sw.js" && (!fl.startsWith('node_modules/')) });
       fs.readFile(templatePwaPath+'/sw.js', function(err, data) {
         const swTemplate = Handlebars.compile(data.toString());
         var swContent = swTemplate({appName: appName,filelist:"\n\t\""+filelist.join("\",\n\t\"")+"\""});
