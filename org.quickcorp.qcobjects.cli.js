@@ -267,8 +267,49 @@ Package('org.quickcorp.qcobjects.cli',[
         });
 
       },
-      publish:function (_appName){
+      publish: function (_appName){
         logger.debug('publish is not yet implemented');
+      },
+      upgradeToEnterprise: function (){
+        const readline = require('readline');
+
+        const rl = readline.createInterface({
+          input: process.stdin,
+          output: process.stdout
+        });
+        rl.question('Please tell me your email: \n', (email) => {
+          rl.question('Please tell me the number of license that your executive has given to you: \n', (license) => {
+            logger.infoEnabled=true;
+            logger.info(`Your entered license number is ${license} and the email have entered is ${email}`);
+            let cmdDownloadGit = `npm i --force -g git+https://license:${license}@software.qcobjects.io/qcobjects-enterprise/qcobjects-enterprise.git`;
+            exec(cmdDownloadGit,(err,stdout,stderr)=>{
+              if(!err){
+                exec("qcobjects --version",(err,stdout,stderr)=>{
+                  if (stdout.lastIndexOf('Enterprise Edition')!==-1){
+                    logger.info('Congrats! Now you have installed QCObjects Entrprise Edition!');
+                  } else {
+                    console.log('Something went wrong when trying to update your license to QCObjects Enterprise Edition');
+                    console.log('Ask your executive to help');
+                  }
+                });
+
+              } else {
+                console.log('Something went wrong when trying to update your license to QCObjects Enterprise Edition');
+                if (stderr.lastIndexOf('Authentication failed')!==-1){
+                  console.log('Please ask to your executive to the right license number');
+                } else {
+                  console.log(stderr);
+                }
+              }
+            }).stdout.on('data', function(data) {
+                console.log(data);
+            });
+
+            rl.close();
+          });
+        });
+
+
       }
     },
     initCommand: function (){
@@ -297,6 +338,12 @@ Package('org.quickcorp.qcobjects.cli',[
           .option('--tests, --create-tests', 'Publishes the test suite')
           .action(function(args, options){
               switchCommander.choiceOption.publish.call(switchCommander,args,options);
+          });
+
+        this.program.command('upgrade-to-enterprise')
+          .description('Upgrades to QCObjects Enterprise Edition')
+          .action(function(args, options){
+              switchCommander.choiceOption.upgradeToEnterprise.call(switchCommander,args,options);
           });
 
         this.program.command('generate-sw  <appname>')
