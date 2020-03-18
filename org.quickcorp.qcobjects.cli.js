@@ -37,6 +37,7 @@ logger.debugEnabled=false;
 CONFIG.set('node_modules_path','./node_modules/');
 CONFIG.set('qcobjectsnewapp_path',CONFIG.get('node_modules_path')+'/qcobjectsnewapp');
 
+require(absolutePath+'/org.quickcorp.qcobjects.api.client_services');
 
 Package('org.quickcorp.qcobjects.cli',[
   Class('SwitchCommander',{
@@ -50,6 +51,33 @@ Package('org.quickcorp.qcobjects.cli',[
             })
           )
             : (dir);
+    },
+    register: function (email,phonenumber){
+      return new Promise (function (resolve,reject){
+        logger.info(`I'm going to register your profile on the cloud...`);
+        let cloudClient = New(QuickCorpCloud, {
+          apiMethod: 'register',
+          data:{email:email,phonenumber:phonenumber}
+        });
+//        logger.debugEnabled = true;
+        try {
+          let service = serviceLoader(cloudClient).then(successResonse => {
+            let template = successResonse.service.template;
+            console.log(template);
+            console.log(typeof template);
+            let response = JSON.parse(template);
+            console.log(response);
+            resolve();
+          }).catch ((e)=>{
+            console.log('\u{1F926} Something went wrong \u{1F926} when trying to register you in the cloud');
+            reject();
+          });
+        } catch (e){
+          console.log('\u{1F926} Something went wrong \u{1F926} when trying to register you in the cloud');
+          reject();
+        }
+
+      });
     },
     generateServiceWorker: function (appName){
       var filelist = ["/"].concat(this.fileListRecursive('./'));
@@ -271,41 +299,92 @@ Package('org.quickcorp.qcobjects.cli',[
         logger.debug('publish is not yet implemented');
       },
       upgradeToEnterprise: function (){
+        let switchCommander = this;
         const readline = require('readline');
 
         const rl = readline.createInterface({
           input: process.stdin,
           output: process.stdout
         });
-        rl.question('Please tell me your email: \n', (email) => {
-          rl.question('Please tell me the number of license that your executive has given to you: \n', (license) => {
-            logger.infoEnabled=true;
-            logger.info(`Your entered license number is ${license} and the email have entered is ${email}`);
-            let cmdDownloadGit = `npm i --force -g git+https://license:${license}@software.qcobjects.io/qcobjects-enterprise/qcobjects-enterprise.git`;
-            exec(cmdDownloadGit,(err,stdout,stderr)=>{
-              if(!err){
-                exec("qcobjects --version",(err,stdout,stderr)=>{
-                  if (stdout.lastIndexOf('Enterprise Edition')!==-1){
-                    logger.info('Congrats! Now you have installed QCObjects Entrprise Edition!');
-                  } else {
-                    console.log('Something went wrong when trying to update your license to QCObjects Enterprise Edition');
-                    console.log('Ask your executive to help');
-                  }
-                });
+        rl.question(`
+[NOTE: No information will be sent to a server until I got your consent]
 
-              } else {
-                console.log('Something went wrong when trying to update your license to QCObjects Enterprise Edition');
-                if (stderr.lastIndexOf('Authentication failed')!==-1){
-                  console.log('Please ask to your executive to the right license number');
-                } else {
-                  console.log(stderr);
-                }
+Please tell me your e-Mail (\u{1F48C}):
+`, (email) => {
+          rl.question ('Please tell me your phone number (\u{1F919}): \n', (phonenumber) => {
+            rl.question (`
+Please select one of the following options (type a number):
+
+1.- \u{1F640} This is your first interaction \u{1F60D} with QCObjects Enterprise Edition \u{1F3E2},
+you want to send your email and phone number to one of our executives to process your
+inquiry, pay the license (when aplies) and receive a new fresh license number
+that will free up to you the most advanced features for large companies
+
+2.- \u{2714} Your assigned executive \u{1F9D1} has given to you a new fresh QCObjects Enterprise Edition License Number
+and you want to enter it to follow up with the next steps.
+
+3.- \u{1F3C3} You want to quit this form, as you got here accidentally
+(You should think about it. It's not a coincidence, It's destiny \u{1F600}).
+
+Please enter the number of the option and press [enter]: `, (interaction_option)=> {
+              logger.infoEnabled=true;
+
+              switch (interaction_option) {
+                case '1':
+                  switchCommander.register(email,phonenumber).then(function (){
+                    rl.close();
+                  }).catch ((e)=>{
+                    rl.close();
+                  });
+                  break;
+                case '2':
+                  rl.question('Please tell me the number of license that your executive has given to you: \n', (license) => {
+                    logger.info(`Your entered license number is ${license} and the email have entered is ${email}`);
+                    logger.info(`Now, I'm installing QCObjects Enterprise Edition in your computer...`);
+                    let cmdDownloadGit = `npm i --force -g git+https://license:${license}@software.qcobjects.io/qcobjects-enterprise/qcobjects-enterprise.git`;
+                    exec(cmdDownloadGit,(err,stdout,stderr)=>{
+                      if(!err){
+                        exec("qcobjects --version",(err,stdout,stderr)=>{
+                          if (stdout.lastIndexOf('Enterprise Edition')!==-1){
+                            logger.info('\u{1F44F} Congrats! Now you have installed QCObjects Entrprise Edition! \u{1F44F}');
+                            logger.info(`You can test it using:
+> qcobjects --version
+
+To find more help, type the command:
+
+> qcobjects --help
+
+Enjoy!
+`);
+                          } else {
+                            console.log('\u{1F926} Something went wrong \u{1F926} when trying to update your license to QCObjects Enterprise Edition');
+                            console.log('Ask your executive to help');
+                          }
+                        });
+
+                      } else {
+                        console.log('\u{1F926} Something went wrong \u{1F926} when trying to update your license to QCObjects Enterprise Edition');
+                        if (stderr.lastIndexOf('Authentication failed')!==-1){
+                          console.log('Please ask to your executive for the right license number');
+                        } else {
+                          console.log(stderr);
+                        }
+                      }
+                    }).stdout.on('data', function(data) {
+                        console.log(data);
+                    });
+
+                    rl.close();
+                  });
+
+                  break;
+                default:
+                  logger.info('\u{1F937} You can continue to use QCObjects Community Edition, see you! \u{1F64B} ');
+                  rl.close();
+                  break;
               }
-            }).stdout.on('data', function(data) {
-                console.log(data);
-            });
 
-            rl.close();
+            })
           });
         });
 
