@@ -63,11 +63,8 @@ Package('org.quickcorp.qcobjects.cli',[
         try {
           let service = serviceLoader(cloudClient).then(successResonse => {
             let template = successResonse.service.template;
-            console.log(template);
-            console.log(typeof template);
             let response = JSON.parse(template);
-            console.log(response);
-            resolve();
+            resolve(response);
           }).catch ((e)=>{
             console.log('\u{1F926} Something went wrong \u{1F926} when trying to register you in the cloud');
             reject();
@@ -306,13 +303,18 @@ Package('org.quickcorp.qcobjects.cli',[
           input: process.stdin,
           output: process.stdout
         });
-        rl.question(`
+
+        var emailQuestion = function (){
+          rl.question(`
 [NOTE: No information will be sent to a server until I got your consent]
 
 Please tell me your e-Mail (\u{1F48C}):
 `, (email) => {
-          rl.question ('Please tell me your phone number (\u{1F919}): \n', (phonenumber) => {
-            rl.question (`
+            if (email !== ''){
+              var phoneNumberQuestion = function (){
+                rl.question ('Please tell me your phone number (\u{1F919}): \n', (phonenumber) => {
+                  if (phonenumber !== ''){
+                    rl.question (`
 Please select one of the following options (type a number):
 
 1.- \u{1F640} This is your first interaction \u{1F60D} with QCObjects Enterprise Edition \u{1F3E2},
@@ -327,27 +329,33 @@ and you want to enter it to follow up with the next steps.
 (You should think about it. It's not a coincidence, It's destiny \u{1F600}).
 
 Please enter the number of the option and press [enter]: `, (interaction_option)=> {
-              logger.infoEnabled=true;
+                      logger.infoEnabled=true;
 
-              switch (interaction_option) {
-                case '1':
-                  switchCommander.register(email,phonenumber).then(function (){
-                    rl.close();
-                  }).catch ((e)=>{
-                    rl.close();
-                  });
-                  break;
-                case '2':
-                  rl.question('Please tell me the number of license that your executive has given to you: \n', (license) => {
-                    logger.info(`Your entered license number is ${license} and the email have entered is ${email}`);
-                    logger.info(`Now, I'm installing QCObjects Enterprise Edition in your computer...`);
-                    let cmdDownloadGit = `npm i --force -g git+https://license:${license}@software.qcobjects.io/qcobjects-enterprise/qcobjects-enterprise.git`;
-                    exec(cmdDownloadGit,(err,stdout,stderr)=>{
-                      if(!err){
-                        exec("qcobjects --version",(err,stdout,stderr)=>{
-                          if (stdout.lastIndexOf('Enterprise Edition')!==-1){
-                            logger.info('\u{1F44F} Congrats! Now you have installed QCObjects Entrprise Edition! \u{1F44F}');
-                            logger.info(`You can test it using:
+                      switch (interaction_option) {
+                        case '1':
+                          switchCommander.register(email,phonenumber).then(function (response){
+                            logger.info(`\u{1F44F} Congrats! You have been successfully registered to the cloud! \u{1F44F}
+One of our executives will be in touch with you as soon as possible to give you the next steps
+to get a new License Number and start using QCObjects Entrprise Edition!
+
+(In the meantime, you can continue using all the features of the QCObjects Community Edition)
+`);
+                            rl.close();
+                          }).catch ((e)=>{
+                            rl.close();
+                          });
+                          break;
+                        case '2':
+                          rl.question('Please tell me the number of license that your executive has given to you: \n', (license) => {
+                            logger.info(`Your entered license number is ${license} and the email have entered is ${email}`);
+                            logger.info(`Now, I'm installing QCObjects Enterprise Edition in your computer...`);
+                            let cmdDownloadGit = `npm i --force -g git+https://license:${license}@software.qcobjects.io/qcobjects-enterprise/qcobjects-enterprise.git`;
+                            exec(cmdDownloadGit,(err,stdout,stderr)=>{
+                              if(!err){
+                                exec("qcobjects --version",(err,stdout,stderr)=>{
+                                  if (stdout.lastIndexOf('Enterprise Edition')!==-1){
+                                    logger.info('\u{1F44F} Congrats! Now you have installed QCObjects Entrprise Edition! \u{1F44F}');
+                                    logger.info(`You can test it using:
 > qcobjects --version
 
 To find more help, type the command:
@@ -356,38 +364,56 @@ To find more help, type the command:
 
 Enjoy!
 `);
-                          } else {
-                            console.log('\u{1F926} Something went wrong \u{1F926} when trying to update your license to QCObjects Enterprise Edition');
-                            console.log('Ask your executive to help');
-                          }
-                        });
+                                  } else {
+                                    console.log('\u{1F926} Something went wrong \u{1F926} when trying to update your license to QCObjects Enterprise Edition');
+                                    console.log('Ask your executive to help');
+                                  }
+                                });
 
-                      } else {
-                        console.log('\u{1F926} Something went wrong \u{1F926} when trying to update your license to QCObjects Enterprise Edition');
-                        if (stderr.lastIndexOf('Authentication failed')!==-1){
-                          console.log('Please ask to your executive for the right license number');
-                        } else {
-                          console.log(stderr);
-                        }
+                              } else {
+                                console.log('\u{1F926} Something went wrong \u{1F926} when trying to update your license to QCObjects Enterprise Edition');
+                                if (stderr.lastIndexOf('Authentication failed')!==-1){
+                                  console.log('Please ask to your executive for the right license number');
+                                } else {
+                                  console.log(stderr);
+                                }
+                              }
+                            }).stdout.on('data', function(data) {
+                                console.log(data);
+                            });
+
+                            rl.close();
+                          });
+
+                          break;
+                        default:
+                          logger.info('\u{1F937} You can continue to use QCObjects Community Edition, see you! \u{1F64B} ');
+                          rl.close();
+                          break;
                       }
-                    }).stdout.on('data', function(data) {
-                        console.log(data);
+
                     });
 
-                    rl.close();
-                  });
+                  } else {
+                    console.log(`You need to enter a Phone Number if you want to be contacted.
+If you want to quit, press Ctrl-C.
+`);
+                    phoneNumberQuestion();
+                  }
+                });
+              };
+              phoneNumberQuestion();
 
-                  break;
-                default:
-                  logger.info('\u{1F937} You can continue to use QCObjects Community Edition, see you! \u{1F64B} ');
-                  rl.close();
-                  break;
-              }
-
-            })
+            } else {
+              console.log(`You need to enter a real e-Mail adress if you want to be contacted.
+If you want to quit, press Ctrl-C.
+`);
+              emailQuestion();
+            }
           });
-        });
 
+        };
+        emailQuestion();
 
       }
     },

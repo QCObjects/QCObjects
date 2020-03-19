@@ -4,7 +4,7 @@ Package('org.quickcorp.qcobjects.api.client_services', [
   Class('QuickCorpCloud', Service, {
     name: 'quickcorp_cloud',
     external: true,
-    useHTTP2:false,
+    useHTTP2:true,
     cached: false,
     method: 'post',
     headers: {
@@ -17,17 +17,16 @@ Package('org.quickcorp.qcobjects.api.client_services', [
     withCredentials: false,
     _new_: function(o) {
       // service instantiated
-      logger.debugEnabled=true
       this.headers['Authorization'] = `Basic token`;
       this.url = this.basePath + o.apiMethod;
       this.data = o.data;
     },
     done: function(service,standardResponse) {
       // service loaded
-      console.log(standardResponse)
+      logger.debug(standardResponse);
     },
     fail: function (e){
-        console.log(e)
+        logger.debug(e);
     }
   })
 ]);
