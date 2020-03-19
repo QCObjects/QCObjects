@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "commander": "^2.20.3",
-    "handlebars": "^4.7.3",
+    "handlebars": "latest",
     "mime": "^2.4.4",
     "qcobjects": "latest",
     "qcobjects-sdk": "latest",
