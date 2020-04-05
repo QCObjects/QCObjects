@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+console.log('Initializing tests...')
 describe('QCObjects Integrity', function () {
   const path = require('path');
   const {execSync} = require('child_process');
