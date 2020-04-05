@@ -19,8 +19,8 @@
     "yaml": "^1.8.0"
   },
   "repository": {
-    "type": "git",
-    "url": "git+https://gitlab.com/api/v4/projects/12435344/repository/archive?private_token=Wys-MPRmB1sSFn3eeX84"
+    "type": "file",
+    "url": "https://gitlab.com/api/v4/projects/12435344/repository/archive?private_token=Wys-MPRmB1sSFn3eeX84"
   },
   "keywords": [
     "node",
