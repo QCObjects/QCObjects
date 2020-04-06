@@ -15,7 +15,7 @@ To create a new progressive web app type:
 
 To create an accelerated mobile page type:
 ```shell
-> qcobjects create mynewapp --pwa
+> qcobjects create mynewapp --amp
 ```
 
 The QCObjects HTTP2 Server Settings file is in:
