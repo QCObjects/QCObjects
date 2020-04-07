@@ -53,7 +53,7 @@
     "qcobjects-shell": "./qcobjects-shell.js",
     "qcobjects-createcert": "./qcobjects-createcert.js",
     "qcobjects-gae-server": "./qcobjects-gae-http-server.js",
-    "qcobjects-collab": "./collab-repl.js"
+    "qcobjects-collab": "./qcobjects-collab.js"
   },
   "devDependencies": {
     "jasmine": "^3.5.0"
