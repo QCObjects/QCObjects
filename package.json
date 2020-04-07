@@ -1,6 +1,6 @@
 {
   "name": "qcobjects-cli",
-  "version": "0.1.71",
+  "version": "0.1.72",
   "description": "qcobjects cli command line tool",
   "main": "qcobjects-cli.js",
   "scripts": {
@@ -53,7 +53,7 @@
     "qcobjects-shell": "./qcobjects-shell.js",
     "qcobjects-createcert": "./qcobjects-createcert.js",
     "qcobjects-gae-server": "./qcobjects-gae-http-server.js",
-    "collab-repl":"./collab-repl.js"
+    "collab-repl": "./collab-repl.js"
   },
   "devDependencies": {
     "jasmine": "^3.5.0"
