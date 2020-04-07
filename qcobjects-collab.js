@@ -126,14 +126,14 @@ let unixsocket_server = net.createServer(function (socket) {
 let http_server = net.createServer(function (socket) {
   global.connections += 1;
   repl.start("QCObjects Collaborative TCP socket> ", socket).context=global;
-}).listen(CONFIG.get('serverPortHTTP',80));
+}).listen(CONFIG.get('serverPortHTTP',80),CONFIG.get('domain','0.0.0.0'));
 
 http_server.on('error', function (e) {
   if (e.code == 'EADDRINUSE') {
     console.log('Address in use, retrying...');
     setTimeout(function () {
       http_server.close();
-      http_server.listen(CONFIG.get('serverPortHTTP',80));
+      http_server.listen(CONFIG.get('serverPortHTTP',80),CONFIG.get('domain','0.0.0.0'));
     }, 1000);
   }
 });
