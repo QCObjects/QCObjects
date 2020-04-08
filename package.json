@@ -6,8 +6,7 @@
   "scripts": {
     "sync": "git add . && git commit -am ",
     "test": "jasmine",
-    "preversion": "npm test",
-    "version": "npm i --upgrade",
+    "preversion": "npm i --upgrade && npm test",
     "postversion": "git push && git push --tags && npm publish"
   },
   "dependencies": {

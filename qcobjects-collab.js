@@ -114,7 +114,7 @@ var net = require("net"),
     repl = require("repl");
 
 global.connections = 0;
-let unixsocket_default = "/tmp/node-repl-sock";
+let unixsocket_default = "/tmp/qcobjects-collab-socket";
 
 repl.start("QCObjects Collaborative Repl> ").context = global;
 
