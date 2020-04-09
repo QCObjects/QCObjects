@@ -1,6 +1,6 @@
 {
   "name": "qcobjects-cli",
-  "version": "0.1.88",
+  "version": "0.1.89",
   "description": "qcobjects cli command line tool",
   "main": "qcobjects-cli.js",
   "scripts": {
