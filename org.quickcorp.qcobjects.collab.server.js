@@ -25,6 +25,7 @@
 */
 "use strict";
 const os = require('os');
+const fs = require('fs');
 
 const welcometo = 'Welcome to \n';
 const instructions = 'Type:\n .exit to quit\n .help for see a quick guide\n And any other command to execute like pure javascript \n All the QCObjects stuff is already loaded for you';
@@ -123,15 +124,53 @@ Class('CollabServer',{
         'BasicLayout'
   ],
   commands: {
-    loadcmdstr:{
+    loadcmd_json:{
+      help: `
+              Executes a CMD Shell Command
+              and loads the stdout to a variable after trying to convert the result
+              to JSON format
+              The first argument is the variable name followed by an equal sign "=".
+              Example:
+               > .loadcmd_json result = cat somefile.json
+
+              The above command will save the content of somefile.json using cat into the variable global.result
+              as JSON format
+`,
+      action(args) {
+        var _rplServer = this;
+        var commandArgs = args.split(' ');
+        if (commandArgs.length>2){
+          var _variableName = commandArgs[0];
+          var _equal_sign = commandArgs[1].toString();
+          if (_equal_sign === "="){
+            var cmdArguments = commandArgs.slice(2).join(' ');
+            _rplServer.clearBufferedCommand();
+            logger.debug(`Executing... ${cmdArguments}`);
+            exec(cmdArguments, (err, stdout, stderr) => {
+              _rplServer.context[_variableName] = JSON.parse(stdout);
+              _rplServer.displayPrompt();
+            }).stdout.on('data', function(data) {
+                console.log(data);
+            });
+          } else {
+            console.log('That is no good my friend. You need to specify an equal sign.');
+            _rplServer.displayPrompt();
+          }
+        } else {
+          console.log('No enough data in the command line. Try .help');
+          _rplServer.displayPrompt();
+        }
+      }
+    },
+    loadcmd_str:{
       help: `
               Executes a CMD Shell Command
               and loads the stdout to a variable.
               The first argument is the variable name followed by an equal sign "=".
               Example:
-               > .loadcmdstr a = ls *
+               > .loadcmd_str foo = ls *
 
-              The above command will save the output of "ls *" into the variable "a" as string
+              The above command will save the output of "ls *" into the variable global.foo as string
 `,
       action(args) {
         var _rplServer = this;
@@ -153,6 +192,35 @@ Class('CollabServer',{
             console.log('That is no good my friend. You need to specify an equal sign.');
             _rplServer.displayPrompt();
           }
+        } else {
+          console.log('No enough data in the command line. Try .help');
+          _rplServer.displayPrompt();
+        }
+      }
+    },
+    save_json:{
+      help: `
+              Serializes a variable using JSON.stringify
+              and saves it in a file.
+              The first argument is the variable name and the second argument is the name of the file.
+              Example:
+               > .save_json foo ./filename
+
+              The above command will save the stringified content of foo into ./filename
+`,
+      action(args) {
+        var _rplServer = this;
+        var commandArgs = args.split(' ');
+        if (commandArgs.length>=2){
+          var _variableName = commandArgs[0];
+          var _filename = commandArgs[1].toString();
+          var data = JSON.stringify(_rplServer.context[_variableName]);
+          fs.writeFile(_filename, data, (err) => {
+            if (err) throw err;
+            logger.debug(`The data of the file ${_filename} has been saved!`);
+            _rplServer.displayPrompt();
+          });
+
         } else {
           console.log('No enough data in the command line. Try .help');
           _rplServer.displayPrompt();
@@ -201,13 +269,16 @@ Class('CollabServer',{
 
     function unlink_socket (){
       try {
+        logger.debug("Trying to delete the socket... ");
         fs.unlink(CONFIG.get("collab-unix-socket",unixsocket_default), (err) => {
-          if (err) throw err;
+          if (err) {
+            logger.debug("Unix Socket does not exist");
+          };
           logger.debug("Unix Socket was deleted before start");
         });
       } catch (e){
         // socket doesnt exists
-        logger.debug("Unix Socket does not exist");
+        logger.debug("Unix Socket was not deleted");
       }
     }
 
