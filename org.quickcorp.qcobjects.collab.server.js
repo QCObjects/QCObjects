@@ -62,6 +62,8 @@ You can also use a Unix Socket to connect yourself to the engine:
 
 > ssh user@${CONFIG.get("domain",collab_domain_default)} nc -U ${CONFIG.get("collab-unix-socket",unixsocket_default)}
 
+(change "user" for whathever your username is!)
+
 `;
   console.log(collabinstructions);
 
