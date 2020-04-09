@@ -69,7 +69,7 @@ You can also use a Unix Socket to connect yourself to the engine:
 
 }
 
-const options = { useColors: true, prompt:"QCObjects Collab> " };
+const replOptions = { useColors: true, prompt:"QCObjects Collab> " };
 
 Class('CollabServer',{
   runScript: function (){
@@ -136,7 +136,6 @@ Class('CollabServer',{
       action(args) {
         var _rplServer = this;
         var commandArgs = args.split(' ');
-        console.log(commandArgs.length);
         if (commandArgs.length>2){
           var _variableName = commandArgs[0];
           var _equal_sign = commandArgs[1].toString();
@@ -220,7 +219,7 @@ Class('CollabServer',{
       }
     };
 
-    let replServer = repl.start(options);
+    let replServer = repl.start(replOptions);
     replServer.context = global;
     replServer.on('exit', () => {
       unlink_socket();
@@ -233,19 +232,27 @@ Class('CollabServer',{
 
 
 
-    let unixsocket_server = net.createServer(function (socket) {
+    let unixsocket_server = net.createServer(function (unixsocket) {
+      unixsocket.on('end', () => {
+        logger.debug('A Unix socket connection was ended');
+      });
       global.connections += 1;
-      let unixReplServer = repl.start(options, socket);
+      let unixReplServer = repl.start("QCObjects Collab> ", unixsocket);
       unixReplServer.context=global;
       _defineReplCommands(unixReplServer,collabServer.commands);
     }).listen(CONFIG.get("collab-unix-socket",unixsocket_default));
 
-    let http_server = net.createServer(function (socket) {
+
+    let http_server = net.createServer(function (httpsocket) {
+      httpsocket.on('end', () => {
+        logger.debug('A http connection was ended');
+      });
       global.connections += 1;
-      let httpReplServer = repl.start(options, socket);
+      let httpReplServer = repl.start("QCObjects Collab> ", httpsocket);
       httpReplServer.context=global;
       _defineReplCommands(httpReplServer,collabServer.commands);
     }).listen(CONFIG.get('collab-port',collab_port_default),CONFIG.get('collab-domain',collab_domain_default));
+
 
     http_server.on('error', function (e) {
       if (e.code == 'EADDRINUSE') {
