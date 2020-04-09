@@ -24,6 +24,7 @@
  * license document, but changing it is not allowed.
 */
 "use strict";
+const os = require('os');
 require('qcobjects');
 
 const welcometo = 'Welcome to \n';
@@ -37,10 +38,34 @@ const package_config = require(absolutePath+'/package.json');
 const qcobjects_pkg_config = require('qcobjects/package.json');
 const qcobjects_sdk_pkg_config = require('qcobjects-sdk/package.json');
 require(absolutePath+'/org.quickcorp.qcobjects.defaultsettings.js');
+
 console.log(welcometo);
 console.log(logo);
+
+let unixsocket_default = os.tmpdir()+"/qcobjects-collab-socket";
+let collab_port_default = 10300;
+let collab_domain_default = "0.0.0.0";
+
 if (process.argv.length<3){
   console.log(instructions);
+
+  const collabinstructions = `
+Collab for Data Science
+=======================
+
+QCObjects Collab is a tool that helps you to make data science math using JavaScript
+
+You can use a TCP socket to connect yourself to the engine:
+
+> ssh user@${CONFIG.get("domain",collab_domain_default)} nc ${CONFIG.get("collab-domain",collab_domain_default)} ${CONFIG.get("collab-port",collab_port_default)}
+
+You can also use a Unix Socket to connect yourself to the engine:
+
+> ssh user@${CONFIG.get("domain",collab_domain_default)} nc -U ${CONFIG.get("unix_socket",unixsocket_default)}
+
+`;
+  console.log(collabinstructions);
+
 }
 
 const vm = require('vm');
@@ -48,12 +73,12 @@ let sandbox = {
   require:require,
   module:module,
   __dirname:'./',
-  __filename:'qcobjects-shell-file.js'
+  __filename:'qcobjects-collab'
 };
 global.require = require.bind(global);
 global.module = module;
 global.__dirname = './';
-global.__filename = 'qcobjects-shell-file.js';
+global.__filename = 'qcobjects-collab';
 global = vm.createContext(global);
 const runScript = (code,logOutput=false)=>{
   const options = {filename:sandbox.__filename};
@@ -114,26 +139,52 @@ var net = require("net"),
     repl = require("repl");
 
 global.connections = 0;
-let unixsocket_default = "/tmp/qcobjects-collab-socket";
 
-repl.start("QCObjects Collaborative Repl> ").context = global;
+function unlink_socket (){
+  try {
+    fs.unlink(CONFIG.get("unix_socket",unixsocket_default), (err) => {
+      if (err) throw err;
+      logger.debug("Unix Socket was deleted before start");
+    });
+  } catch (e){
+    // socket doesnt exists
+    logger.debug("Unix Socket does not exist");
+  }
+}
+
+unlink_socket();
+
+let replServer = repl.start("QCObjects Collab> ");
+replServer.context = global;
+replServer.on('exit', () => {
+  unlink_socket();
+
+  console.log('Thank you for using QCObjects Collab for Data Science!');
+  console.log('Have a nice day!');
+  process.exit();
+});
+
+
+
 
 let unixsocket_server = net.createServer(function (socket) {
   global.connections += 1;
-  repl.start("QCObjects Collaborative Unix socket> ", socket).context=global;
+  let unixReplServer = repl.start("QCObjects Collab> ", socket);
+  unixReplServer.context=global;
 }).listen(CONFIG.get("unix_socket",unixsocket_default));
 
 let http_server = net.createServer(function (socket) {
   global.connections += 1;
-  repl.start("QCObjects Collaborative TCP socket> ", socket).context=global;
-}).listen(CONFIG.get('serverPortHTTP',80),CONFIG.get('domain','0.0.0.0'));
+  let httpReplServer = repl.start("QCObjects Collab> ", socket);
+  httpReplServer.context=global;
+}).listen(CONFIG.get('collab-port',collab_port_default),CONFIG.get('collab-domain',collab_domain_default));
 
 http_server.on('error', function (e) {
   if (e.code == 'EADDRINUSE') {
     console.log('Address in use, retrying...');
     setTimeout(function () {
       http_server.close();
-      http_server.listen(CONFIG.get('serverPortHTTP',80),CONFIG.get('domain','0.0.0.0'));
+      http_server.listen(CONFIG.get('collab-port',collab_port_default),CONFIG.get('collab-domain',collab_domain_default));
     }, 1000);
   }
 });
