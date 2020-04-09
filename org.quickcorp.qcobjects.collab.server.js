@@ -69,7 +69,7 @@ You can also use a Unix Socket to connect yourself to the engine:
 
 }
 
-const replOptions = { useColors: true, prompt:"QCObjects Collab> " };
+const replOptions = { useColors: true, prompt:"QCObjects Collab> ", terminal: true, useGlobal: true };
 
 Class('CollabServer',{
   runScript: function (){
@@ -237,7 +237,16 @@ Class('CollabServer',{
         logger.debug('A Unix socket connection was ended');
       });
       global.connections += 1;
-      let unixReplServer = repl.start("QCObjects Collab> ", unixsocket);
+      let unixReplServer = repl.start({
+          prompt: 'QCObjects Collab> '
+        , input: unixsocket
+        , output: unixsocket
+        , terminal: true
+        , useGlobal: true
+      });
+      unixReplServer.on('exit', function () {
+        unixsocket.end();
+      })
       unixReplServer.context=global;
       _defineReplCommands(unixReplServer,collabServer.commands);
     }).listen(CONFIG.get("collab-unix-socket",unixsocket_default));
@@ -248,7 +257,16 @@ Class('CollabServer',{
         logger.debug('A http connection was ended');
       });
       global.connections += 1;
-      let httpReplServer = repl.start("QCObjects Collab> ", httpsocket);
+      let httpReplServer = repl.start({
+          prompt: 'QCObjects Collab> '
+        , input: httpsocket
+        , output: httpsocket
+        , terminal: true
+        , useGlobal: true
+      });
+      httpReplServer.on('exit', function () {
+        httpsocket.end();
+      })
       httpReplServer.context=global;
       _defineReplCommands(httpReplServer,collabServer.commands);
     }).listen(CONFIG.get('collab-port',collab_port_default),CONFIG.get('collab-domain',collab_domain_default));
