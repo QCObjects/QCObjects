@@ -90,9 +90,6 @@ Class('CollabServer',{
     }
 
   },
-  preloaded_scripts: [
-    "Object.assign(this,require('qcobjects'));"
-  ],
   protected_symbols: [ 'clearInterval',
     'clearTimeout',
     'setInterval',
@@ -296,12 +293,6 @@ Class('CollabServer',{
     global.__dirname = './';
     global.__filename = 'qcobjects-collab';
     global = vm.createContext(global);
-
-    function runPreload (context){
-      for (var k in collabServer.preloaded_scripts){
-        collabServer.runScript(context,collabServer.preloaded_scripts[k].trim());
-      }
-    }
 
     var net = require("net"),
         repl = require("repl");
