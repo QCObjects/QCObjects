@@ -70,15 +70,14 @@ You can also use a Unix Socket to connect yourself to the engine:
 
 }
 
-const replOptions = { useColors: true, prompt:"QCObjects Collab> ", terminal: true, useGlobal: true };
 
 Class('CollabServer',{
-  runScript: function (){
+  runScript: function (context){
     const runScript = (code,logOutput=false)=>{
       const options = {filename:sandbox.__filename};
 
       const backgroundRunScript = (code)=>{
-        var output = vm.runInContext(code,global,options);
+        var output = vm.runInContext(code,context,options);
         return output;
       }
 
@@ -91,13 +90,8 @@ Class('CollabServer',{
     }
 
   },
-  syncGlobal: function (){
-    var s = 'Object.assign(this,this.constructor.constructor(\'return this\')())';
-    this.runScript(s);
-  },
   preloaded_scripts: [
-    "require('qcobjects')",
-    "Object.assign(this,this.constructor.constructor(\'return this\')())"
+    "Object.assign(this,require('qcobjects'));"
   ],
   protected_symbols: [ 'clearInterval',
     'clearTimeout',
@@ -137,7 +131,7 @@ Class('CollabServer',{
               as JSON format
 `,
       action(args) {
-        var _rplServer = this;
+        let _rplServer = this;
         var commandArgs = args.split(' ');
         if (commandArgs.length>2){
           var _variableName = commandArgs[0];
@@ -147,7 +141,11 @@ Class('CollabServer',{
             _rplServer.clearBufferedCommand();
             logger.debug(`Executing... ${cmdArguments}`);
             exec(cmdArguments, (err, stdout, stderr) => {
-              _rplServer.context[_variableName] = JSON.parse(stdout);
+              try {
+                _rplServer.context[_variableName] = JSON.parse(stdout);
+              } catch (e){
+                logger.debug(`It was not possible to parse the data.`);
+              }
               _rplServer.displayPrompt();
             }).stdout.on('data', function(data) {
                 console.log(data);
@@ -173,7 +171,7 @@ Class('CollabServer',{
               The above command will save the output of "ls *" into the variable global.foo as string
 `,
       action(args) {
-        var _rplServer = this;
+        let _rplServer = this;
         var commandArgs = args.split(' ');
         if (commandArgs.length>2){
           var _variableName = commandArgs[0];
@@ -209,11 +207,12 @@ Class('CollabServer',{
               The above command will save the stringified content of foo into ./filename
 `,
       action(args) {
-        var _rplServer = this;
+        let _rplServer = this;
         var commandArgs = args.split(' ');
         if (commandArgs.length>=2){
           var _variableName = commandArgs[0];
           var _filename = commandArgs[1].toString();
+          logger.debug(`Saving variable ${_variableName} in ${_filename}...`);
           var data = JSON.stringify(_rplServer.context[_variableName]);
           fs.writeFile(_filename, data, (err) => {
             if (err) throw err;
@@ -227,10 +226,49 @@ Class('CollabServer',{
         }
       }
     },
+    load_json:{
+      help: `
+              Loads a json from a file and saves it into a variable.
+              The first argument is the variable name and the second argument is the name of the file.
+              Example:
+               > .load_json foo = ./filename
+
+              The above command will load a json from ./filename and save it in global.foo as an object
+`,
+      action(args) {
+        let _rplServer = this;
+        var commandArgs = args.split(' ');
+        if (commandArgs.length>2){
+          var _variableName = commandArgs[0];
+          var _equal_sign = commandArgs[1].toString();
+          if (_equal_sign === "="){
+            var _filename = commandArgs[2].toString();
+            logger.debug(`Trying to read ${_variableName} from ${_filename}...`);
+            fs.readFile(_filename,(err, data) => {
+              if (err) throw err;
+              try {
+                _rplServer.context[_variableName] = JSON.parse(data.toString());
+                logger.debug(`The data of the file ${_filename} has been loaded!`);
+              } catch (e){
+                logger.debug(`It was not possible to parse the data.`);
+              }
+              _rplServer.displayPrompt();
+            });
+          } else {
+            console.log('That is no good my friend. You need to specify an equal sign.');
+            _rplServer.displayPrompt();
+          }
+
+        } else {
+          console.log('No enough data in the command line. Try .help');
+          _rplServer.displayPrompt();
+        }
+      }
+    },
     cmd:{
       help: 'Executes a CMD Shell Command',
       action() {
-        var _rplServer = this;
+        let _rplServer = this;
         var cmdArguments = [...arguments].join(' ');
         _rplServer.clearBufferedCommand();
         logger.debug(`Executing... ${cmdArguments}`);
@@ -252,14 +290,17 @@ Class('CollabServer',{
       __dirname:'./',
       __filename:'qcobjects-collab'
     };
+    global = require('qcobjects');
     global.require = require.bind(global);
     global.module = module;
     global.__dirname = './';
     global.__filename = 'qcobjects-collab';
     global = vm.createContext(global);
 
-    for (var k in collabServer.preloaded_scripts){
-      collabServer.runScript(collabServer.preloaded_scripts[k].trim());
+    function runPreload (context){
+      for (var k in collabServer.preloaded_scripts){
+        collabServer.runScript(context,collabServer.preloaded_scripts[k].trim());
+      }
     }
 
     var net = require("net"),
@@ -284,14 +325,20 @@ Class('CollabServer',{
 
     unlink_socket();
 
-    var _defineReplCommands = function (_replServer,commands){
+    var _defineReplCommands = function (_cmdReplServer,commands){
       for (var _command in commands){
-        _replServer.defineCommand(_command, commands[_command]);
+        _cmdReplServer.defineCommand(_command, commands[_command]);
       }
     };
 
-    let replServer = repl.start(replOptions);
+    let replServer = repl.start({
+       useColors: true,
+       prompt:"QCObjects Collab> ",
+       terminal: true,
+       useGlobal: false
+     });
     replServer.context = global;
+
     replServer.on('exit', () => {
       unlink_socket();
 
@@ -313,7 +360,7 @@ Class('CollabServer',{
         , input: unixsocket
         , output: unixsocket
         , terminal: true
-        , useGlobal: true
+        , useGlobal: false
       });
       unixReplServer.on('exit', function () {
         unixsocket.end();
@@ -333,7 +380,7 @@ Class('CollabServer',{
         , input: httpsocket
         , output: httpsocket
         , terminal: true
-        , useGlobal: true
+        , useGlobal: false
       });
       httpReplServer.on('exit', function () {
         httpsocket.end();
