@@ -5,7 +5,7 @@
   "main": "qcobjects-cli.js",
   "scripts": {
     "sync": "git add . && git commit -am ",
-    "test": "jasmine",
+    "test": "npx eslint *.js && jasmine",
     "preversion": "npm i --upgrade && npm test",
     "postversion": "git push && git push --tags && npm publish"
   },
@@ -55,6 +55,7 @@
     "qcobjects-collab": "./qcobjects-collab.js"
   },
   "devDependencies": {
+    "eslint": "^6.8.0",
     "jasmine": "^3.5.0"
   }
 }

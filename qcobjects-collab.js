@@ -23,22 +23,28 @@
  * Everyone is permitted to copy and distribute verbatim copies of this
  * license document, but changing it is not allowed.
 */
+/*eslint no-unused-vars: "off"*/
+/*eslint no-redeclare: "off"*/
+/*eslint no-empty: "off"*/
+/*eslint strict: "off"*/
+/*eslint no-mixed-operators: "off"*/
+/*eslint no-undef: "off"*/
 "use strict";
-const path = require('path');
+const path = require("path");
 const absolutePath = path.resolve( __dirname, "./" );
 
-require('qcobjects');
+require("qcobjects");
 
-require(absolutePath+'/org.quickcorp.qcobjects.defaultsettings.js');
+require(absolutePath+"/org.quickcorp.qcobjects.defaultsettings.js");
 
-require(absolutePath+'/org.quickcorp.qcobjects.collab.server.js');
+require(absolutePath+"/org.quickcorp.qcobjects.collab.server.js");
 
-Class('Main',{
+Class("Main",{
   _new_:()=>{
     const app = New(CollabServer);
     app.start();
 
-    logger.debug('initialized');
+    logger.debug("initialized");
   }
 });
 

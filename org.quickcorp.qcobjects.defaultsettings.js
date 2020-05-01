@@ -22,34 +22,40 @@
  * Everyone is permitted to copy and distribute verbatim copies of this
  * license document, but changing it is not allowed.
 */
+/*eslint no-unused-vars: "off"*/
+/*eslint no-redeclare: "off"*/
+/*eslint no-empty: "off"*/
+/*eslint strict: "off"*/
+/*eslint no-mixed-operators: "off"*/
+/*eslint no-undef: "off"*/
 "use strict";
 
-CONFIG.set('documentRootFileIndex','index.html');
-CONFIG.set('projectPath',`${process.cwd()}/`);
-CONFIG.set('useConfigService',false); // this is only true useful for client web side
-CONFIG.set('documentRoot','./');
-CONFIG.set('serverPortHTTP',80);
-CONFIG.set('serverPortHTTPS',443);
-CONFIG.set('private-key-pem','localhost-privkey.pem');
-CONFIG.set('private-cert-pem','localhost-cert.pem');
-CONFIG.set('allowHTTP1',true);
-CONFIG.set('useTemplate',false);
-CONFIG.set('domain','localhost');
+CONFIG.set("documentRootFileIndex","index.html");
+CONFIG.set("projectPath",`${process.cwd()}/`);
+CONFIG.set("useConfigService",false); // this is only true useful for client web side
+CONFIG.set("documentRoot","./");
+CONFIG.set("serverPortHTTP",80);
+CONFIG.set("serverPortHTTPS",443);
+CONFIG.set("private-key-pem","localhost-privkey.pem");
+CONFIG.set("private-cert-pem","localhost-cert.pem");
+CONFIG.set("allowHTTP1",true);
+CONFIG.set("useTemplate",false);
+CONFIG.set("domain","localhost");
 
 let setDevMode = function (devmode){
-  if (typeof devmode !== 'undefined'){
+  if (typeof devmode !== "undefined"){
     switch (true) {
-      case devmode=='debug':
+      case devmode=="debug":
         logger.debugEnabled = true;
         logger.warnEnabled = true;
         logger.infoEnabled = true;
         break;
-      case devmode=='warn':
+      case devmode=="warn":
         logger.debugEnabled = false;
         logger.warnEnabled = true;
         logger.infoEnabled = true;
         break;
-      case devmode=='info':
+      case devmode=="info":
         logger.debugEnabled = false;
         logger.warnEnabled = false;
         logger.infoEnabled = true;
@@ -67,30 +73,30 @@ let setDevMode = function (devmode){
     logger.infoEnabled = false;
   }
 
-}
+};
 
 try {
-  var _config = require(CONFIG.get('projectPath')+'config.json');
-  logger.debug('Loading settings from your config.json');
+  var _config = require(CONFIG.get("projectPath")+"config.json");
+  logger.debug("Loading settings from your config.json");
 
-  let _secretKey = (_config.hasOwnProperty('domain'))?(_config['domain']):('_secret_');
+  let _secretKey = (_config.hasOwnProperty.call(_config,"domain"))?(_config["domain"]):("_secret_");
 
-  if (_config.hasOwnProperty('__encoded__')) {
+  if (_config.hasOwnProperty.call(_config,"__encoded__")) {
     _config = JSON.parse(_Crypt.decrypt(_config.__encoded__, _secretKey));
   }
   for (var k in _config){
     CONFIG.set(k,_config[k]);
   }
 
-  setDevMode(CONFIG.get('devmode',''));
+  setDevMode(CONFIG.get("devmode",""));
 
-  if (typeof CONFIG.get('backend') !== 'undefined'){
-    global.set('backendAvailable',true);
+  if (typeof CONFIG.get("backend") !== "undefined"){
+    global.set("backendAvailable",true);
 
-    if (typeof CONFIG.get('basePath') !== 'undefined'){
+    if (typeof CONFIG.get("basePath") !== "undefined"){
       logger.debug(`Changing the current directory: ${process.cwd()}`);
       try {
-        process.chdir(CONFIG.get('basePath'));
+        process.chdir(CONFIG.get("basePath"));
         logger.debug(`New directory: ${process.cwd()}`);
       } catch (err) {
         logger.warn(`It was impossible to change the current chdir: ${err}`);
@@ -98,5 +104,5 @@ try {
     }
   }
 }catch (e){
-  logger.debug('No config.json file in your project');
+  logger.debug("No config.json file in your project");
 }

@@ -23,17 +23,23 @@
  * Everyone is permitted to copy and distribute verbatim copies of this
  * license document, but changing it is not allowed.
 */
+/*eslint no-unused-vars: "off"*/
+/*eslint no-redeclare: "off"*/
+/*eslint no-empty: "off"*/
+/*eslint strict: "off"*/
+/*eslint no-mixed-operators: "off"*/
+/*eslint no-undef: "off"*/
 "use strict";
-const path = require('path');
+const path = require("path");
 const absolutePath = path.resolve( __dirname, "./" );
-const templatePath = path.resolve( __dirname, "./templates/apps/" )+'/'
+const templatePath = path.resolve( __dirname, "./templates/apps/" )+"/";
 
-require('qcobjects');
+require("qcobjects");
 
-require(absolutePath+'/org.quickcorp.qcobjects.defaultsettings.js');
+require(absolutePath+"/org.quickcorp.qcobjects.defaultsettings.js");
 
 
-const { execSync } = require('child_process');
+const { execSync } = require("child_process");
 // stderr is sent to stderr of parent process
 // you can set options.stdio if you want it to go elsewhere
-let stdout = execSync('openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj \'/CN='+CONFIG.get('domain')+'\'  -keyout '+CONFIG.get('private-key-pem')+' -out '+CONFIG.get('private-cert-pem'));
+let stdout = execSync("openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN="+CONFIG.get("domain")+"'  -keyout "+CONFIG.get("private-key-pem")+" -out "+CONFIG.get("private-cert-pem"));
