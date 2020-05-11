@@ -48,6 +48,80 @@ require(absolutePath+"/org.quickcorp.qcobjects.api.client_services");
 Package("org.quickcorp.qcobjects.cli",[
   Class("SwitchCommander",{
     program:require("commander"),
+    shellCommands: function (_shell_commands){
+      return new Promise(function (resolve_all,reject_all){
+        var _promises_set = [];
+        for (var k in _shell_commands){
+          var shell_command = _shell_commands[k];
+          _promises_set.push(
+            new Promise(
+            function (resolve,reject){
+              exec(shell_command,(err,stdout,stderr)=>{
+                if (!err){
+                  resolve(stdout);
+                } else {
+                  logger.debug(`[FAILED]: ${shell_command}`);
+                  logger.debug(`${stderr}`);
+                  reject(stderr);
+                }
+              }).stdout.on("data", function(data) {
+                  logger.info(data);
+              });
+            })
+          );
+        }
+        var _promise_all = Promise.all(_promises_set).then(function (response){
+          resolve_all(response);
+        }).catch(function (e){
+          reject_all(e);
+        });
+      });
+    },
+    syncGit: function (versionString,commitMsg){
+
+      this.shellCommands([
+        `git add . && git commit -am ${commitMsg}`,
+        "git fetch origin --tags",
+        "git tag -ln",
+        `git tag -a "v${versionString}" -m "${commitMsg}"`,
+        "git push && git push --tags",
+      ]).then(function (response){
+        logger.info("Synced to Git");
+        logger.debug(response);
+      }).catch (function (e){
+        logger.info("Something went wrong trying to sync to git");
+        logger.debug(e);
+      });
+    },
+    parseVersionString: function (versionString){
+      let regexpVer = /^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
+      let versionObject = {...versionString.match(regexpVer).groups};
+      return versionObject;
+    },
+    getVersionStringFromFile: function (filename){
+      let versionString;
+      try {
+        versionString = fs.readFileSync(filename).toString().replace("\n","");
+      } catch (e){
+        versionString = "0.0.1";
+      }
+      return versionString;
+    },
+    buildNewSemVersionString: function ({major,minor,patch}){
+      return `${major}.${minor}.${patch}`;
+    },
+    parseVersionSuffix: function (versionString){
+      let versionObject = this.parseVersionString(versionString);
+      let semVersionString = this.buildNewSemVersionString(versionObject);
+      return versionString.replace(semVersionString,"");
+    },
+    buildNewVersionString: function ({major,minor,patch},suffix){
+      let semVersionString = this.buildNewSemVersionString({major,minor,patch});
+      return `${semVersionString}${suffix}`;
+    },
+    saveNewVersionFile: function (filename,versionString){
+      fs.writeFileSync(filename,versionString);
+    },
     fileListRecursive : function (dir) {
         var instance = this;
         return (fs.statSync(dir).isDirectory())
@@ -301,6 +375,51 @@ Package("org.quickcorp.qcobjects.cli",[
       publish: function (_appName){
         logger.debug("publish is not yet implemented");
       },
+      v_major: function (filename,options){
+        filename = (typeof filename === "undefined")?("VERSION"):(filename);
+        let versionString = this.getVersionStringFromFile(filename);
+        let versionSuffix = this.parseVersionSuffix(versionString);
+        let versionObject = this.parseVersionString(versionString);
+        let major = parseInt(versionObject.major);
+        let minor = parseInt(versionObject.minor);
+        let patch = parseInt(versionObject.patch);
+        let newVersion = this.buildNewVersionString({major:major+1,minor:minor,patch:patch},versionSuffix);
+        this.saveNewVersionFile(filename,newVersion);
+        if (options.syncGit){
+          var commitMsg = options.commitMsg || `New Version v${newVersion}`;
+          this.syncGit(newVersion,commitMsg);
+        }
+      },
+      v_minor: function (filename,options){
+        filename = (typeof filename === "undefined")?("VERSION"):(filename);
+        let versionString = this.getVersionStringFromFile(filename);
+        let versionSuffix = this.parseVersionSuffix(versionString);
+        let versionObject = this.parseVersionString(versionString);
+        let major = parseInt(versionObject.major);
+        let minor = parseInt(versionObject.minor);
+        let patch = parseInt(versionObject.patch);
+        let newVersion = this.buildNewVersionString({major:major,minor:minor+1,patch:patch},versionSuffix);
+        this.saveNewVersionFile(filename,newVersion);
+        if (options.syncGit){
+          var commitMsg = options.commitMsg || `New Version v${newVersion}`;
+          this.syncGit(newVersion,commitMsg);
+        }
+      },
+      v_patch: function (filename,options){
+        filename = (typeof filename === "undefined")?("VERSION"):(filename);
+        let versionString = this.getVersionStringFromFile(filename);
+        let versionSuffix = this.parseVersionSuffix(versionString);
+        let versionObject = this.parseVersionString(versionString);
+        let major = parseInt(versionObject.major);
+        let minor = parseInt(versionObject.minor);
+        let patch = parseInt(versionObject.patch);
+        let newVersion = this.buildNewVersionString({major:major,minor:minor,patch:patch+1},versionSuffix);
+        this.saveNewVersionFile(filename,newVersion);
+        if (options.syncGit){
+          var commitMsg = options.commitMsg || `New Version v${newVersion}`;
+          this.syncGit(newVersion,commitMsg);
+        }
+      },
       upgradeToEnterprise: function (){
         let switchCommander = this;
         const readline = require("readline");
@@ -460,12 +579,34 @@ If you want to quit, press Ctrl-C.
               switchCommander.choiceOption.publish.call(switchCommander,args,options);
           });
 
+        this.program.command("v-major [filename]")
+          .option("--git, --sync-git", "Sync with Git")
+          .option("-m, --commit-msg [message]", "Commit Message")
+          .description("Semantic Versioning: Upgrade to a new major version")
+          .action(function(args, options){
+              switchCommander.choiceOption.v_major.call(switchCommander,args,options);
+          });
+        this.program.command("v-minor [filename]")
+          .option("--git, --sync-git", "Sync with Git")
+          .option("-m, --commit-msg [message]", "Commit Message")
+          .description("Semantic Versioning: Upgrade to a new minor version")
+          .action(function(args, options){
+              switchCommander.choiceOption.v_minor.call(switchCommander,args,options);
+          });
+
+        this.program.command("v-patch [filename]")
+          .option("--git, --sync-git", "Sync with Git")
+          .option("-m, --commit-msg [message]", "Commit Message")
+          .description("Semantic Versioning: Upgrade to a new patch version")
+          .action(function(args, options){
+              switchCommander.choiceOption.v_patch.call(switchCommander,args,options);
+          });
+
         this.program.command("upgrade-to-enterprise")
           .description("Upgrades to QCObjects Enterprise Edition")
           .action(function(args, options){
               switchCommander.choiceOption.upgradeToEnterprise.call(switchCommander,args,options);
           });
-
         this.program.command("generate-sw  <appname>")
           .description("Generates the service worker  <appname>")
           .action(function(args, options){
