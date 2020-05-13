@@ -41,35 +41,6 @@ const Handlebars = require("handlebars");
 Package("org.quickcorp.qcobjects.cli.commands.version",[
   Class("CommandHandler",{
     switchCommander:null,
-    parseVersionString: function (versionString){
-      let regexpVer = /^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
-      let versionObject = {...versionString.match(regexpVer).groups};
-      return versionObject;
-    },
-    getVersionStringFromFile: function (filename){
-      let versionString;
-      try {
-        versionString = fs.readFileSync(filename).toString().replace("\n","");
-      } catch (e){
-        versionString = "0.0.1";
-      }
-      return versionString;
-    },
-    buildNewSemVersionString: function ({major,minor,patch}){
-      return `${major}.${minor}.${patch}`;
-    },
-    parseVersionSuffix: function (versionString){
-      let versionObject = this.parseVersionString(versionString);
-      let semVersionString = this.buildNewSemVersionString(versionObject);
-      return versionString.replace(semVersionString,"");
-    },
-    buildNewVersionString: function ({major,minor,patch},suffix){
-      let semVersionString = this.buildNewSemVersionString({major,minor,patch});
-      return `${semVersionString}${suffix}`;
-    },
-    saveNewVersionFile: function (filename,versionString){
-      fs.writeFileSync(filename,versionString);
-    },
     syncGit: function (versionString,commitMsg){
 
       this.switchCommander.shellCommands([

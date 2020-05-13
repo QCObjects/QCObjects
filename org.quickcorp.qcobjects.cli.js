@@ -493,13 +493,13 @@ If you want to quit, press Ctrl-C.
 
         let importPluginCommands = function (){
           this.pluginCommandsList = [];
-          let _pluginCommandsList = global.ClassesList.filter(c=>c.packageName.startsWith('org.quickcorp.qcobjects.cli.commands.'));
-          _pluginCommandsList.filter(pluginCommand=>pluginCommand.className.endsWith('.CommandHandler')).map(pluginCommand => {
+          let _pluginCommandsList = global.ClassesList.filter(c=>c.packageName.startsWith("org.quickcorp.qcobjects.cli.commands."));
+          _pluginCommandsList.filter(pluginCommand=>pluginCommand.className.endsWith(".CommandHandler")).map(pluginCommand => {
             this.pluginCommandsList.push(New(pluginCommand.classFactory,{
               switchCommander:this
-            }))
+            }));
           });
-        }
+        };
         importPluginCommands.call(switchCommander);
 
         switchCommander.program.command("upgrade-to-enterprise")
