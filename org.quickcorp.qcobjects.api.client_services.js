@@ -37,16 +37,15 @@ Package("org.quickcorp.qcobjects.api.client_services", [
     cached: false,
     method: "post",
     headers: {
-      "Origin": "localhost",
-      "Content-Type": "application/json",
-      "::method":"post"
+      "origin": "localhost",
+      "content-type": "application/json"
     },
     basePath: "https://cloud.quickcorp.org/",
     url: "",
     withCredentials: false,
     _new_: function(o) {
       // service instantiated
-      this.headers["Authorization"] = "Basic token";
+      this.headers["authorization"] = "Basic token";
       this.url = this.basePath + o.apiMethod;
       this.data = o.data;
     },
