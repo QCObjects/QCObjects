@@ -56,6 +56,7 @@ if (process.argv.length<3){
   console.log(logo);
   console.log(instructions);
 }
+require(absolutePath+"/org.quickcorp.qcobjects.defaultsettings.js");
 
 require(absolutePath+"/org.quickcorp.qcobjects.cli");
 

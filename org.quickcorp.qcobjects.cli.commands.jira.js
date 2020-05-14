@@ -46,41 +46,48 @@ Package("org.quickcorp.qcobjects.cli.commands.jira",[
     getIssueList: function (username, password, project){
       return new Promise(function (resolve, reject){
         logger.info("I'm going to get the issue list from the jira cloud...");
-        let cloudClient = New(JiraCloud, {
-          username: "correojean@gmail.com",
-          password: "xglC5b7Pp7X55xJQ08Y4A5DB",
-          apiMethod: "rest/api/latest/search",
-          data:{"jql":"project = QJI","startAt":0,"maxResults":5000,"fields":["id","key","summary","timetracking"]}
-        });
-        try {
-          let service = serviceLoader(cloudClient).then(successResponse => {
-            let template = successResponse.service.template;
-            let responseHeaders = successResponse.responseHeaders;
-            if (responseHeaders[":status"] === 200 || !cloudClient.useHTTP2){
-              let response = JSON.parse(template);
-              resolve(response);
-            } else {
-              console.error("\u{1F926} Something went wrong \u{1F926} when trying to get jira issues from the cloud. The status was: "+responseHeaders[":status"]);
-              reject(template);
-            }
-          }).catch ((e)=>{
+        let jira_config = CONFIG.get("jira",null);
+        if (jira_config !== null){
+          let jira_username = jira_config.username;
+          let jira_password = jira_config.auth_token;
+          let jira_project = jira_config.project;
+          let jira_domain = jira_config.domain;
+          let jira_issue_fields = ["id","key","summary","timetracking"];
+          let cloudClient = New(JiraCloud, {
+            domain:  `${jira_domain}`,
+            username: `${jira_username}`,
+            password: `${jira_password}`,
+            apiMethod: "rest/api/latest/search",
+            data:{"jql":`project = ${jira_project}`,"startAt":0,"maxResults":5000,"fields":jira_issue_fields}
+          });
+          try {
+            let service = serviceLoader(cloudClient).then(successResponse => {
+              let template = successResponse.service.template;
+              let responseHeaders = successResponse.responseHeaders;
+              if (responseHeaders[":status"] === 200 || !cloudClient.useHTTP2){
+                let response = JSON.parse(template);
+                resolve(response);
+              } else {
+                console.error("\u{1F926} Something went wrong \u{1F926} when trying to get jira issues from the cloud. The status was: "+responseHeaders[":status"]);
+                reject(template);
+              }
+            }).catch ((e)=>{
+              console.error("\u{1F926} Something went wrong \u{1F926} when trying to get jira issues from the cloud");
+              reject(e);
+            });
+          } catch (e){
             console.error("\u{1F926} Something went wrong \u{1F926} when trying to get jira issues from the cloud");
             reject(e);
-          });
-        } catch (e){
-          console.error("\u{1F926} Something went wrong \u{1F926} when trying to get jira issues from the cloud");
-          reject(e);
+          }
+
+        } else {
+          console.error("\u{1F926} Something went wrong \u{1F926} You need to set the jira config settings");
+          reject();
         }
 
       });
     },
     choiceOption:{
-      credentials: function (username,options){
-
-      },
-      whereis: function (jira_base_url,options){
-
-      },
       issues: function (options){
 
         this.getIssueList().then(function (response){
@@ -103,8 +110,6 @@ Package("org.quickcorp.qcobjects.cli.commands.jira",[
         .option("-f, --format <format>", "Format (json, table)")
         .description(`Jira Integration:
                               Sub-Commands can be:
-                                  credentials: To save creadential for auth login to jira
-                                  whereis: To inform QCObjects where is your JIRA located
                                   issues: To get the issues list from JIRA
           `)
         .action(function(subcommand, options){

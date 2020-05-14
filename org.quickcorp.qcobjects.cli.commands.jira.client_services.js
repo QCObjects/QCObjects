@@ -45,7 +45,7 @@ Package("org.quickcorp.qcobjects.cli.commands.jira.client_services", [
     withCredentials: false,
     _new_: function(o) {
       // service instantiated
-      this.domain = "qcobjects.atlassian.net";
+      this.domain = `${o.domain}`;
       this.basePath = `https://${this.domain}/`;
       this.username_password = `${o.username}:${o.password}`;
       this.headers["authorization"] = `Basic ${Buffer.from(this.username_password).toString("base64")}`;
