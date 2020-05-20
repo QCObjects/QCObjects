@@ -22,33 +22,39 @@
  * Everyone is permitted to copy and distribute verbatim copies of this
  * license document, but changing it is not allowed.
 */
+/*eslint no-unused-vars: "off"*/
+/*eslint no-redeclare: "off"*/
+/*eslint no-empty: "off"*/
+/*eslint strict: "off"*/
+/*eslint no-mixed-operators: "off"*/
+/*eslint no-undef: "off"*/
 "use strict";
-const fs = require('fs');
-const os = require('os');
-const { exec,execSync } = require('child_process');
+const fs = require("fs");
+const os = require("os");
+const { exec,execSync } = require("child_process");
 // MY_ENV_VAR="HELLO WORLD" php -f index.php
 
 let fixWinCmd = function (commandline){
-  if (!process.platform.toLowerCase().startsWith('win')){
-    commandline = commandline.replace(/(")/g, String.fromCharCode(92)+`\"`);
+  if (!process.platform.toLowerCase().startsWith("win")){
+    commandline = commandline.replace(/(")/g, String.fromCharCode(92)+"\"");
   }
   return commandline;
-}
+};
 
-Package('org.quickcorp.backend.php',[
-  Class('PHPMicroservice',BackendMicroservice,{
+Package("org.quickcorp.backend.php",[
+  Class("PHPMicroservice",BackendMicroservice,{
     body:null,
-    tempFileName: '',
+    tempFileName: "",
     get_php_headers_list:function (){
       var phpheaders = {
         "QUERY_STRING":`${this.request.query}`,
-        "REDIRECT_STATUS":`200`,
+        "REDIRECT_STATUS":"200",
         "REQUEST_METHOD":`${this.request.method}`,
         "SCRIPT_FILENAME":`${this.scriptFilePath}`,
         "SCRIPT_NAME":`${this.scriptFilePath.toString()}`,
         "PATH_INFO":`${this.request.path}`,
         "SERVER_NAME":`${this.domain}`,
-        "SERVER_PROTOCOL":`HTTP/2`,
+        "SERVER_PROTOCOL":"HTTP/2",
         "REQUEST_URI":`${this.request.href}`,
         "HTTP_HOST":`${this.domain}`
       };
@@ -56,13 +62,13 @@ Package('org.quickcorp.backend.php',[
         return encodeURIComponent(str).replace(/[!'()]/g, escape).replace(/\*/g, "%2A");
       }
       for (var headername in this.request.headers){
-        if (!headername.startsWith(':')){
-          var phpheadername = headername.toUpperCase().replace(new RegExp('-','g'),'_');
+        if (!headername.startsWith(":")){
+          var phpheadername = headername.toUpperCase().replace(new RegExp("-","g"),"_");
           var headervalue = this.request.headers[headername];
-          if (typeof headervalue != 'string'){
+          if (typeof headervalue != "string"){
             headervalue = JSON.stringify(headervalue);
           }
-          phpheaders['HTTP_'+phpheadername] = fixedEncodeURIComponent(headervalue);
+          phpheaders["HTTP_"+phpheadername] = fixedEncodeURIComponent(headervalue);
         }
       }
 
@@ -72,22 +78,22 @@ Package('org.quickcorp.backend.php',[
       var filename = os.tmpdir() + this.tempFileName;
       fs.writeFile(filename, data, (err) => {
         if (err) throw err;
-        logger.debug('A temp data file has been saved!');
+        logger.debug("A temp data file has been saved!");
         done.call(this);
       });
     },
     generateTempFileName: function (){
-      this.tempFileName = 'temp' + Date.now().toString();
+      this.tempFileName = "temp" + Date.now().toString();
       return this.tempFileName;
     },
     trimSlash:function (pathname){
-      if (pathname.startsWith('/')){
+      if (pathname.startsWith("/")){
         pathname = pathname.slice(1);
       }
-      if (pathname.endsWith('/')){
+      if (pathname.endsWith("/")){
         pathname = pathname.slice(0,-1);
       }
-      return pathname.replace('//','/');
+      return pathname.replace("//","/");
     },
     get:function (){
       var microservice = this;
@@ -95,31 +101,31 @@ Package('org.quickcorp.backend.php',[
 
       microservice.saveTempData(this.request.query,function (){
         try {
-          process.chdir(CONFIG.get('documentRoot')+microservice.request.pathname.slice(1));
+          process.chdir(CONFIG.get("documentRoot")+microservice.request.pathname.slice(1));
         } catch (e){}
 
-        var scriptFileName = (microservice.route.hasOwnProperty('redirect_to')
-          && microservice.route.redirect_to !== '')?(microservice.route.redirect_to):(microservice.request.scriptname);
+        var scriptFileName = (microservice.route.hasOwnProperty.call(microservice.route,"redirect_to")
+          && microservice.route.redirect_to !== "")?(microservice.route.redirect_to):(microservice.request.scriptname);
         var pathname = this.trimSlash(microservice.request.pathname);
-        var documentRoot = CONFIG.get('documentRoot','');
-        if (documentRoot == './'){
-          documentRoot = '';
+        var documentRoot = CONFIG.get("documentRoot","");
+        if (documentRoot == "./"){
+          documentRoot = "";
         }
 
         var scriptFilePath;
-        if (documentRoot !== ''){
+        if (documentRoot !== ""){
           scriptFilePath = `${documentRoot}/${pathname}/${scriptFileName}`;
         } else {
           scriptFilePath = `${pathname}/${scriptFileName}`;
         }
 
-        scriptFilePath = scriptFilePath.replace('//','/');
-        if (scriptFilePath.startsWith('/') && !documentRoot.startsWith('/')){
+        scriptFilePath = scriptFilePath.replace("//","/");
+        if (scriptFilePath.startsWith("/") && !documentRoot.startsWith("/")){
           scriptFilePath = scriptFilePath.slice(1);
         }
 
         logger.debug(`Loading PHP file: ${scriptFilePath}`);
-        var PHPIncludePath = `.:${CONFIG.get('documentRoot')}:${CONFIG.get('projectPath')}`;
+        var PHPIncludePath = `.:${CONFIG.get("documentRoot")}:${CONFIG.get("projectPath")}`;
 
         microservice.scriptFilePath = scriptFilePath;
 
@@ -139,7 +145,7 @@ foreach ($_SERVER as $_k => $_v) {
 unlink(sys_get_temp_dir().'${microservice.tempFileName}');
 include('${scriptFilePath}');
 ?>
-EOF`
+EOF`;
         commandline = fixWinCmd(commandline);
         logger.debug(commandline);
         try {
@@ -149,7 +155,7 @@ EOF`
             microservice.done();
           });
         } catch (ex){
-          microservice.body = '500 - INTERNAL ERROR';
+          microservice.body = "500 - INTERNAL ERROR";
           logger.debug(ex.toString());
           console.log(ex);
           microservice.done();
@@ -158,39 +164,39 @@ EOF`
       });
 
     },
-    head:function (formData){this.done()},
+    head:function (formData){this.done();},
     post:function (formData){
-      logger.debug('POST DATA');
+      logger.debug("POST DATA");
       var microservice = this;
       microservice.generateTempFileName();
 
       microservice.saveTempData(formData,function (){
         try {
-          process.chdir(CONFIG.get('documentRoot')+microservice.request.pathname.slice(1));
+          process.chdir(CONFIG.get("documentRoot")+microservice.request.pathname.slice(1));
         } catch (e){}
 
-        var scriptFileName = (microservice.route.hasOwnProperty('redirect_to')
-          && microservice.route.redirect_to !== '')?(microservice.route.redirect_to):(microservice.request.scriptname);
+        var scriptFileName = (microservice.route.hasOwnProperty.call(microservice.route,"redirect_to")
+          && microservice.route.redirect_to !== "")?(microservice.route.redirect_to):(microservice.request.scriptname);
         var pathname = this.trimSlash(microservice.request.pathname);
-        var documentRoot = CONFIG.get('documentRoot','');
-        if (documentRoot == './'){
-          documentRoot = '';
+        var documentRoot = CONFIG.get("documentRoot","");
+        if (documentRoot == "./"){
+          documentRoot = "";
         }
 
         var scriptFilePath;
-        if (documentRoot !== ''){
+        if (documentRoot !== ""){
           scriptFilePath = `${documentRoot}/${pathname}/${scriptFileName}`;
         } else {
           scriptFilePath = `${pathname}/${scriptFileName}`;
         }
 
-        scriptFilePath = scriptFilePath.replace('//','/');
-        if (scriptFilePath.startsWith('/') && !documentRoot.startsWith('/')){
+        scriptFilePath = scriptFilePath.replace("//","/");
+        if (scriptFilePath.startsWith("/") && !documentRoot.startsWith("/")){
           scriptFilePath = scriptFilePath.slice(1);
         }
 
         logger.debug(`Loading PHP file: ${scriptFilePath}`);
-        var PHPIncludePath = `.:${CONFIG.get('documentRoot')}:${CONFIG.get('projectPath')}`;
+        var PHPIncludePath = `.:${CONFIG.get("documentRoot")}:${CONFIG.get("projectPath")}`;
 
         microservice.scriptFilePath = scriptFilePath;
 
@@ -210,14 +216,14 @@ foreach ($_SERVER as $_k => $_v) {
 unlink(sys_get_temp_dir().'${microservice.tempFileName}');
 @include('${scriptFilePath}');
 ?>
-EOF`
+EOF`;
         commandline = fixWinCmd(commandline);
 //        logger.debug(commandline);
 
         try {
           microservice.body = execSync(commandline).toString();
         } catch (ex){
-          microservice.body = '500 - INTERNAL ERROR';
+          microservice.body = "500 - INTERNAL ERROR";
           logger.debug(ex.toString());
         }
         microservice.done();
@@ -225,12 +231,12 @@ EOF`
       });
 
     },
-    put:function (formData){this.done()},
-    delete:function (formData){this.done()},
-    connect:function (formData){this.done()},
-    options:function (formData){this.done()},
-    trace:function (formData){this.done()},
-    patch:function (formData){this.done()},
+    put:function (formData){this.done();},
+    delete:function (formData){this.done();},
+    connect:function (formData){this.done();},
+    options:function (formData){this.done();},
+    trace:function (formData){this.done();},
+    patch:function (formData){this.done();},
     done: function(){
       var microservice = this;
       var stream = microservice.stream;
@@ -248,41 +254,41 @@ EOF`
         stream.write(this.body);
         stream.end();
       } catch (e){
-        logger.debug('Something wrong writing the response for microservice'+e.toString());
+        logger.debug("Something wrong writing the response for microservice"+e.toString());
       }
     },
     _new_:function (o){
-      logger.debug('PHP Microservice executing');
+      logger.debug("PHP Microservice executing");
       let microservice = this;
       let request = microservice.request;
       let stream = o.stream;
       microservice.stream = stream;
-      stream.on('data', (data) => {
+      stream.on("data", (data) => {
         // data from POST, GET
         var requestMethod = request.method.toLowerCase();
-        var supportedMethods = {'post':microservice.post,
+        var supportedMethods = {"post":microservice.post,
                               };
-        if (supportedMethods.hasOwnProperty(requestMethod)) {
+        if (supportedMethods.hasOwnProperty.call(supportedmethods,requestMethod)) {
           supportedMethods[requestMethod].call(microservice,data);
         }
       });
 
       // data from POST, GET
       var requestMethod = request.method.toLowerCase();
-      var supportedMethods = {'get':microservice.get,
-                              'head':microservice.head,
-                              'put':microservice.put,
-                              'delete':microservice.delete,
-                              'connect':microservice.connect,
-                              'options':microservice.options,
-                              'trace':microservice.trace,
-                              'patch':microservice.patch
+      var supportedMethods = {"get":microservice.get,
+                              "head":microservice.head,
+                              "put":microservice.put,
+                              "delete":microservice.delete,
+                              "connect":microservice.connect,
+                              "options":microservice.options,
+                              "trace":microservice.trace,
+                              "patch":microservice.patch
                             };
-      if (supportedMethods.hasOwnProperty(requestMethod)) {
+      if (supportedMethods.hasOwnProperty.call(supportedMethods,requestMethod)) {
         supportedMethods[requestMethod].call(microservice);
       }
 
     }
   }),
-  Class('Microservice',PHPMicroservice)
+  Class("Microservice",PHPMicroservice)
 ]);
