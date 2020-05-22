@@ -67,7 +67,7 @@ Package("org.quickcorp.qcobjects.cli",[
               }).stdout.on("data", function(data) {
                   logger.info(data);
               });
-            })
+            });
           }
         );
         var _promise_all = Promise.all(_promises_set).then(function (response){

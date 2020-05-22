@@ -42,7 +42,7 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
   Class("CommandHandler",{
     switchCommander:null,
     syncGit: function (versionString,commitMsg, syncNpm = false){
-      let _commands_ = []
+      let _commands_ = [];
       if (syncNpm){
         _commands_ = _commands_.concat(
           [
