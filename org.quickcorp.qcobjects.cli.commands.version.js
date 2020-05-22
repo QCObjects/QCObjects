@@ -146,7 +146,7 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
         filename = (typeof filename === "undefined")?("VERSION"):(filename);
         var commandHandler = this;
          commandHandler.switchCommander.shellCommands([
-           `echo \$(git describe\)`
+           "echo $(git describe)"
          ]).then(function (response){
            let versionString = response[0].split("-")[0].slice(1);
            let versionSuffix = commandHandler.parseVersionSuffix(versionString);
@@ -157,9 +157,10 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
            let newVersion = commandHandler.buildNewVersionString({major:major,minor:minor,patch:patch},versionSuffix);
            commandHandler.saveNewVersionFile(filename,newVersion);
            var commitMsg = options.commitMsg || `New Version v${newVersion}`;
-           commandHandler.switchCommander.shellCommands([
-                       `npm version "${newVersion}" --allow-same-version -m "${commitMsg}"`
-                     ]
+           commandHandler.switchCommander.shellCommands(
+             [
+               `npm version "${newVersion}" --allow-same-version -m "${commitMsg}"`
+             ]
             ).then(function (response){
               console.log(response);
             });
