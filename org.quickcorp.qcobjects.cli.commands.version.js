@@ -79,6 +79,7 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
       });
     },
     parseVersionString: function (versionString){
+      versionString = versionString.replace("\n","");
       let regexpVer = /^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
       let versionObject = {...versionString.match(regexpVer).groups};
       return versionObject;
@@ -96,6 +97,7 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
       return `${major}.${minor}.${patch}`;
     },
     parseVersionSuffix: function (versionString){
+      versionString = versionString.replace("\n","");
       let versionObject = this.parseVersionString(versionString);
       let semVersionString = this.buildNewSemVersionString(versionObject);
       return versionString.replace(semVersionString,"");
@@ -160,6 +162,7 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
            "echo $(git describe)"
          ]).then(function (response){
            let versionString = response[0].split("-")[0].slice(1);
+           console.log(versionString);
            let versionSuffix = commandHandler.parseVersionSuffix(versionString);
            let versionObject = commandHandler.parseVersionString(versionString);
            let major = parseInt(versionObject.major);
