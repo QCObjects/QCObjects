@@ -65,7 +65,7 @@ Package("org.quickcorp.qcobjects.cli",[
                   reject(stderr);
                 }
               }).stdout.on("data", function(data) {
-                  logger.info(data);
+                  console.log(data);
               });
             });
           }
