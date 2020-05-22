@@ -54,11 +54,22 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
         [
           `git add . && git commit -am "${commitMsg}"`,
           "git fetch origin --tags",
-          "git tag -ln",
-          `git tag -a "v${versionString}" -m "${commitMsg}"`,
+          "git tag -ln"
+        ]);
+
+      if (!syncNpm){
+        _commands_ = _commands_.concat(
+          [
+            `git tag -a "v${versionString}" -m "${commitMsg}"`,
+          ]
+        );
+      }
+
+      _commands_ = _commands_.concat([
           "git push && git push --tags"
         ]
       );
+
       this.switchCommander.shellCommands(_commands_).then(function (response){
         logger.info("Synced to Git");
         logger.debug(response);
