@@ -212,7 +212,7 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
                ).filter(desc=>!desc.startsWith(minor.slice(1))).sort().unique().join("\n\t- ")
              };
            }).map(hist=>{return `## ${hist.major} -> ${hist.minor}` + "\n" + hist.history;}).join("\n");
-           let subtitle = "This is an automatic Changelog history of versions generated using the command: **qcobjects v-changelog > CHANGELOG**";
+           let subtitle = "This is an automatic Changelog history of versions generated using the command: **qcobjects v-changelog > CHANGELOG.md**";
            console.log("# Changelog \n\n"+subtitle+"\n\n"+history);
 
          });
