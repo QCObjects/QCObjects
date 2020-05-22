@@ -183,6 +183,39 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
               console.log(response);
             });
          });
+      },
+      v_changelog: function (){
+        let commandHandler = this;
+        commandHandler.switchCommander.shellCommands(
+          [
+            "git tag -ln"
+          ]
+         ).then(function (response){
+           var versionTags = response[0].split("\n").map(tag=>tag.split(" ").unique()).unique().map(
+             tag=>{return {
+               "version":tag[0],
+               "major":tag[0].split(".")[0],
+               "minor":tag[0].split(".")[0]+"."+tag[0].split(".")[1],
+               "description":tag.slice(1).join(" ").trim()
+             }}
+           );
+           var minorVersionTags = versionTags.filter(tag=>tag.version!=="").map(tag=>tag.version.split(".")[0] +"."+ tag.version.split(".")[1]).unique();
+           var majorVersionTags = versionTags.filter(tag=>tag.version!=="").map(tag=>tag.version.split(".")[0]).unique();
+           var history = minorVersionTags.map(minor=>{
+             return {
+               "major":minor.split(".")[0],
+               "minor":minor,
+               "history":"\n\t- "+versionTags.filter(tag=>tag.minor===minor).map(
+                 function (tag){
+                   return tag.description
+                 }
+               ).filter(desc=>!desc.startsWith(minor.slice(1))).sort().unique().join("\n\t- ")
+             }
+           }).map(hist=>{return `## ${hist.major} -> ${hist.minor}` + "\n" + hist.history}).join("\n");
+           let subtitle = `This is an automatic Changelog history of versions generated using the command: **qcobjects v-changelog > CHANGELOG**`;
+           console.log("# Changelog \n\n"+subtitle+"\n\n"+history);
+
+         });
       }
     },
     _new_({switchCommander}){
@@ -222,6 +255,11 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
             commandHandler.choiceOption.v_sync.call(commandHandler,args,options);
         });
 
+      switchCommander.program.command("v-changelog")
+        .description("Semantic Versioning: Shows a changelog using Semantic Versioning")
+        .action(function(args, options){
+            commandHandler.choiceOption.v_changelog.call(commandHandler,args,options);
+        });
 
     }
   })
