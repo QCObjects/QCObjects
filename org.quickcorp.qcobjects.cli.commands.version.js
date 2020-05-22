@@ -142,6 +142,29 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
           this.syncGit(newVersion,commitMsg, options.syncNpm);
         }
       },
+      v_sync: function (filename, options){
+        filename = (typeof filename === "undefined")?("VERSION"):(filename);
+        var commandHandler = this;
+         commandHandler.switchCommander.shellCommands([
+           `echo \$(git describe\)`
+         ]).then(function (response){
+           let versionString = response[0].split("-")[0].slice(1);
+           let versionSuffix = commandHandler.parseVersionSuffix(versionString);
+           let versionObject = commandHandler.parseVersionString(versionString);
+           let major = parseInt(versionObject.major);
+           let minor = parseInt(versionObject.minor);
+           let patch = parseInt(versionObject.patch);
+           let newVersion = commandHandler.buildNewVersionString({major:major,minor:minor,patch:patch},versionSuffix);
+           commandHandler.saveNewVersionFile(filename,newVersion);
+           var commitMsg = options.commitMsg || `New Version v${newVersion}`;
+           commandHandler.switchCommander.shellCommands([
+                       `npm version "${newVersion}" --allow-same-version -m "${commitMsg}"`
+                     ]
+            ).then(function (response){
+              console.log(response);
+            });
+         });
+      }
     },
     _new_({switchCommander}){
       let commandHandler = this;
@@ -171,6 +194,12 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
         .description("Semantic Versioning: Upgrade to a new patch version")
         .action(function(args, options){
             commandHandler.choiceOption.v_patch.call(commandHandler,args,options);
+        });
+
+      switchCommander.program.command("v-sync [filename]")
+        .description("Semantic Versioning: Sync the version of NPM with version of GIT")
+        .action(function(args, options){
+            commandHandler.choiceOption.v_sync.call(commandHandler,args,options);
         });
 
 

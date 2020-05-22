@@ -53,7 +53,7 @@ Package("org.quickcorp.qcobjects.cli",[
       return new Promise(function (resolve_all,reject_all){
         var _promises_set = _shell_commands.map(
           function (shell_command){
-            return new Promise(
+            return (new Promise(
             function (resolve,reject){
               logger.debug(shell_command);
               exec(shell_command,(err,stdout,stderr)=>{
@@ -65,9 +65,9 @@ Package("org.quickcorp.qcobjects.cli",[
                   reject(stderr);
                 }
               }).stdout.on("data", function(data) {
-                  console.log(data);
+                  logger.info(data);
               });
-            });
+            })).catch(e=>reject_all(e));
           }
         );
         var _promise_all = Promise.all(_promises_set).then(function (response){
@@ -75,7 +75,7 @@ Package("org.quickcorp.qcobjects.cli",[
         }).catch(function (e){
           reject_all(e);
         });
-      });
+      }).catch(e=>console.log(e));
     },
     fileListRecursive : function (dir) {
         var instance = this;
