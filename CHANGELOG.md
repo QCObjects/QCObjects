@@ -14,7 +14,6 @@ This is an automatic Changelog history of versions generated using the command: 
 	- PHP Support for QCObjects Server
 	- PHP Support for QCObjects server
 	- PHP support for QCObjects Server
-	- Synced Versions from git and npm
 	- allowing {param} style in microservices paths
 	- asynchronous exec of php
 	- calling Microservice straight from the package to prevent scope issues
@@ -70,3 +69,4 @@ This is an automatic Changelog history of versions generated using the command: 
 	- upgrade-to-enterprise
 	- using ClassFactory to recover the Microservice Package
 	- v-sync
+	- version: fetch git tags before tagging
