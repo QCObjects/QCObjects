@@ -46,6 +46,7 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
       if (syncNpm){
         _commands_ = _commands_.concat(
           [
+            "git fetch --tags -f",
             `npm version "${versionString}" -m "${commitMsg}"`
           ]
         );
@@ -173,6 +174,7 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
            var commitMsg = options.commitMsg || `Synced Version v${newVersion}`;
            commandHandler.switchCommander.shellCommands(
              [
+               "git fetch --tags -f",
                `git add . && git commit -am "${commitMsg}"`,
                "git fetch origin --tags",
                "git tag -ln",
