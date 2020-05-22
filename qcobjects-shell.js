@@ -117,9 +117,9 @@ const preloaded_scripts = [
   "Object.assign(this,this.constructor.constructor('return this')())"
 ];
 
-for (var k in preloaded_scripts){
-  runScript(preloaded_scripts[k].trim());
-}
+preloaded_scripts.map(preloaded_script =>
+  runScript(preloaded_script.trim())
+)
 
 
 console.log(welcometo);
