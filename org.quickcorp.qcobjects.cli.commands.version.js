@@ -161,7 +161,7 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
          commandHandler.switchCommander.shellCommands([
            "echo $(git describe)"
          ]).then(function (response){
-           let versionString = response[0].split("-")[0].slice(1);
+           let versionString = response[0].split("-")[0].slice(1).replace("\n","");
            console.log(versionString);
            let versionSuffix = commandHandler.parseVersionSuffix(versionString);
            let versionObject = commandHandler.parseVersionString(versionString);
@@ -216,6 +216,7 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
         });
 
       switchCommander.program.command("v-sync [filename]")
+        .option("-m, --commit-msg [message]", "Commit Message")
         .description("Semantic Versioning: Sync the version of NPM with version of GIT")
         .action(function(args, options){
             commandHandler.choiceOption.v_sync.call(commandHandler,args,options);
