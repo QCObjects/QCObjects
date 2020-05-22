@@ -170,10 +170,14 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
            let patch = parseInt(versionObject.patch);
            let newVersion = commandHandler.buildNewVersionString({major:major,minor:minor,patch:patch},versionSuffix);
            commandHandler.saveNewVersionFile(filename,newVersion);
-           var commitMsg = options.commitMsg || `New Version v${newVersion}`;
+           var commitMsg = options.commitMsg || `Synced Version v${newVersion}`;
            commandHandler.switchCommander.shellCommands(
              [
-               `npm version "${newVersion}" --allow-same-version -m "${commitMsg}"`
+               `git add . && git commit -am "${commitMsg}"`,
+               "git fetch origin --tags",
+               "git tag -ln",
+               `npm version "${newVersion}" --allow-same-version -m "${commitMsg}"`,
+               "git push && git push --tags"
              ]
             ).then(function (response){
               console.log(response);
