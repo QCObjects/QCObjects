@@ -41,15 +41,25 @@ const Handlebars = require("handlebars");
 Package("org.quickcorp.qcobjects.cli.commands.version",[
   Class("CommandHandler",{
     switchCommander:null,
-    syncGit: function (versionString,commitMsg){
-
-      this.switchCommander.shellCommands([
-        `git add . && git commit -am ${commitMsg}`,
-        "git fetch origin --tags",
-        "git tag -ln",
-        `git tag -a "v${versionString}" -m "${commitMsg}"`,
-        "git push && git push --tags",
-      ]).then(function (response){
+    syncGit: function (versionString,commitMsg, syncNpm = false){
+      let _commands_ = []
+      if (syncNpm){
+        _commands_ = _commands_.concat(
+          [
+            `npm version "${versionString}" -m "${commitMsg}"`
+          ]
+        );
+      }
+      _commands_ = _commands_.concat(
+        [
+          `git add . && git commit -am "${commitMsg}"`,
+          "git fetch origin --tags",
+          "git tag -ln",
+          `git tag -a "v${versionString}" -m "${commitMsg}"`,
+          "git push && git push --tags"
+        ]
+      );
+      this.switchCommander.shellCommands(_commands_).then(function (response){
         logger.info("Synced to Git");
         logger.debug(response);
       }).catch (function (e){
@@ -99,7 +109,7 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
         this.saveNewVersionFile(filename,newVersion);
         if (options.syncGit){
           var commitMsg = options.commitMsg || `New Version v${newVersion}`;
-          this.syncGit(newVersion,commitMsg);
+          this.syncGit(newVersion,commitMsg, options.syncNpm);
         }
       },
       v_minor: function (filename,options){
@@ -114,7 +124,7 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
         this.saveNewVersionFile(filename,newVersion);
         if (options.syncGit){
           var commitMsg = options.commitMsg || `New Version v${newVersion}`;
-          this.syncGit(newVersion,commitMsg);
+          this.syncGit(newVersion,commitMsg, options.syncNpm);
         }
       },
       v_patch: function (filename,options){
@@ -129,7 +139,7 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
         this.saveNewVersionFile(filename,newVersion);
         if (options.syncGit){
           var commitMsg = options.commitMsg || `New Version v${newVersion}`;
-          this.syncGit(newVersion,commitMsg);
+          this.syncGit(newVersion,commitMsg, options.syncNpm);
         }
       },
     },
@@ -139,6 +149,7 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
 
       switchCommander.program.command("v-major [filename]")
         .option("--git, --sync-git", "Sync with Git")
+        .option("--npm, --sync-npm", "Sync with NPM")
         .option("-m, --commit-msg [message]", "Commit Message")
         .description("Semantic Versioning: Upgrade to a new major version")
         .action(function(args, options){
@@ -146,6 +157,7 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
         });
       switchCommander.program.command("v-minor [filename]")
         .option("--git, --sync-git", "Sync with Git")
+        .option("--npm, --sync-npm", "Sync with NPM")
         .option("-m, --commit-msg [message]", "Commit Message")
         .description("Semantic Versioning: Upgrade to a new minor version")
         .action(function(args, options){
@@ -154,6 +166,7 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
 
       switchCommander.program.command("v-patch [filename]")
         .option("--git, --sync-git", "Sync with Git")
+        .option("--npm, --sync-npm", "Sync with NPM")
         .option("-m, --commit-msg [message]", "Commit Message")
         .description("Semantic Versioning: Upgrade to a new patch version")
         .action(function(args, options){

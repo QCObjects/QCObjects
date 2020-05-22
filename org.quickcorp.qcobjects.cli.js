@@ -51,12 +51,11 @@ Package("org.quickcorp.qcobjects.cli",[
     program:require("commander"),
     shellCommands: function (_shell_commands){
       return new Promise(function (resolve_all,reject_all){
-        var _promises_set = [];
-        for (var k in _shell_commands){
-          var shell_command = _shell_commands[k];
-          _promises_set.push(
-            new Promise(
+        var _promises_set = _shell_commands.map(
+          function (shell_command){
+            return new Promise(
             function (resolve,reject){
+              logger.debug(shell_command);
               exec(shell_command,(err,stdout,stderr)=>{
                 if (!err){
                   resolve(stdout);
@@ -69,8 +68,8 @@ Package("org.quickcorp.qcobjects.cli",[
                   logger.info(data);
               });
             })
-          );
-        }
+          }
+        );
         var _promise_all = Promise.all(_promises_set).then(function (response){
           resolve_all(response);
         }).catch(function (e){
