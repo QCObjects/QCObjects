@@ -197,7 +197,7 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
                "major":tag[0].split(".")[0],
                "minor":tag[0].split(".")[0]+"."+tag[0].split(".")[1],
                "description":tag.slice(1).join(" ").trim()
-             }}
+             };}
            );
            var minorVersionTags = versionTags.filter(tag=>tag.version!=="").map(tag=>tag.version.split(".")[0] +"."+ tag.version.split(".")[1]).unique();
            var majorVersionTags = versionTags.filter(tag=>tag.version!=="").map(tag=>tag.version.split(".")[0]).unique();
@@ -207,12 +207,12 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
                "minor":minor,
                "history":"\n\t- "+versionTags.filter(tag=>tag.minor===minor).map(
                  function (tag){
-                   return tag.description
+                   return tag.description;
                  }
                ).filter(desc=>!desc.startsWith(minor.slice(1))).sort().unique().join("\n\t- ")
-             }
-           }).map(hist=>{return `## ${hist.major} -> ${hist.minor}` + "\n" + hist.history}).join("\n");
-           let subtitle = `This is an automatic Changelog history of versions generated using the command: **qcobjects v-changelog > CHANGELOG**`;
+             };
+           }).map(hist=>{return `## ${hist.major} -> ${hist.minor}` + "\n" + hist.history;}).join("\n");
+           let subtitle = "This is an automatic Changelog history of versions generated using the command: **qcobjects v-changelog > CHANGELOG**";
            console.log("# Changelog \n\n"+subtitle+"\n\n"+history);
 
          });
