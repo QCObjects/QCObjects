@@ -119,7 +119,7 @@ const preloaded_scripts = [
 
 preloaded_scripts.map(preloaded_script =>
   runScript(preloaded_script.trim())
-)
+);
 
 
 console.log(welcometo);
