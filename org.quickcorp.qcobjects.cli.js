@@ -308,9 +308,7 @@ Package("org.quickcorp.qcobjects.cli",[
           }
           logger.debug(createAppCommand);
           exec(createAppCommand, (err, stdout, stderr) => {
-            console.log(stdout);
             exec("npm cache verify && npm i --save-dev ", (err, stdout, stderr) => {
-              console.log(stdout);
               Promise.resolve(switchCommander.copyTemplate()).then(()=>{
                 logger.info("Good! Your application is getting done. You can play with QCObjects now!");
                 logger.info("In about five seconds your server will start...");
@@ -319,9 +317,15 @@ Package("org.quickcorp.qcobjects.cli",[
                   exec("npm uninstall "+appTemplateName+" --save && npm cache verify",(err,stdout,stderr)=>{
                     switchCommander.generateServiceWorker(appName);
                   });
+                }).stdout.on("data", function(data) {
+                    console.log(data);
                 });
               });
+            }).stdout.on("data", function(data) {
+                console.log(data);
             });
+          }).stdout.on("data", function(data) {
+              console.log(data);
           });
 
         });
