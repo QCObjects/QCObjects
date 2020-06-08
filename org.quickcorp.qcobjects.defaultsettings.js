@@ -104,5 +104,6 @@ try {
     }
   }
 }catch (e){
-  logger.debug("No config.json file in your project");
+  logger.debug(e);
+  logger.debug("Something went wrong trying to load config.json file in your project");
 }
