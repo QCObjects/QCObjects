@@ -50,7 +50,7 @@ switch (certificate_provider) {
     break;
   case "letsencrypt":
     var prehook_posthook = "--pre-hook \"service qcobjects stop\" --post-hook=\"service qcobjects start\"";
-    stdout = execSync(`certbot -n -d ${CONFIG.get("domain")} --authenticator --standalone ${prehook_posthook}`);
+    stdout = execSync(`certbot -n -d ${CONFIG.get("domain")} certonly --standalone ${prehook_posthook}`);
     break;
   default:
     break;
