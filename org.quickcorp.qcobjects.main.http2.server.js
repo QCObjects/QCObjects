@@ -93,6 +93,7 @@ Package("org.quickcorp.qcobjects.main.http2.server",[
         stream.end();
 
       } catch (e){
+        logger.debug("[ERROR] something went wrong when trying to send the response as file "+filename);
         if (e.errno==-2){
           const headers = {
             ":status": 404,
@@ -161,6 +162,7 @@ Package("org.quickcorp.qcobjects.main.http2.server",[
     response:"",
     server:null,
     scriptname:"",
+    interceptorInstances:[],
     showIPAddress:function (){
       var _ret_ = "";
       var os = require("os");
@@ -213,13 +215,14 @@ Package("org.quickcorp.qcobjects.main.http2.server",[
       logger.info("Listening on HTTPS PORT: "+CONFIG.get("serverPortHTTPS").toString());
       logger.info("Go to: \n"+this.showPossibleURL());
 
-      this.server = http2.createSecureServer({
+      let http2ServerInstance = this;
+      http2ServerInstance.server = http2.createSecureServer({
         key: fs.readFileSync(CONFIG.get("private-key-pem")),
         cert: fs.readFileSync(CONFIG.get("private-cert-pem")),
         allowHTTP1:CONFIG.get("allowHTTP1"),
         origins:["https://"+CONFIG.get("domain"),"http://"+CONFIG.get("domain")]
       });
-      var server = this.server;
+      var server = http2ServerInstance.server;
 
       server.on("error", (err) => console.error(err));
 
@@ -232,6 +235,25 @@ Package("org.quickcorp.qcobjects.main.http2.server",[
 
       });
 
+      if (global.get("backendAvailable")){
+        logger.info("Loading backend interceptors...");
+        let interceptors = CONFIG.get("backend",{}).interceptors;
+        if (typeof interceptors !== "undefined"){
+          logger.info("Backend Interceptors Available");
+          interceptors.map(interceptor=>{
+            ImportMicroservice (interceptor.microservice);
+            var interceptorClassFactory = ClassFactory(interceptor.microservice+".Interceptor");
+            var interceptorInstance = New(interceptorClassFactory,{
+              domain:CONFIG.get("domain"),
+              basePath:CONFIG.get("basePath"),
+              projectPath:CONFIG.get("projectPath"),
+              interceptor:interceptor,
+              server:server
+            });
+            http2ServerInstance.interceptorInstances.push(interceptorInstance);
+          });
+        }
+      }
 
       server.on("stream", (stream, headers, flags) => {
         CONFIG.set("backendTimeout",CONFIG.get("backendTimeout") || 20000);
@@ -275,23 +297,25 @@ Package("org.quickcorp.qcobjects.main.http2.server",[
         let request = Object.assign(New(HTTP2ServerRequest),require("url").parse(headers[":path"]));
         request.headers = headers;
         request.flags = flags;
-        this.request = request;
-        this.request.method = headers[":method"];
-        this.request.path = headers[":path"];
+        http2ServerInstance.request = request;
+        http2ServerInstance.request.method = headers[":method"];
+        http2ServerInstance.request.path = headers[":path"];
 
 
-        if (this.request.pathname.indexOf(".")<0){
-            this.request.scriptname = CONFIG.get("documentRootFileIndex");
+        if (http2ServerInstance.request.pathname.indexOf(".")<0){
+            http2ServerInstance.request.scriptname = CONFIG.get("documentRootFileIndex");
         } else {
-          this.request.scriptname = this.request.pathname.split("/").reverse()[0];
+          http2ServerInstance.request.scriptname = http2ServerInstance.request.pathname.split("/").reverse()[0];
         }
-        this.request.pathname = this.request.pathname.substr(0,this.request.pathname.lastIndexOf("/"));
+        http2ServerInstance.request.pathname = this.request.pathname.substr(0,http2ServerInstance.request.pathname.lastIndexOf("/"));
 
         logger.debug(PipeLog.pipe(this.request));
 
         if (global.get("backendAvailable")){
-          logger.info("Backend Microservices Available");
-          let routes = CONFIG.get("backend").routes;
+          logger.info("Backend Microservices Available...");
+
+          logger.info("Loading backend routes...");
+          let routes = CONFIG.get("backend",{}).routes;
           let selectedRoute = routes.filter(route=>{let standardRoutePath = route.path.replace(/{(.*?)}/g,"(?<$1>.*)");return (new RegExp(standardRoutePath,"g")).test(request.path);});
           if (selectedRoute.length>0){
             selectedRoute.map(route=>{
@@ -300,7 +324,7 @@ Package("org.quickcorp.qcobjects.main.http2.server",[
               let selectedRouteParams = {...[...request.path.matchAll((new RegExp( standardRoutePath ,"g")))][0]["groups"]};
               ImportMicroservice (route.microservice);
               var microServiceClassFactory = ClassFactory(route.microservice+".Microservice");
-              this.response = New(microServiceClassFactory,{
+              http2ServerInstance.response = New(microServiceClassFactory,{
                 domain:CONFIG.get("domain"),
                 basePath:CONFIG.get("basePath"),
                 projectPath:CONFIG.get("projectPath"),
@@ -313,8 +337,12 @@ Package("org.quickcorp.qcobjects.main.http2.server",[
             });
           } else {
             this.response = New(HTTP2ServerResponse,{
+              domain:CONFIG.get("domain"),
+              basePath:CONFIG.get("basePath"),
+              projectPath:CONFIG.get("projectPath"),
+              server:server,
               stream:stream,
-              request:this.request
+              request:request
             });
           }
 
@@ -322,8 +350,12 @@ Package("org.quickcorp.qcobjects.main.http2.server",[
           // ...
 
           this.response = New(HTTP2ServerResponse,{
+            domain:CONFIG.get("domain"),
+            basePath:CONFIG.get("basePath"),
+            projectPath:CONFIG.get("projectPath"),
+            server:server,
             stream:stream,
-            request:this.request
+            request:request
           });
 
         }
