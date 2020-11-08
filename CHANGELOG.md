@@ -14,9 +14,11 @@ This is an automatic Changelog history of versions generated using the command: 
 	- PHP Support for QCObjects Server
 	- PHP Support for QCObjects server
 	- PHP support for QCObjects Server
+	- adding interceptors
 	- allowing {param} style in microservices paths
 	- asynchronous exec of php
 	- calling Microservice straight from the package to prevent scope issues
+	- catch error message on fail to load config.json
 	- collab repl
 	- collab socket default name
 	- config.json encryption for built-in server
@@ -30,9 +32,11 @@ This is an automatic Changelog history of versions generated using the command: 
 	- filter node_modules for creating sw
 	- filter node_modules packages for create --pwa
 	- fix
+	- fix 404
 	- fix cloud client services
 	- fix dependencies
 	- fix path for microservice
+	- fix processObject CONFIG
 	- fix repo
 	- fix secret security issue
 	- fix timeout handler headers
@@ -46,6 +50,7 @@ This is an automatic Changelog history of versions generated using the command: 
 	- ignore certificates on .gitignore
 	- info of possible urls in server
 	- introducing devmode into config.json settings server side
+	- list function for strings
 	- migrate v-minor , v-major v-patch commands to a plugin command handler
 	- openapi.json and openapi.yaml automatically generated backend
 	- php input
