@@ -54,7 +54,11 @@ Package("com.qcobjects.backend.microservice.static", [
           "content-type": mime.getType(fileName)
         };
         console.log(fd);
-        stream.respondWithFD(fd, headers);
+        try {
+          stream.respondWithFD(fd, headers);
+        } catch (e){
+          logger.debug("Something went wrong while sending headers...");
+        }
         stream.on("close", () => {
           logger.info("closing file "+ fileName);
           fs.closeSync(fd);
@@ -62,6 +66,7 @@ Package("com.qcobjects.backend.microservice.static", [
         stream.end();
 
       } catch (e){
+        logger.debug("ERROR NOT FOUND");
         if (e.errno==-2){
           const headers = {
             ":status": 404,
