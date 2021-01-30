@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * QCObjects CLI 0.1.x
+ * QCObjects CLI 2.3.x
  * ________________
  *
  * Author: Jean Machuca <correojean@gmail.com>
@@ -37,7 +37,11 @@ require("qcobjects");
 
 require(absolutePath+"/org.quickcorp.qcobjects.defaultsettings.js");
 
-require(absolutePath+"/org.quickcorp.qcobjects.main.http2.server.js");
+if (CONFIG.get("useLegacyHTTP",false)){
+  require(absolutePath+"/org.quickcorp.qcobjects.main.http.server.js");
+} else {
+  require(absolutePath+"/org.quickcorp.qcobjects.main.http2.server.js");
+}
 
 Class("Main",{
   _new_:()=>{
