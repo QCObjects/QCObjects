@@ -50,7 +50,7 @@ global.__get_version__ = function (){
   const qcobjects_pkg_config = require("qcobjects/package.json");
   const qcobjects_sdk_pkg_config = require("qcobjects-sdk/package.json");
   return "QCObjects: v"+qcobjects_pkg_config.version+", SDK: v"+qcobjects_sdk_pkg_config.version+", CLI: v"+package_config.version;
-}
+};
 
 
 let setDevMode = function (devmode){
