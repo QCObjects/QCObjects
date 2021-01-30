@@ -45,7 +45,8 @@ if (CONFIG.get("useLegacyHTTP",false)){
 
 Class("Main",{
   _new_:()=>{
-    const app = New(HTTP2Server);
+    const _ServerClass_ = (CONFIG.get("useLegacyHTTP",false))? (HTTPServer): (HTTP2Server);
+    const app = New(_ServerClass_);
     app.start();
 
     logger.debug("initialized");
