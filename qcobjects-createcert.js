@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * QCObjects CLI 0.1.x
+ * QCObjects CLI 2.3.x
  * ________________
  *
  * Author: Jean Machuca <correojean@gmail.com>
