@@ -42,6 +42,17 @@ CONFIG.set("allowHTTP1",true);
 CONFIG.set("useTemplate",false);
 CONFIG.set("domain","localhost");
 
+global.__get_version__ = function (){
+  const path = require("path");
+
+  const absolutePath = path.resolve( __dirname, "./" );
+  const package_config = require(absolutePath+"/package.json");
+  const qcobjects_pkg_config = require("qcobjects/package.json");
+  const qcobjects_sdk_pkg_config = require("qcobjects-sdk/package.json");
+  return "QCObjects: v"+qcobjects_pkg_config.version+", SDK: v"+qcobjects_sdk_pkg_config.version+", CLI: v"+package_config.version;
+}
+
+
 let setDevMode = function (devmode){
   if (typeof devmode !== "undefined"){
     switch (true) {

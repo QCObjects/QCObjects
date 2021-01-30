@@ -37,6 +37,9 @@ const package_config = require(absolutePath+"/package.json");
 
 
 require("qcobjects");
+
+require(absolutePath+"/org.quickcorp.qcobjects.defaultsettings.js");
+
 logger.debugEnabled = false;
 const welcometo = "Welcome to \n";
 const instructions = `

@@ -38,10 +38,14 @@ const util = require("util");
 const path = require("path");
 const absolutePath = path.resolve( __dirname, "./" );
 
-const package_config = require(absolutePath+"/package.json");
 
 const vm = require("vm");
 require("qcobjects");
+
+require(absolutePath+"/org.quickcorp.qcobjects.defaultsettings.js");
+
+
+const package_config = require(absolutePath+"/package.json");
 const qcobjects_pkg_config = require("qcobjects/package.json");
 const qcobjects_sdk_pkg_config = require("qcobjects-sdk/package.json");
 
@@ -81,10 +85,12 @@ readline.emitKeypressEvents(process.stdin);
 if (process.stdin.isTTY)
   process.stdin.setRawMode(true);
 
+let qcobjects_version = global.__get_version__();
+
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
-  prompt: "QCObjects v"+qcobjects_pkg_config.version+", SDK: v"+qcobjects_sdk_pkg_config.version+", CLI: v"+package_config.version+"> "
+  prompt: qcobjects_version + " >"
 });
 
 const protected_symbols = [ "clearInterval",

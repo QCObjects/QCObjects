@@ -470,7 +470,7 @@ If you want to quit, press Ctrl-C.
       if (process.argv.length>1){
 
         switchCommander.program
-          .version(package_config.version);
+          .version(global.__get_version__());
         switchCommander.program
           .command("create <appname>")
           .description("Creates an app with <appname>")
@@ -541,6 +541,7 @@ If you want to quit, press Ctrl-C.
             console.log("");
             process.exit(0);
           });
+
           switchCommander.program.on("command:*", function () {
             console.error("Invalid command: %s\nSee --help for a list of available commands.", switchCommander.program.args.join(" "));
             process.exit(1);
