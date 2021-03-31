@@ -208,7 +208,9 @@ Package("org.quickcorp.qcobjects.cli",[
           output: process.stdout
         });
 
-        rl.question("Please tell me your git repository url: \n", (answer) => {
+        rl.question(`Please tell me your git repository url
+[press ENTER \u{21b5} to leave it blank or Ctrl+C to cancel]: 
+`, (answer) => {
           logger.info(`your git repository url is ${answer}`);
           rl.close();
           let giturl = answer;
