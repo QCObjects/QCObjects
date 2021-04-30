@@ -14,6 +14,7 @@
     "handlebars": "^4.7.6",
     "mime": "^2.4.7",
     "qcobjects-sdk": "latest",
+    "qcobjects": "latest",
     "yaml": "^1.8.0"
   },
   "repository": {
@@ -55,7 +56,6 @@
   },
   "devDependencies": {
     "eslint": "^6.8.0",
-    "jasmine": "^3.7.0",
-    "qcobjects": "latest"
+    "jasmine": "^3.7.0"
   }
 }
