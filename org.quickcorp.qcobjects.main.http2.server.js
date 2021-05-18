@@ -32,7 +32,6 @@
 
 const path = require("path");
 const absolutePath = path.resolve( __dirname, "./" );
-const Handlebars = require("handlebars");
 
 const http2 = require("http2");
 const fs = require("fs");

@@ -36,7 +36,6 @@ const templatePath = path.resolve( __dirname, "./templates/apps/" )+"/";
 const templatePwaPath = path.resolve( __dirname, "./templates/pwa/" )+"/";
 const package_config = require(absolutePath+"/package.json");
 const { exec,execSync } = require("child_process");
-const Handlebars = require("handlebars");
 
 require(absolutePath+"/org.quickcorp.qcobjects.cli.commands.jira.client_services");
 

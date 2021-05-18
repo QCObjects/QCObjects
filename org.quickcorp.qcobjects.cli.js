@@ -36,8 +36,6 @@ const templatePath = path.resolve( __dirname, "./templates/apps/" )+"/";
 const templatePwaPath = path.resolve( __dirname, "./templates/pwa/" )+"/";
 const package_config = require(absolutePath+"/package.json");
 const { exec,execSync } = require("child_process");
-const Handlebars = require("handlebars");
-
 
 logger.debugEnabled=false;
 CONFIG.set("node_modules_path","./node_modules/");
@@ -45,6 +43,19 @@ CONFIG.set("qcobjectsnewapp_path",CONFIG.get("node_modules_path")+"/qcobjectsnew
 
 require(absolutePath+"/org.quickcorp.qcobjects.api.client_services");
 require(absolutePath+"/org.quickcorp.qcobjects.cli.commands");
+
+let ImportCustomCommand = function (commandName, commandPackage){
+  let _ret_;
+  var standardPath = findPackageNodePath(commandPackage) || findPackageNodePath(commandPackage+".js");
+  if (standardPath !== null){
+    _ret_ = Import (commandPackage);
+  } else {
+    logger.debug(`${commandPackage} is not a valid package for ${commandName}!`);
+    _ret_ = Promise.reject(new Error(`${commandName} does not exist!`));
+  }
+  return _ret_;
+};
+
 
 Package("org.quickcorp.qcobjects.cli",[
   Class("SwitchCommander",{
@@ -114,23 +125,37 @@ Package("org.quickcorp.qcobjects.cli",[
     generateServiceWorker: function (appName){
       var filelist = ["/"].concat(this.fileListRecursive("./"));
       filelist = filelist.filter(function (fl){return fl !== "sw.js" && (!fl.startsWith("node_modules/")); });
-      fs.readFile(templatePwaPath+"/sw.js", function(err, data) {
-        const swTemplate = Handlebars.compile(data.toString());
-        var swContent = swTemplate({appName: appName,filelist:"\n\t\""+filelist.join("\",\n\t\"")+"\""});
-        fs.writeFile("./sw.js", swContent, err => {
-          logger.info("Service Worker Generated");
-          console.log("");
-          console.log("Now simply put:");
-          console.log("CONFIG.set('serviceWorkerURI','/sw.js');");
-          console.log(" In your init.js file ");
-          console.log("");
-          console.log("To start your app in a local server ");
-          console.log("Execute the command: ");
-          console.log("> qcobjects launch <appname>");
-          console.log("");
-          process.exit(0);
-        });
+      filelist = filelist.filter(fname => !fname.endsWith(".pem"));
+      filelist = filelist.filter(fname => !fname.endsWith(".sh"));
+      filelist = filelist.filter(fname => !(new RegExp("^package(.*).json$")).test(fname));
+      filelist = filelist.filter(fname => !fname.startsWith("."));
+      var fileListString = "\n\t\""+filelist.join("\",\n\t\"")+"\"";
+      var component = New(Component, {
+        templateURI: "templates/pwa/sw.js",
+        name:"sw", cached:false,
+        data: {
+          appName: appName,
+          appVersion: "0.0.1",
+          filelist: fileListString
+        },
+        done ({request, component}) {
+          fs.writeFile("./sw.js", component.parsedAssignmentText, err => {
+            logger.info("Service Worker Generated");
+            console.log("");
+            console.log("Now simply put:");
+            console.log("CONFIG.set('serviceWorkerURI','/sw.js');");
+            console.log(" In your init.js file ");
+            console.log("");
+            console.log("To start your app in a local server ");
+            console.log("Execute the command: ");
+            console.log("> qcobjects launch <appname>");
+            console.log("");
+            process.exit(0);
+          });
+          return Promise.resolve({request, component});
+        }
       });
+      return component;
     },
     copyTemplate: function (){
       var map_files = function (pathname,callback){
@@ -209,7 +234,7 @@ Package("org.quickcorp.qcobjects.cli",[
         });
 
         rl.question(`Please tell me your git repository url
-[press ENTER \u{21b5} to leave it blank or Ctrl+C to cancel]: 
+[press ENTER \u{21b5} to leave it blank or Ctrl+C to cancel]:
 `, (answer) => {
           logger.info(`your git repository url is ${answer}`);
           rl.close();

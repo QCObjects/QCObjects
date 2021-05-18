@@ -1,7 +1,6 @@
 "use strict";
 const path = require("path");
 const absolutePath = path.resolve( __dirname, "./" );
-const Handlebars = require("handlebars");
 
 const http2 = require("http2");
 const fs = require("fs");
@@ -30,8 +29,21 @@ Package("org.quickcorp.cli.templates.app.spa_local",[
     done:function (){
       var appTemplateInstance = this;
       const source = appTemplateInstance.template;
-      const template = Handlebars.compile(source);
-      this.body = template({title: "QCObjects"});
+
+      (New(Component, {
+        name: "static_source",
+        template: source,
+        cached:false,
+        tplsource: "inline",
+        data: {
+          title: "QCObjects"
+        },
+        done ({request, component}) {
+          appTemplateInstance.body = component.parsedAssignmentText;
+          return Promise.resolve({request, component});
+        }
+      }));
+
       if (appTemplateInstance.compileAndSave){
         appTemplateInstance.save();
       }

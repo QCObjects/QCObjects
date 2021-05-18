@@ -4,7 +4,6 @@
         "es6": true,
         "node": true
     },
-    "extends": "qcobjects",
     "parserOptions": {
         "ecmaVersion": 2018,
         "sourceType": "module"

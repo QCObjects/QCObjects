@@ -34,7 +34,6 @@ const fs = require("fs");
 const mime = require("mime");
 
 const absolutePath = path.resolve( __dirname, "./" );
-const Handlebars = require("handlebars");
 
 Package("org.quickcorp.qcobjects.main.file",[
   Class("FileDispatcher",{
@@ -54,8 +53,21 @@ Package("org.quickcorp.qcobjects.main.file",[
       var appTemplateInstance = this;
       const source = appTemplateInstance.template;
       if (appTemplateInstance.isTemplate()){
-        const template = Handlebars.compile(source);
-        appTemplateInstance.body = template({title: "QCObjects"});
+
+        (New(Component, {
+          name: "static_source",
+          template: source,
+          cached:false,
+          tplsource: "inline",
+          data: {
+            title: "QCObjects"
+          },
+          done ({request, component}) {
+            appTemplateInstance.body = component.parsedAssignmentText;
+            return Promise.resolve({request, component});
+          }
+        }));
+
       } else {
         appTemplateInstance.body = source;
       }

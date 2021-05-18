@@ -5,13 +5,12 @@
   "main": "qcobjects-cli.js",
   "scripts": {
     "sync": "git add . && git commit -am ",
-    "test": "npx eslint *.js && jasmine",
+    "test": "npx eslint **/*.js --fix && $(npm bin)/jasmine",
     "preversion": "npm i --upgrade && npm test",
     "postversion": "git push && git push --tags && npm publish"
   },
   "dependencies": {
     "commander": "^2.20.3",
-    "handlebars": "^4.7.7",
     "mime": "^2.4.7",
     "qcobjects": "latest",
     "qcobjects-sdk": "latest",
@@ -49,9 +48,11 @@
     "qcobjects": "./qcobjects-cli.js",
     "qcobjects-cli": "./qcobjects-cli.js",
     "qcobjects-server": "./qcobjects-http2-server.js",
+    "qcobjects-http2-server": "./qcobjects-http2-server.js",
     "qcobjects-shell": "./qcobjects-shell.js",
     "qcobjects-createcert": "./qcobjects-createcert.js",
     "qcobjects-gae-server": "./qcobjects-gae-http-server.js",
+    "qcobjects-http-server": "./qcobjects-http-server.js",
     "qcobjects-collab": "./qcobjects-collab.js"
   },
   "devDependencies": {
