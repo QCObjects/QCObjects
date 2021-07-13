@@ -131,8 +131,11 @@ Package("org.quickcorp.qcobjects.cli",[
       filelist = filelist.filter(fname => !fname.startsWith("."));
       var fileListString = "\n\t\""+filelist.join("\",\n\t\"")+"\"";
       var component = New(Component, {
-        templateURI: "templates/pwa/sw.js",
-        name:"sw", cached:false,
+        templateURI: "sw.js",
+        basePath:templatePwaPath,
+        name:"sw",
+        cached:false,
+        tplsource: "default",
         data: {
           appName: appName,
           appVersion: "0.0.1",
