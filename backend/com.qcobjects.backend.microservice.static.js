@@ -48,12 +48,15 @@ Package("com.qcobjects.backend.microservice.static", [
         logger.info(`Delivering static file... ${fileName}`);
         const fd = fs.openSync(fileName, "r");
         const stat = fs.fstatSync(fd);
-        const headers = {
+        let headers = {
           "content-length": stat.size,
           "last-modified": stat.mtime.toUTCString(),
-          "content-type": mime.getType(fileName)
+          "content-type": mime.getType(fileName),
+          "cache-control": CONFIG.get("cacheControl", "max-age=31536000")
         };
-        console.log(fd);
+        if (typeof microservice.route.responseHeaders !== "undefined"){
+          headers = Object.assign(headers, microservice.route.responseHeaders);
+        }
         try {
           stream.respondWithFD(fd, headers);
         } catch (e){
