@@ -32,7 +32,7 @@ caches.delete(cacheName); // force to reload cache for the first time the sw is 
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(cacheName).then(cache => {
-      return cache.addAll([`${start_url}`,{{{filelist}}}])
+      return cache.addAll([`${start_url}`,{{filelist}}])
           .then(() => self.skipWaiting());
     })
   );
