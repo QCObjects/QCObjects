@@ -188,13 +188,15 @@ Package("org.quickcorp.qcobjects.main.http.gae.server",[
         const headers = {
           "content-length": stat.size,
           "last-modified": stat.mtime.toUTCString(),
-          "content-type": mime.getType(fileName)
+          "content-type": mime.getType(fileName),
+          "cache-control": CONFIG.get("cacheControl", "max-age=31536000")
         };
         console.log("closing file", fileName);
         fs.closeSync(fd);
         stream.setHeader("content-length", headers["content-length"]);
         stream.setHeader("last-modified", headers["last-modified"]);
         stream.setHeader("content-type", headers["content-type"]);
+        stream.setHeader("cache-control", headers["cache-control"]);
 
         // This line opens the file as a readable stream
         var readStream = fs.createReadStream(fileName);

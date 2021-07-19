@@ -68,7 +68,8 @@ Package("org.quickcorp.qcobjects.main.http2.server",[
   Class("HTTP2ServerResponse",{
     headers:{
       ":status": 200,
-      "content-type": "text/html"
+      "content-type": "text/html",
+      "cache-control": CONFIG.get("cacheControl", "max-age=31536000")
     },
     body:"",
     request:null,
@@ -82,11 +83,12 @@ Package("org.quickcorp.qcobjects.main.http2.server",[
         const headers = {
           "content-length": stat.size,
           "last-modified": stat.mtime.toUTCString(),
-          "content-type": mime.getType(fileName)
+          "content-type": mime.getType(fileName),
+          "cache-control": CONFIG.get("cacheControl", "max-age=31536000")
         };
         stream.respondWithFD(fd, headers);
         stream.on("close", () => {
-          console.log("closing file", fileName);
+          logger.debug("closing file " + fileName);
           fs.closeSync(fd);
         });
         stream.end();
@@ -96,11 +98,12 @@ Package("org.quickcorp.qcobjects.main.http2.server",[
         if (e.errno==-2){
           const headers = {
             ":status": 404,
-            "content-type": "text/html"
+            "content-type": mime.getType(fileName)
           };
+          stream.respond (headers);
           stream.write("<h1>404 - FILE NOT FOUND</h1>");
           stream.on("close", () => {
-            console.log("closing file", fileName);
+            logger.debug("closing file " + fileName);
           });
           stream.end();
         }
