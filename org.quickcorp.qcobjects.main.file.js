@@ -82,6 +82,7 @@ Package("org.quickcorp.qcobjects.main.file",[
             ".js",
             ".svg"].includes(appTemplateInstance.file_extension())){
         appTemplateInstance.headers["content-type"]=mime.getType(appTemplateInstance.templateURI);
+        appTemplateInstance.headers["cache-control"]=CONFIG.get("cacheControl", "max-age=31536000");
         appTemplateInstance.done.call(appTemplateInstance,
                                       appTemplateInstance.headers,
                                       appTemplateInstance.body,
