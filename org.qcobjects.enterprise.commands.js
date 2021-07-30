@@ -38,7 +38,12 @@ const package_config = require(absolutePath+"/package.json");
 const { exec,execSync } = require("child_process");
 
 Class ("QCObjectsEnterprise", {
+  install (switchCommander) {
+    let instance = this;
+    return instance.installEnterprise(license, email);
+  },
   upgrade (switchCommander){
+    let instance = this;
     const readline = require("readline");
 
     const rl = readline.createInterface({
@@ -98,40 +103,7 @@ Class ("QCObjectsEnterprise", {
                       };
                       rl.question("Please tell me the number of license that your executive has given to you: \n", (license) => {
                         rl.stdoutMuted = false;
-                        logger.info(`Your entered license number is ${asterisk.repeat(license.length)} and the email that you have entered is ${email}`);
-                        logger.info("Now, I'm installing QCObjects Enterprise Edition in your computer...");
-                        let cmdDownloadGit = `npm i --force -g git+https://license:${license}@software.qcobjects.io/qcobjects-enterprise/qcobjects-enterprise.git`;
-                        exec(cmdDownloadGit,(err,stdout,stderr)=>{
-                          if(!err){
-                            exec("qcobjects --version",(err,stdout,stderr)=>{
-                              if (stdout.lastIndexOf("Enterprise Edition")!==-1){
-                                logger.info("\u{1F44F} Congrats! Now you have installed QCObjects Entrprise Edition! \u{1F44F}");
-                                logger.info(`You can test it using:
-  > qcobjects --version
-
-  To find more help, type the command:
-
-  > qcobjects --help
-
-  Enjoy!
-  `);
-                              } else {
-                                console.log("\u{1F926} Something went wrong \u{1F926} when trying to update your license to QCObjects Enterprise Edition");
-                                console.log("Ask your executive to help");
-                              }
-                            });
-
-                          } else {
-                            console.log("\u{1F926} Something went wrong \u{1F926} when trying to update your license to QCObjects Enterprise Edition");
-                            if (stderr.lastIndexOf("Authentication failed")!==-1){
-                              console.log("Please ask to your executive for the right license number");
-                            } else {
-                              console.log(stderr);
-                            }
-                          }
-                        }).stdout.on("data", function(data) {
-                            console.log(data);
-                        });
+                        instance.installEnterprise(license, email);
 
                         rl.close();
                       });
@@ -165,6 +137,47 @@ Class ("QCObjectsEnterprise", {
 
     };
     emailQuestion();
+
+  },
+  installEnterprise (license, email) {
+    const asterisk = "*";
+    var license = CONFIG.get("enterprise-license", license);
+    var email = CONFIG.get("enterprise-email", email);
+
+    logger.info(`Your entered license number is ${asterisk.repeat(license.length)} and the email that you have entered is ${email}`);
+    logger.info("Now, I'm installing QCObjects Enterprise Edition in your computer...");
+    let cmdDownloadGit = `npm i --force -g git+https://license:${license}@software.qcobjects.io/qcobjects-enterprise/qcobjects-enterprise.git`;
+    exec(cmdDownloadGit,(err,stdout,stderr)=>{
+      if(!err){
+        exec("qcobjects --version",(err,stdout,stderr)=>{
+          if (stdout.lastIndexOf("Enterprise Edition")!==-1){
+            logger.info("\u{1F44F} Congrats! Now you have installed QCObjects Entrprise Edition! \u{1F44F}");
+            logger.info(`You can test it using:
+> qcobjects --version
+
+To find more help, type the command:
+
+> qcobjects --help
+
+Enjoy!
+`);
+          } else {
+            console.log("\u{1F926} Something went wrong \u{1F926} when trying to update your license to QCObjects Enterprise Edition");
+            console.log("Ask your executive to help");
+          }
+        });
+
+      } else {
+        console.log("\u{1F926} Something went wrong \u{1F926} when trying to update your license to QCObjects Enterprise Edition");
+        if (stderr.lastIndexOf("Authentication failed")!==-1){
+          console.log("Please ask to your executive for the right license number");
+        } else {
+          console.log(stderr);
+        }
+      }
+    }).stdout.on("data", function(data) {
+        console.log(data);
+    });
 
   }
 
