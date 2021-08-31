@@ -146,8 +146,12 @@ Package("org.quickcorp.qcobjects.main.http.server",[
     done: function(){
       var microservice = this;
       var stream = microservice.stream;
-//      stream.respond(microservice.headers);
-      stream.writeHead(200, {"Content-Type": "text/plain"});
+      try {
+        stream.writeHead(200, microservice.headers);
+      } catch (e){
+        logger.debug("Something went wront while sending headers in http...");
+        logger.debug(e.toString());
+      }
       if (microservice.body != null){
         microservice.finishWithBody.call(microservice,stream);
       }
