@@ -21,7 +21,7 @@
  *
  * Everyone is permitted to copy and distribute verbatim copies of this
  * license document, but changing it is not allowed.
-*/
+ */
 /*eslint no-unused-vars: "off"*/
 /*eslint no-redeclare: "off"*/
 /*eslint no-empty: "off"*/
@@ -36,92 +36,136 @@ const absolutePath = path.resolve(__dirname, "./");
 const mime = require("mime");
 
 Package("com.qcobjects.backend.microservice.static", [
-  Class("Microservice",BackendMicroservice,{
+  Class("Microservice", BackendMicroservice, {
     finishWithBody: function(stream) {},
-    done: function () {
+    done: function() {
       // read and send file content in the stream
 
       let microservice = this;
       let stream = microservice.stream;
       let fileName = `${process.cwd()}/${microservice.fileName}`;
-      try {
-        logger.info(`Delivering static file... ${fileName}`);
-        const fd = fs.openSync(fileName, "r");
-        const stat = fs.fstatSync(fd);
-        let headers = {
-          "content-length": stat.size,
-          "last-modified": stat.mtime.toUTCString(),
-          "content-type": mime.getType(fileName),
-          "cache-control": CONFIG.get("cacheControl", "max-age=31536000")
-        };
-        if (typeof microservice.route.responseHeaders !== "undefined"){
-          headers = Object.assign(headers, microservice.route.responseHeaders);
-        }
+
+      const sendFileHTTP2 = function(stream, fileName) {
+        // read and send file content in the stream
 
         try {
+          const fd = fs.openSync(fileName, "r");
+          const stat = fs.fstatSync(fd);
+          let headers = {
+            "content-length": stat.size,
+            "last-modified": stat.mtime.toUTCString(),
+            "content-type": mime.getType(fileName),
+            "cache-control": CONFIG.get("cacheControl", "max-age=31536000")
+          };
+          if (typeof microservice.route.responseHeaders !== "undefined") {
+            headers = Object.assign(headers, microservice.route.responseHeaders);
+            console.log(headers);
+          }
+
           stream.respondWithFD(fd, headers);
-        } catch (e){
-          logger.debug("Something went wrong while sending headers...");
+          stream.on("close", () => {
+            logger.debug("closing file " + fileName);
+            fs.closeSync(fd);
+          });
+          stream.end();
+
+        } catch (e) {
+          logger.debug("[ERROR] something went wrong when trying to send the response as file " + fileName);
+          if (e.errno == -2) {
+            const headers = {
+              ":status": 404,
+              "content-type": mime.getType(fileName)
+            };
+            stream.respond(headers);
+            stream.write("<h1>404 - FILE NOT FOUND</h1>");
+            stream.on("close", () => {
+              logger.debug("closing file " + fileName);
+            });
+            stream.end();
+          }
         }
-        stream.on("close", () => {
-          logger.info("closing file "+ fileName);
+
+      };
+
+      const sendFileLegacyHTTP = function(stream, fileName) {
+        // read and send file content in the stream
+        let headers;
+        try {
+          console.log("trying to read "+ fileName);
+          const fd = fs.openSync(fileName, "r");
+          const stat = fs.fstatSync(fd);
+          headers = {
+            "Content-Length": stat.size,
+            "Last-Modified": stat.mtime.toUTCString(),
+            "Content-Type": mime.getType(fileName),
+            "Cache-Control": CONFIG.get("cacheControl", "max-age=31536000")
+          };
+          if (typeof microservice.route.responseHeaders !== "undefined") {
+            headers = Object.assign(headers, microservice.route.responseHeaders);
+            console.log(headers);
+          }
+
+          logger.debug("closing file " + fileName);
           fs.closeSync(fd);
-        });
+
+          stream.writeHead(200, headers);
+
+          stream.write(fs.readFileSync(fileName));
+          stream.on("close", () => {
+            console.log("closing static file", fileName);
+          });
+
+        } catch (e){
+          if (e.errno==-2){
+            headers = {
+              ":status": 404,
+              "Content-Type": "text/html"
+            };
+            stream.writeHead(404, headers);
+            stream.write("<h1>404 - FILE NOT FOUND</h1>");
+            stream.on("close", () => {
+              console.log("closing static file with error: ", fileName);
+            });
+          }
+          console.log(e);
+          stream.end();
+        }
         stream.end();
 
-      } catch (e){
-        logger.debug("ERROR NOT FOUND");
-        if (e.errno==-2){
-          const headers = {
-            ":status": 404,
-            "content-type": "text/html"
-          };
-          stream.write("<h1>404 - FILE NOT FOUND</h1>");
-          stream.on("close", () => {
-            logger.debug("file not found "+ fileName);
-            logger.info("closing file "+ fileName);
-          });
-          stream.end();
-        } else {
-          console.log(e);
-          const headers = {
-            ":status": 500,
-            "content-type": "text/html"
-          };
-          stream.write("<h1>500 - INTERNAL ERROR</h1>");
-          stream.on("close", () => {
-            logger.debug("internal error "+ fileName);
-            logger.info("closing file "+ fileName);
-          });
-          stream.end();
-        }
+      };
+
+      if (typeof stream.respondWithFD !== "undefined") {
+        sendFileHTTP2(stream, fileName);
+      } else {
+        sendFileLegacyHTTP(stream, fileName);
       }
+
     },
-    static: function (method,data){
+    static: function(method, data) {
       var microservice = this;
       var redirect_to = microservice.route.redirect_to;
-      return new Promise (function (resolve,reject){
+      return new Promise(function(resolve, reject) {
         var supported_methods = microservice.route.supported_methods;
         var _method_allowed_ = false;
-        if (typeof supported_methods !== "undefined"){
-          if (supported_methods =="*" || (typeof method == "undefined") || [...supported_methods].map(m=>m.toLowerCase()).indexOf(method.toLowerCase())!== -1){
+        if (typeof supported_methods !== "undefined") {
+          if (supported_methods == "*" || (typeof method == "undefined") || [...supported_methods].map(m => m.toLowerCase()).indexOf(method.toLowerCase()) !== -1) {
             _method_allowed_ = true;
           }
         } else {
           _method_allowed_ = true;
         }
 
-        logger.debug("Starting static delivery microservice call for method: "+method);
-        if (_method_allowed_){
+        logger.debug("Starting static delivery microservice call for method: " + method);
+        if (_method_allowed_) {
           logger.info("I'm going to deliver a static path...");
-          if (redirect_to){
+          if (redirect_to) {
             let request_path = microservice.request.path;
-            let re = (new RegExp(microservice.route.path.replace( /{(.*?)}/g,"\(\?\<$1\>\.\*\)" ),"g"));
-            microservice.fileName  = request_path.replace(re,microservice.route.redirect_to);
+            let re = (new RegExp(microservice.route.path.replace(/{(.*?)}/g, "\(\?\<$1\>\.\*\)"), "g"));
+            microservice.fileName = request_path.replace(re, microservice.route.redirect_to);
             try {
               resolve();
-            } catch (e){
-              console.log("\u{1F926} Something went wrong \u{1F926} when trying to deliver a static path: "+microservice.fileName);
+            } catch (e) {
+              console.log("\u{1F926} Something went wrong \u{1F926} when trying to deliver a static path: " + microservice.fileName);
               reject();
             }
           } else {
@@ -129,7 +173,7 @@ Package("com.qcobjects.backend.microservice.static", [
             reject();
           }
         } else {
-          logger.debug("Method: "+method+" will be skipped");
+          logger.debug("Method: " + method + " will be skipped");
           resolve();
         }
 
@@ -137,64 +181,64 @@ Package("com.qcobjects.backend.microservice.static", [
     },
     head: function(formData) {
       var microservice = this;
-      microservice.static("head",formData).then(response=>{
-        microservice.body=response;
+      microservice.static("head", formData).then(response => {
+        microservice.body = response;
         microservice.done();
       });
     },
-    get: function(formData){
+    get: function(formData) {
       var microservice = this;
-      microservice.static("get",formData).then(response=>{
-        microservice.body=response;
+      microservice.static("get", formData).then(response => {
+        microservice.body = response;
         microservice.done();
       });
     },
-    post:function (formData){
+    post: function(formData) {
       var microservice = this;
-      microservice.static("post",formData).then(response=>{
-        microservice.body=response;
+      microservice.static("post", formData).then(response => {
+        microservice.body = response;
         microservice.done();
       });
     },
     put: function(formData) {
       var microservice = this;
-      microservice.static("put",formData).then(response=>{
-        microservice.body=response;
+      microservice.static("put", formData).then(response => {
+        microservice.body = response;
         microservice.done();
       });
     },
     delete: function(formData) {
       var microservice = this;
-      microservice.static("delete",formData).then(response=>{
-        microservice.body=response;
+      microservice.static("delete", formData).then(response => {
+        microservice.body = response;
         microservice.done();
       });
     },
     connect: function(formData) {
       var microservice = this;
-      microservice.static("connect",formData).then(response=>{
-        microservice.body=response;
+      microservice.static("connect", formData).then(response => {
+        microservice.body = response;
         microservice.done();
       });
     },
     options: function(formData) {
       var microservice = this;
-      microservice.static("options",formData).then(response=>{
-        microservice.body=response;
+      microservice.static("options", formData).then(response => {
+        microservice.body = response;
         microservice.done();
       });
     },
     trace: function(formData) {
       var microservice = this;
-      microservice.static("trace",formData).then(response=>{
-        microservice.body=response;
+      microservice.static("trace", formData).then(response => {
+        microservice.body = response;
         microservice.done();
       });
     },
     patch: function(formData) {
       var microservice = this;
-      microservice.static("patch",formData).then(response=>{
-        microservice.body=response;
+      microservice.static("patch", formData).then(response => {
+        microservice.body = response;
         microservice.done();
       });
     }
