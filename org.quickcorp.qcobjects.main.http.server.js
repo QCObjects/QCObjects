@@ -101,7 +101,7 @@ Package("org.quickcorp.qcobjects.main.http.server",[
       let server = microservice.server;
       let request = microservice.request;
       this.cors();
-      server.on("data", (data) => {
+      microservice.req.on("data", (data) => {
         // data from POST, GET
         var requestMethod = request.method.toLowerCase();
         var supportedMethods = {"post":microservice.post,
@@ -333,9 +333,11 @@ Package("org.quickcorp.qcobjects.main.http.server",[
 
       const http = require("http");
 
-      this.server = http.createServer((req, res) => {});
+      oHTTPServer.server = http.createServer((req, res) => {
 
-      var server = this.server;
+      });
+
+      var server = oHTTPServer.server;
 
       server.on("error", (err) => console.error(err));
 
@@ -402,6 +404,7 @@ Package("org.quickcorp.qcobjects.main.http.server",[
                 routeParams:selectedRouteParams,
                 server:server,
                 stream:res,
+                req:req,
                 request:request
               });
             });
