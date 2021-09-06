@@ -101,7 +101,7 @@ Package("org.quickcorp.qcobjects.main.http.gae.server",[
       let server = microservice.server;
       let request = microservice.request;
       this.cors();
-      server.on("data", (data) => {
+      microservice.req.on("data", (data) => {
         // data from POST, GET
         var requestMethod = request.method.toLowerCase();
         var supportedMethods = {"post":microservice.post,
@@ -146,8 +146,12 @@ Package("org.quickcorp.qcobjects.main.http.gae.server",[
     done: function(){
       var microservice = this;
       var stream = microservice.stream;
-//      stream.respond(microservice.headers);
-      stream.writeHead(200, {"Content-Type": "text/plain"});
+      try {
+        stream.writeHead(200, microservice.headers);
+      } catch (e){
+        logger.debug("Something went wront while sending headers in http...");
+        logger.debug(e.toString());
+      }
       if (microservice.body != null){
         microservice.finishWithBody.call(microservice,stream);
       }
@@ -191,7 +195,7 @@ Package("org.quickcorp.qcobjects.main.http.gae.server",[
           "content-type": mime.getType(fileName),
           "cache-control": CONFIG.get("cacheControl", "max-age=31536000")
         };
-        console.log("closing file", fileName);
+        logger.debug("closing file " + fileName);
         fs.closeSync(fd);
         stream.setHeader("content-length", headers["content-length"]);
         stream.setHeader("last-modified", headers["last-modified"]);
@@ -318,7 +322,7 @@ Package("org.quickcorp.qcobjects.main.http.gae.server",[
     _new_:function (){
       let oHTTPServer = this;
       const welcometo = "Welcome to \n";
-      const instructions = "QCObjects GAE HTTPServer \n";
+      const instructions = "QCObjects Legacy HTTPServer \n";
       const logo = " .d88888b.  .d8888b.  .d88888b. 888       d8b                888            \r\nd88P\" \"Y88bd88P  Y88bd88P\" \"Y88b888       Y8P                888            \r\n888     888888    888888     888888                          888            \r\n888     888888       888     88888888b.  8888 .d88b.  .d8888b888888.d8888b  \r\n888     888888       888     888888 \"88b \"888d8P  Y8bd88P\"   888   88K      \r\n888 Y8b 888888    888888     888888  888  88888888888888     888   \"Y8888b. \r\nY88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r\n \"Y888888\"  \"Y8888P\"  \"Y88888P\" 88888P\"   888 \"Y8888  \"Y8888P \"Y888 88888P' \r\n       Y8b                                888                               \r\n                                         d88P                               \r\n                                       888P\"   ";
       console.log(welcometo);
       console.log(logo);
@@ -329,9 +333,11 @@ Package("org.quickcorp.qcobjects.main.http.gae.server",[
 
       const http = require("http");
 
-      this.server = http.createServer((req, res) => {});
+      oHTTPServer.server = http.createServer((req, res) => {
 
-      var server = this.server;
+      });
+
+      var server = oHTTPServer.server;
 
       server.on("error", (err) => console.error(err));
 
@@ -398,6 +404,7 @@ Package("org.quickcorp.qcobjects.main.http.gae.server",[
                 routeParams:selectedRouteParams,
                 server:server,
                 stream:res,
+                req:req,
                 request:request
               });
             });
