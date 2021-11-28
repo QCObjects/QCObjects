@@ -7,7 +7,7 @@
     "sync": "git add . && git commit -am ",
     "test": "npx eslint **/*.js --fix && $(npm bin)/jasmine",
     "preversion": "npm i --upgrade && npm test",
-    "postversion": "git push && git push --tags && npm publish"
+    "postversion": "git push && git push --tags"
   },
   "dependencies": {
     "commander": "^2.20.3",
