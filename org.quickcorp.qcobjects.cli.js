@@ -249,13 +249,23 @@ Package("org.quickcorp.qcobjects.cli",[
           let createAppCommandCustom = ` 
 { 
       "name": "${appName.toLowerCase()}", 
+      "version": "0.0.1",
       "repository": { 
         "type": "git", 
         "url": "${giturl}" 
       }, 
       "description": "This is a custom NPM template app from ${options.createCustom} generated with QCObjects.", 
-      "main": "js/init.js", 
-      "license": "LGPL-3.0-or-later", 
+      "main": "js/init.js",
+      "license": "LGPL-3.0-or-later",
+      "scripts": { 
+        "test": "(npx eslint *.js js/*.js js/packages/*.js --fix) && (npx jasmine)", 
+        "sync": "git add . && git commit -am ", 
+        "preversion": "npm i --upgrade && npm test", 
+        "postversion": "git push && git push --tags", 
+        "coverage": "nyc --reporter=lcov --reporter=text-summary npm run test", 
+        "start": "node app.js", 
+        "build": "exit 0" 
+      }, 
       "dependencies": { 
         "${options.createCustom}": "latest", 
         "qcobjects": "latest", 
@@ -275,6 +285,7 @@ Package("org.quickcorp.qcobjects.cli",[
           let createAppCommandPWA = ` 
 { 
       "name": "${appName.toLowerCase()}", 
+      "version": "0.0.1",
       "repository": { 
         "type": "git", 
         "url": "${giturl}" 
@@ -286,7 +297,7 @@ Package("org.quickcorp.qcobjects.cli",[
         "test": "(npx eslint *.js js/*.js js/packages/*.js --fix) && (npx jasmine)", 
         "sync": "git add . && git commit -am ", 
         "preversion": "npm i --upgrade && npm test", 
-        "postversion": "git push && git push --tags && npm publish", 
+        "postversion": "git push && git push --tags", 
         "coverage": "nyc --reporter=lcov --reporter=text-summary npm run test", 
         "start": "node app.js", 
         "build": "exit 0" 
@@ -310,6 +321,7 @@ Package("org.quickcorp.qcobjects.cli",[
           let createAppCommandAMP = `echo 
 { 
       "name": "${appName.toLowerCase()}", 
+      "version": "0.0.1",
       "repository": { 
         "type": "git", 
         "url": "${giturl}" 
@@ -321,7 +333,7 @@ Package("org.quickcorp.qcobjects.cli",[
         "test": "(npx eslint *.js js/*.js js/packages/*.js --fix) && (npx jasmine)", 
         "sync": "git add . && git commit -am ", 
         "preversion": "npm i --upgrade && npm test", 
-        "postversion": "git push && git push --tags && npm publish", 
+        "postversion": "git push && git push --tags", 
         "coverage": "nyc --reporter=lcov --reporter=text-summary npm run test", 
         "start": "node app.js", 
         "build": "exit 0" 
@@ -345,6 +357,7 @@ Package("org.quickcorp.qcobjects.cli",[
           let createAppCommandPHP = ` 
 { 
       "name": "${appName.toLowerCase()}", 
+      "version": "0.0.1",
       "repository": {
           "type": "git",
           "url": "${giturl}"
@@ -356,7 +369,7 @@ Package("org.quickcorp.qcobjects.cli",[
         "test": "(npx eslint *.js js/*.js js/packages/*.js --fix) && (npx jasmine)", 
         "sync": "git add . && git commit -am ", 
         "preversion": "npm i --upgrade && npm test", 
-        "postversion": "git push && git push --tags && npm publish", 
+        "postversion": "git push && git push --tags", 
         "coverage": "nyc --reporter=lcov --reporter=text-summary npm run test", 
         "start": "node app.js", 
         "build": "exit 0" 
