@@ -10,6 +10,6 @@ deploy:
       changes:
         - package.json
   script:
-    - echo "registry=https://registry.npmjs.org/:_authToken=:_authToken=${CI_JOB_TOKEN}">.npmrc
+    - echo "registry=https://registry.npmjs.org/:_authToken=:_authToken=${NPM_TOKEN}">.npmrc
     - npm ci
     - npm publish
