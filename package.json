@@ -12,9 +12,16 @@
   "dependencies": {
     "commander": "^2.20.3",
     "mime": "^2.4.7",
-    "qcobjects": "latest",
+    "qcobjects": "^2.3.66-lts",
     "qcobjects-sdk": "latest",
     "yaml": "^1.8.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.2.0",
+    "eslint-config-qcobjects": "^0.0.13",
+    "jasmine": "^3.7.0",
+    "qcobjects": "^2.3.66-lts",
+    "qcobjects-cli": "latest"
   },
   "repository": {
     "type": "file",
@@ -54,10 +61,5 @@
     "qcobjects-gae-server": "./qcobjects-gae-http-server.js",
     "qcobjects-http-server": "./qcobjects-http-server.js",
     "qcobjects-collab": "./qcobjects-collab.js"
-  },
-  "devDependencies": {
-    "eslint": "^6.8.0",
-    "eslint-config-qcobjects": "0.0.6",
-    "jasmine": "^3.7.0"
   }
 }
