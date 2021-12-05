@@ -271,7 +271,7 @@ Package("org.quickcorp.qcobjects.cli",[
         "qcobjects": "latest", 
         "qcobjects-sdk": "latest"
       }, 
-      "devDependencies": 
+      "devDependencies": {
         "eslint": "^8.2.0",
         "eslint-config-qcobjects": "latest", 
         "jasmine": "latest", 
