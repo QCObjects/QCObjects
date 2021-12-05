@@ -49,7 +49,16 @@ global.__get_version__ = function (){
   const package_config = require(absolutePath+"/package.json");
   const qcobjects_pkg_config = require("qcobjects/package.json");
   const qcobjects_sdk_pkg_config = require("qcobjects-sdk/package.json");
-  return "QCObjects: v"+qcobjects_pkg_config.version+", SDK: v"+qcobjects_sdk_pkg_config.version+", CLI: v"+package_config.version;
+  return {
+    "qcobjects":qcobjects_pkg_config.version,
+    "sdk":qcobjects_sdk_pkg_config.version,
+    "cli":package_config.version
+  };
+};
+
+global.__get_version_string__ = function (){
+  const version = global.__get_version__();
+  return "QCObjects: v"+version.qcobjects+", SDK: v"+version.sdk+", CLI: v"+version.cli;
 };
 
 
