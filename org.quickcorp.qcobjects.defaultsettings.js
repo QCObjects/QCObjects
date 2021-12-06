@@ -49,7 +49,16 @@ global.__get_version__ = function (){
   const package_config = require(absolutePath+"/package.json");
   const qcobjects_pkg_config = require("qcobjects/package.json");
   const qcobjects_sdk_pkg_config = require("qcobjects-sdk/package.json");
-  return "QCObjects: v"+qcobjects_pkg_config.version+", SDK: v"+qcobjects_sdk_pkg_config.version+", CLI: v"+package_config.version;
+  return {
+    "qcobjects":qcobjects_pkg_config.version,
+    "sdk":qcobjects_sdk_pkg_config.version,
+    "cli":package_config.version
+  };
+};
+
+global.__get_version_string__ = function (){
+  const version = global.__get_version__();
+  return "QCObjects: v"+version.qcobjects+", SDK: v"+version.sdk+", CLI: v"+version.cli;
 };
 
 
@@ -118,3 +127,55 @@ try {
   logger.debug(e);
   logger.debug("Something went wrong trying to load config.json file in your project");
 }
+
+(async function (){
+  /* Auto Discover dependencies (lib, handlers, commands) */
+  const path = require("path");
+  const projectPath = CONFIG.get("projectPath", `${process.cwd()}/`);
+  const loadLibs = async () => {
+    let _ret_;
+    if (CONFIG.get("autodiscover", false) || CONFIG.get("autodiscover_libs",false)){
+      _ret_ = Promise.all(Object.keys(require(`${projectPath}/package.json`).dependencies).filter((p)=>require(`${findPackageNodePath(p)}/${p}/package.json`).keywords.includes("qcobjects-lib")).map((p)=>Import(p))).then(()=>logger.info("Libs loaded"));
+    } else {
+      _ret_ = Promise.resolve();
+      logger.debug("To load libs, set autodiscover_libs to true in your config.json");
+    }
+    return _ret_;
+  };
+  const loadHandlers = async () => {
+    let _ret_;
+    if (CONFIG.get("autodiscover", false) || CONFIG.get("autodiscover_handlers",false)){
+      _ret_ = Promise.all(Object.keys(require(`${projectPath}/package.json`).dependencies).filter((p)=>require(`${findPackageNodePath(p)}/${p}/package.json`).keywords.includes("qcobjects-handler")).map((p)=>Import(p))).then(()=>logger.info("Handlers loaded"));
+    } else {
+      _ret_ = Promise.resolve();
+      logger.debug("To load handlers, set autodiscover_handlers to true in your config.json");
+    }
+    return _ret_;
+  };
+  const loadCommands = async () => {
+    let _ret_;
+    if (CONFIG.get("autodiscover", false) || CONFIG.get("autodiscover_commands",false)){
+      _ret_ = Promise.all(Object.keys(require(`${projectPath}/package.json`).dependencies).filter((p)=>require(`${findPackageNodePath(p)}/${p}/package.json`).keywords.includes("qcobjects-command")).map((p)=>Import(p))).then(()=>logger.info("Commands loaded"));
+    } else {
+      _ret_ = Promise.resolve();
+      logger.debug("To load commands, set autodiscover_commands to true in your config.json");
+    }
+    return _ret_;
+  };
+  if (CONFIG.get("autodiscover", false)
+    || CONFIG.get("autodiscover_libs",false)
+    || CONFIG.get("autodiscover_handlers",false)
+    || CONFIG.get("autodiscover_commands",false)
+    ){
+    logger.info("Auto discover is enabled");
+  } else if (!CONFIG.get("autodiscover", false)) {
+    logger.info("Auto discover is disabled");
+    logger.debug("To load all dependencies, set autodiscover to true in your config.json");
+  } else {
+    logger.info("Auto discover is disabled");
+  }
+
+  await loadLibs();
+  await loadHandlers();
+  await loadCommands();
+})().then (()=>logger.info("Dependencies loaded"));

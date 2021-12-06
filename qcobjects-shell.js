@@ -85,7 +85,7 @@ readline.emitKeypressEvents(process.stdin);
 if (process.stdin.isTTY)
   process.stdin.setRawMode(true);
 
-let qcobjects_version = global.__get_version__();
+let qcobjects_version = global.__get_version_string__();
 
 const rl = readline.createInterface({
   input: process.stdin,
