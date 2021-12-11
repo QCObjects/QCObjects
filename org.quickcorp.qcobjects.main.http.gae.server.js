@@ -291,6 +291,7 @@ Package("org.quickcorp.qcobjects.main.http.gae.server",[
     response:"",
     server:null,
     scriptname:"",
+    interceptorInstances:[],
     showIPAddress:function (){
       var _ret_ = "";
       var os = require("os");
@@ -340,6 +341,26 @@ Package("org.quickcorp.qcobjects.main.http.gae.server",[
       var server = oHTTPServer.server;
 
       server.on("error", (err) => console.error(err));
+
+      if (global.get("backendAvailable")){
+        logger.info("Loading backend interceptors...");
+        let interceptors = CONFIG.get("backend",{}).interceptors;
+        if (typeof interceptors !== "undefined"){
+          logger.info("Backend Interceptors Available");
+          interceptors.map(interceptor=>{
+            ImportMicroservice (interceptor.microservice);
+            var interceptorClassFactory = ClassFactory(interceptor.microservice+".Interceptor");
+            var interceptorInstance = New(interceptorClassFactory,{
+              domain:CONFIG.get("domain"),
+              basePath:CONFIG.get("basePath"),
+              projectPath:CONFIG.get("projectPath"),
+              interceptor:interceptor,
+              server:server
+            });
+            http2ServerInstance.interceptorInstances.push(interceptorInstance);
+          });
+        }
+      }
 
       server.on("request", (req, res) => {
 
