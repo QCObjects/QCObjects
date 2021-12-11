@@ -33,7 +33,6 @@
 const path = require("path");
 const absolutePath = path.resolve( __dirname, "./" );
 
-const http2 = require("http2");
 const fs = require("fs");
 const mime = require("mime");
 require(absolutePath+"/org.quickcorp.qcobjects.main.file.js");
@@ -357,7 +356,7 @@ Package("org.quickcorp.qcobjects.main.http.server",[
               interceptor:interceptor,
               server:server
             });
-            http2ServerInstance.interceptorInstances.push(interceptorInstance);
+            oHTTPServer.interceptorInstances.push(interceptorInstance);
           });
         }
       }
