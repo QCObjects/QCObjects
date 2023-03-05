@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /**
  * QCObjects CLI 2.4.x
  * ________________
@@ -30,25 +29,27 @@
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
 "use strict";
-const path = require("path");
-const absolutePath = path.resolve( __dirname, "./" );
+Package("org.qcobjects.common.pipelog", [
+    class PipeLog extends InheritClass {
+        constructor() {
+            super(...arguments);
+        }
 
-require("qcobjects");
+        pipe(o) {
+            var _o = [];
+            for (var k in o) {
+                if (typeof o[k] !== "undefined" &&
+                    o[k] !== null &&
+                    typeof o[k] !== "function") {
+                    try {
+                        _o.push("" + k + "=" + o[k].toString());
+                    } catch (e) {
+                        // error logging, do nothing
+                    }
+                }
+            }
+            return _o.join(" ");
+        }
 
-require(absolutePath+"/org.quickcorp.qcobjects.defaultsettings.js");
-
-require(absolutePath+"/org.quickcorp.qcobjects.main.http.gae.server.js");
-
-class Main extends InheritClass {
-
-  constructor (){
-    super(...arguments);
-    const app = New(HTTPServer);
-    app.start();
-
-    logger.debug("initialized");
-
-  }
-}
-
-let __main__ = new Main ();
+    }
+]);

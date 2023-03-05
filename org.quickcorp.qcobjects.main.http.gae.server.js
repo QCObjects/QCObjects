@@ -1,5 +1,5 @@
 /**
- * QCObjects CLI 2.3.x
+ * QCObjects CLI 2.4.x
  * ________________
  *
  * Author: Jean Machuca <correojean@gmail.com>
@@ -31,70 +31,30 @@
 "use strict";
 
 const path = require("path");
-const absolutePath = path.resolve( __dirname, "./" );
+const absolutePath = path.resolve(__dirname, "./");
 
 const fs = require("fs");
 const mime = require("mime");
-require(absolutePath+"/org.quickcorp.qcobjects.main.file.js");
+require(absolutePath + "/org.quickcorp.qcobjects.main.file.js");
+require(absolutePath+ "/org.qcobjects.common.pipelog.js");
 
-let ImportMicroservice = function (microservicePackage){
-  var standardPath = findPackageNodePath(microservicePackage) || findPackageNodePath(microservicePackage+".js");
-  if (standardPath !== null){
-    Import (microservicePackage);
+let ImportMicroservice = function (microservicePackage) {
+  var standardPath = findPackageNodePath(microservicePackage) || findPackageNodePath(microservicePackage + ".js");
+  if (standardPath !== null) {
+    Import(microservicePackage);
   } else {
-    Import (absolutePath+"/backend/"+microservicePackage);
+    Import(absolutePath + "/backend/" + microservicePackage);
   }
 };
 
-Package("org.quickcorp.qcobjects.main.http.gae.server",[
-  Class("BackendMicroservice",Object,{
-    domain:CONFIG.get("domain"),
-    basePath:CONFIG.get("basePath"),
-    body:null,
-    stream:null,
-    server:null,
-    request:null,
-    cors: function (){
-      if (this.route.cors){
-        let {allow_origins,allow_credentials,allow_methods,allow_headers} = this.route.cors;
-        var microservice = this;
-        if (typeof microservice.headers !== "object"){
-          microservice.headers = {};
-        }
-        if (typeof allow_origins !== "undefined"){
-          // an example of allow_origins is ['https://example.com','http://www.example.com']
-          if (allow_origins =="*" || (typeof microservice.request.headers.origin == "undefined") || [...allow_origins].indexOf(microservice.request.headers.origin)!== -1){
-            // for compatibility with all browsers allways return a wildcard when the origin is allowed
-            microservice.headers["Access-Control-Allow-Origin"] = "*";
-          } else {
-            logger.debug("Origin is not allowed: " + microservice.request.headers.origin);
-            logger.debug("Forcing to finish the response...");
-            this.body = {};
-            try {
-              this.done();
-            } catch (e){}
-          }
-        } else {
-          microservice.headers["Access-Control-Allow-Origin"] = "*";
-        }
-        if (typeof allow_credentials !== "undefined"){
-          microservice.headers["Access-Control-Allow-Credentials"] = allow_credentials.toString();
-        } else {
-          microservice.headers["Access-Control-Allow-Credentials"] = "true";
-        }
-        if (typeof allow_methods !== "undefined"){
-          microservice.headers["Access-Control-Allow-Methods"] = [...allow_methods].join(",");
-        } else {
-          microservice.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS, POST";
-        }
-        if (typeof allow_headers !== "undefined"){
-          microservice.headers["Access-Control-Allow-Headers"] = [...allow_headers].join(",");
-        } else {
-          microservice.headers["Access-Control-Allow-Headers"] = "*";
-        }
-      }
-    },
-    _new_:function (o){
+Package("org.quickcorp.qcobjects.main.http.gae.server", [
+
+  class BackendMicroservice extends InheritClass {
+
+    constructor(o) {
+      super(...arguments);
+      this.domain = CONFIG.get("domain");
+      this.basePath = CONFIG.get("basePath");
       logger.debug("Executing GAE HTTP BackendMicroservice ");
       let microservice = this;
       let server = microservice.server;
@@ -103,89 +63,146 @@ Package("org.quickcorp.qcobjects.main.http.gae.server",[
       microservice.req.on("data", (data) => {
         // data from POST, GET
         var requestMethod = request.method.toLowerCase();
-        var supportedMethods = {"post":microservice.post,
-                              };
-        if (supportedMethods.hasOwnProperty.call(supportedMethods,requestMethod)) {
-          supportedMethods[requestMethod].call(microservice,data);
+        var supportedMethods = {
+          "post": microservice.post,
+        };
+        if (supportedMethods.hasOwnProperty.call(supportedMethods, requestMethod)) {
+          supportedMethods[requestMethod].call(microservice, data);
         }
       });
 
       // data from POST, GET
       var requestMethod = request.method.toLowerCase();
-      var supportedMethods = {"get":microservice.get,
-                              "head":microservice.head,
-                              "put":microservice.put,
-                              "delete":microservice.delete,
-                              "connect":microservice.connect,
-                              "options":microservice.options,
-                              "trace":microservice.trace,
-                              "patch":microservice.patch
-                            };
-      if (supportedMethods.hasOwnProperty.call(supportedMethods,requestMethod)) {
+      var supportedMethods = {
+        "get": microservice.get,
+        "head": microservice.head,
+        "put": microservice.put,
+        "delete": microservice.delete,
+        "connect": microservice.connect,
+        "options": microservice.options,
+        "trace": microservice.trace,
+        "patch": microservice.patch
+      };
+      if (supportedMethods.hasOwnProperty.call(supportedMethods, requestMethod)) {
         supportedMethods[requestMethod].call(microservice);
       }
 
-    },
-    head:function (formData){this.done();},
-    post:function (formData){this.done();},
-    put:function (formData){this.done();},
-    delete:function (formData){this.done();},
-    connect:function (formData){this.done();},
-    options:function (formData){this.done();},
-    trace:function (formData){this.done();},
-    patch:function (formData){this.done();},
-    finishWithBody:function (stream){
+
+    }
+
+    cors() {
+      if (this.route.cors) {
+        let {
+          allow_origins,
+          allow_credentials,
+          allow_methods,
+          allow_headers
+        } = this.route.cors;
+        var microservice = this;
+        if (typeof microservice.headers !== "object") {
+          microservice.headers = {};
+        }
+        if (typeof allow_origins !== "undefined") {
+          // an example of allow_origins is ['https://example.com','http://www.example.com']
+          if (allow_origins == "*" || (typeof microservice.request.headers.origin == "undefined") || [...allow_origins].indexOf(microservice.request.headers.origin) !== -1) {
+            // for compatibility with all browsers allways return a wildcard when the origin is allowed
+            microservice.headers["Access-Control-Allow-Origin"] = "*";
+          } else {
+            logger.debug("Origin is not allowed: " + microservice.request.headers.origin);
+            logger.debug("Forcing to finish the response...");
+            this.body = {};
+            try {
+              this.done();
+            } catch (e) {}
+          }
+        } else {
+          microservice.headers["Access-Control-Allow-Origin"] = "*";
+        }
+        if (typeof allow_credentials !== "undefined") {
+          microservice.headers["Access-Control-Allow-Credentials"] = allow_credentials.toString();
+        } else {
+          microservice.headers["Access-Control-Allow-Credentials"] = "true";
+        }
+        if (typeof allow_methods !== "undefined") {
+          microservice.headers["Access-Control-Allow-Methods"] = [...allow_methods].join(",");
+        } else {
+          microservice.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS, POST";
+        }
+        if (typeof allow_headers !== "undefined") {
+          microservice.headers["Access-Control-Allow-Headers"] = [...allow_headers].join(",");
+        } else {
+          microservice.headers["Access-Control-Allow-Headers"] = "*";
+        }
+      }
+    }
+
+    head(formData) {
+      this.done();
+    }
+    post(formData) {
+      this.done();
+    }
+    put(formData) {
+      this.done();
+    }
+    delete(formData) {
+      this.done();
+    }
+    connect(formData) {
+      this.done();
+    }
+    options(formData) {
+      this.done();
+    }
+    trace(formData) {
+      this.done();
+    }
+    patch(formData) {
+      this.done();
+    }
+    finishWithBody(stream) {
       try {
         stream.write(JSON.stringify(this.body));
         stream.end();
-      } catch (e){
-        logger.debug("Something wrong writing the response for microservice"+e.toString());
+      } catch (e) {
+        logger.debug("Something wrong writing the response for microservice" + e.toString());
       }
-    },
-    done: function(){
+    }
+
+    done() {
       var microservice = this;
       var stream = microservice.stream;
       try {
         stream.writeHead(200, microservice.headers);
-      } catch (e){
+      } catch (e) {
         logger.debug("Something went wront while sending headers in http...");
         logger.debug(e.toString());
       }
-      if (microservice.body != null){
-        microservice.finishWithBody.call(microservice,stream);
+      if (microservice.body != null) {
+        microservice.finishWithBody.call(microservice, stream);
       }
     }
-  }),
-  Class("PipeLog",{
-    pipe:(o)=>{
-      var _o = [];
-      for (var k in o){
-        if (typeof o[k] !== "undefined"
-            && o[k] !== null
-            && typeof o[k] !== "function"){
-          try {
-            _o.push(""+k+"="+o[k].toString());
-          } catch (e){
-            // error logging, do nothing
-          }
-        }
-      }
-      return _o.join(" ");
+
+  },
+
+  class HTTPServerResponse extends InheritClass {
+    constructor(o) {
+      super(...arguments);
+      var self = this;
+      self.body = "";
+      self.stream = o.stream;
+      self._generateResponse();
+      this.headers = {
+        ":status": 200,
+        "content-type": "text/html"
+      };
     }
-  }),
-  Class("HTTPServerResponse",{
-    headers:{
-      ":status": 200,
-      "content-type": "text/html"
-    },
-    body:"",
-    request:null,
-    fileDispatcher:null,
-    sendFile: function (stream, fileName) {
+
+    sendFile(stream, fileName) {
       // read and send file content in the stream
 
       try {
-        console.log("trying to read "+ fileName);
+        console.log("trying to read " + fileName);
         const fd = fs.openSync(fileName, "r");
         const stat = fs.fstatSync(fd);
         const headers = {
@@ -210,17 +227,17 @@ Package("org.quickcorp.qcobjects.main.http.gae.server",[
           readStream.pipe(stream);
         });
 
-        readStream.on("end",function (){
+        readStream.on("end", function () {
           stream.end();
         });
 
         // This catches any errors that happen while creating the readable stream (usually invalid names)
-        readStream.on("error", function(err) {
+        readStream.on("error", function (err) {
           stream.end(err);
         });
 
-      } catch (e){
-        if (e.errno==-2){
+      } catch (e) {
+        if (e.errno == -2) {
           const headers = {
             ":status": 404,
             "content-type": "text/html"
@@ -232,94 +249,72 @@ Package("org.quickcorp.qcobjects.main.http.gae.server",[
           stream.end();
         }
       }
-    },
-    _generateResponse:function (){
+    }
+
+    _generateResponse() {
       var response = this;
-      response.fileDispatcher = New(FileDispatcher,{
-        scriptname:response.request.scriptname,
-        pathname:response.request.pathname,
-        done:function (headers,body,templateURI,isTemplate){
+      response.fileDispatcher = New(FileDispatcher, {
+        scriptname: response.request.scriptname,
+        pathname: response.request.pathname,
+        done(headers, body, templateURI, isTemplate) {
           response.headers = headers;
           var stream = response.stream;
-          if (isTemplate){
+          if (isTemplate) {
             logger.debug("TEMPLATE");
             response.body = body;
-//            stream.respond(response.headers);
+            //            stream.respond(response.headers);
             stream.write(response.body);
             stream.end();
-          } else if (headers[":status"]==200){
-            response.sendFile(stream,templateURI);
+          } else if (headers[":status"] == 200) {
+            response.sendFile(stream, templateURI);
           } else {
             logger.debug("NONE ");
-//          stream.respond(response.headers);
+            //          stream.respond(response.headers);
             stream.end();
           }
         }
       });
 
-    },
-    _new_:function (o){
-      var self = this;
-      self.body = "";
-      self.stream = o.stream;
-      self._generateResponse();
+    }
+
+  },
+
+  class HTTPServerRequest extends InheritClass {
+
+    constructor({
+      scriptname = "",
+      path = "",
+      method = "",
+      url = "",
+      headers = null,
+      flags = null,
+      protocol = null,
+      slashes = null,
+      auth = null,
+      host = null,
+      port = null,
+      hostname = null,
+      hash = null,
+      search = "",
+      query = "",
+      pathname = "",
+      href = ""
+    }) {
+      super(...arguments);
 
     }
-  }),
-  Class("HTTPServerRequest",{
-    scriptname:"",
-    path:"",
-    method:"",
-    url:"",
-    headers:null,
-    flags:null,
-    protocol: null,
-    slashes: null,
-    auth: null,
-    host: null,
-    port: null,
-    hostname: null,
-    hash: null,
-    search: "",
-    query: "",
-    pathname: "",
-    href: ""
-  }),
-  Class("HTTPServer",{
-    request:null,
-    response:"",
-    server:null,
-    scriptname:"",
-    interceptorInstances:[],
-    showIPAddress:function (){
-      var _ret_ = "";
-      var os = require("os");
-      var ifaces = os.networkInterfaces();
-      Object.keys(ifaces).forEach(function (iface){
-        ifaces[iface].map(function (ipGroup){
-          _ret_ += iface +": " + PipeLog.pipe(ipGroup)+"\n";
-        });
-      });
-      return _ret_;
-    },
-    showPossibleURL: function (){
-      var _ret_ = "";
-      var os = require("os");
-      var ifaces = os.networkInterfaces();
-      Object.keys(ifaces).forEach(function (iface){
-        ifaces[iface].map(function (ipGroup){
-          if (ipGroup["family"].toLowerCase()=="ipv4"){
-            _ret_ += "http://"+ipGroup["address"]+":"+CONFIG.get("serverPortHTTP").toString()+"/\n";
-          }
-        });
-      });
-      return _ret_;
-    },
-    start:function (){
-      var server = this.server;
-      server.listen(process.env.PORT || CONFIG.get("serverPortHTTP"));
-    },
-    _new_:function (){
+  },
+
+  class HTTPServer extends InheritClass {
+    constructor({
+      request = null,
+      response = "",
+      server = null,
+      scriptname = "",
+      interceptorInstances = []
+    }) {
+      super(...arguments);
+
       let oHTTPServer = this;
       const welcometo = "Welcome to \n";
       const instructions = "QCObjects Legacy HTTPServer \n";
@@ -328,8 +323,8 @@ Package("org.quickcorp.qcobjects.main.http.gae.server",[
       console.log(logo);
       console.log(instructions);
       logger.debug(this.showIPAddress());
-      logger.info("Listening on HTTP PORT: "+CONFIG.get("serverPortHTTP").toString());
-      logger.info("Go to: \n"+this.showPossibleURL());
+      logger.info("Listening on HTTP PORT: " + CONFIG.get("serverPortHTTP").toString());
+      logger.info("Go to: \n" + this.showPossibleURL());
 
       const http = require("http");
 
@@ -341,20 +336,20 @@ Package("org.quickcorp.qcobjects.main.http.gae.server",[
 
       server.on("error", (err) => console.error(err));
 
-      if (global.get("backendAvailable")){
+      if (global.get("backendAvailable")) {
         logger.info("Loading backend interceptors...");
-        let interceptors = CONFIG.get("backend",{}).interceptors;
-        if (typeof interceptors !== "undefined"){
+        let interceptors = CONFIG.get("backend", {}).interceptors;
+        if (typeof interceptors !== "undefined") {
           logger.info("Backend Interceptors Available");
-          interceptors.map(interceptor=>{
-            ImportMicroservice (interceptor.microservice);
-            var interceptorClassFactory = ClassFactory(interceptor.microservice+".Interceptor");
-            var interceptorInstance = New(interceptorClassFactory,{
-              domain:CONFIG.get("domain"),
-              basePath:CONFIG.get("basePath"),
-              projectPath:CONFIG.get("projectPath"),
-              interceptor:interceptor,
-              server:server
+          interceptors.map(interceptor => {
+            ImportMicroservice(interceptor.microservice);
+            var interceptorClassFactory = ClassFactory(interceptor.microservice + ".Interceptor");
+            var interceptorInstance = New(interceptorClassFactory, {
+              domain: CONFIG.get("domain"),
+              basePath: CONFIG.get("basePath"),
+              projectPath: CONFIG.get("projectPath"),
+              interceptor: interceptor,
+              server: server
             });
             oHTTPServer.interceptorInstances.push(interceptorInstance);
           });
@@ -363,86 +358,91 @@ Package("org.quickcorp.qcobjects.main.http.gae.server",[
 
       server.on("request", (req, res) => {
 
-        let request = Object.assign(New(HTTPServerRequest),require("url").parse(req.url));
+        let request = Object.assign(New(HTTPServerRequest), require("url").parse(req.url));
         request.headers = req.headers;
         this.request = request;
         this.request.method = req.method;
         this.request.path = req.url;
         server.setMaxListeners(9999999999);
-        CONFIG.set("backendTimeout",CONFIG.get("backendTimeout") || 20000);
-        var timeoutHandler = ()=>{
+        CONFIG.set("backendTimeout", CONFIG.get("backendTimeout") || 20000);
+        var timeoutHandler = () => {
           // end the stream on timeout
           try {
-            if (!res.destroyed){
+            if (!res.destroyed) {
               logger.info("A timeout occurred..." + CONFIG.get("backendTimeout").toString());
               logger.info("Killing session...");
 
-              res.writeHeader( 500, {
+              res.writeHeader(500, {
                 "content-type": "text/html"
               });
-              res.on("error",()=>{});
+              res.on("error", () => {});
               res.write("<h1>500 - INTERNAL SERVER ERROR (TIMEOUT)</h1>");
               res.end();
             } else {
               logger.debug("Session was normally finishing...");
             }
-          }catch (e){
+          } catch (e) {
             logger.debug("An unhandled error occurred during timeout catching...");
             logger.debug(e.message);
           }
-          server.removeListener("timeout",timeoutHandler);
+          server.removeListener("timeout", timeoutHandler);
 
         };
-        if (!res.destroyed){
+        if (!res.destroyed) {
           server.setTimeout(CONFIG.get("backendTimeout"), timeoutHandler);
         }
 
-        if (this.request.pathname.indexOf(".")<0){
-            this.request.scriptname = CONFIG.get("documentRootFileIndex");
+        if (this.request.pathname.indexOf(".") < 0) {
+          this.request.scriptname = CONFIG.get("documentRootFileIndex");
         } else {
           this.request.scriptname = this.request.pathname.split("/").reverse()[0];
         }
-        this.request.pathname = this.request.pathname.substr(0,this.request.pathname.lastIndexOf("/"));
+        this.request.pathname = this.request.pathname.substr(0, this.request.pathname.lastIndexOf("/"));
 
-        logger.debug(PipeLog.pipe(this.request));
+        logger.debug((new PipeLog()).pipe(this.request));
 
-        if (global.get("backendAvailable")){
+        if (global.get("backendAvailable")) {
           logger.info("Backend GAE Microservices Available");
           let routes = CONFIG.get("backend").routes;
-          let selectedRoute = routes.filter(route=>{let standardRoutePath = route.path.replace(/{(.*?)}/g,"(?<$1>.*)");return (new RegExp(standardRoutePath,"g")).test(request.path);});
-          if (selectedRoute.length>0){
-            selectedRoute.map(route=>{
-              let standardRoutePath = route.path.replace(/{(.*?)}/g,"(?<$1>.*)"); //allowing {param}
-              let selectedRouteParams = {...[...request.path.matchAll((new RegExp( standardRoutePath ,"g")))][0]["groups"]};
-              ImportMicroservice (route.microservice);
-              var microServiceClassFactory = ClassFactory(route.microservice+".Microservice");
-              this.response = New(microServiceClassFactory,{
-                domain:CONFIG.get("domain"),
-                basePath:CONFIG.get("basePath"),
-                projectPath:CONFIG.get("projectPath"),
-                route:route,
-                routeParams:selectedRouteParams,
-                server:server,
-                stream:res,
-                req:req,
-                request:request
+          let selectedRoute = routes.filter(route => {
+            let standardRoutePath = route.path.replace(/{(.*?)}/g, "(?<$1>.*)");
+            return (new RegExp(standardRoutePath, "g")).test(request.path);
+          });
+          if (selectedRoute.length > 0) {
+            selectedRoute.map(route => {
+              let standardRoutePath = route.path.replace(/{(.*?)}/g, "(?<$1>.*)"); //allowing {param}
+              let selectedRouteParams = {
+                ...[...request.path.matchAll((new RegExp(standardRoutePath, "g")))][0]["groups"]
+              };
+              ImportMicroservice(route.microservice);
+              var microServiceClassFactory = ClassFactory(route.microservice + ".Microservice");
+              this.response = New(microServiceClassFactory, {
+                domain: CONFIG.get("domain"),
+                basePath: CONFIG.get("basePath"),
+                projectPath: CONFIG.get("projectPath"),
+                route: route,
+                routeParams: selectedRouteParams,
+                server: server,
+                stream: res,
+                req: req,
+                request: request
               });
             });
           } else {
-            this.response = New(HTTPServerResponse,{
-              server:server,
-              stream:res,
-              request:this.request
+            this.response = New(HTTPServerResponse, {
+              server: server,
+              stream: res,
+              request: this.request
             });
           }
 
         } else {
           // ...
 
-          this.response = New(HTTPServerResponse,{
-            server:server,
-            stream:res,
-            request:this.request
+          this.response = New(HTTPServerResponse, {
+            server: server,
+            stream: res,
+            request: this.request
           });
 
         }
@@ -450,5 +450,37 @@ Package("org.quickcorp.qcobjects.main.http.gae.server",[
       });
 
     }
-  })
+
+    showIPAddress() {
+      var _ret_ = "";
+      var os = require("os");
+      var ifaces = os.networkInterfaces();
+      Object.keys(ifaces).forEach(function (iface) {
+        ifaces[iface].map(function (ipGroup) {
+          _ret_ += iface + ": " + (new PipeLog()).pipe(ipGroup) + "\n";
+        });
+      });
+      return _ret_;
+    }
+
+    showPossibleURL() {
+      var _ret_ = "";
+      var os = require("os");
+      var ifaces = os.networkInterfaces();
+      Object.keys(ifaces).forEach(function (iface) {
+        ifaces[iface].map(function (ipGroup) {
+          if (ipGroup["family"].toLowerCase() == "ipv4") {
+            _ret_ += "http://" + ipGroup["address"] + ":" + CONFIG.get("serverPortHTTP").toString() + "/\n";
+          }
+        });
+      });
+      return _ret_;
+    }
+
+    start() {
+      var server = this.server;
+      server.listen(process.env.PORT || CONFIG.get("serverPortHTTP"));
+    }
+  }
+
 ]);

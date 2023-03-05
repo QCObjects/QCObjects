@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * QCObjects CLI 2.3.x
+ * QCObjects CLI 2.4.x
  * ________________
  *
  * Author: Jean Machuca <correojean@gmail.com>
@@ -43,14 +43,17 @@ if (CONFIG.get("useLegacyHTTP",false)){
   require(absolutePath+"/org.quickcorp.qcobjects.main.http2.server.js");
 }
 
-Class("Main",{
-  _new_:()=>{
+class Main extends InheritClass {
+  constructor (){
+    super(...arguments);
     const _ServerClass_ = (CONFIG.get("useLegacyHTTP",false))? (HTTPServer): (HTTP2Server);
     const app = New(_ServerClass_);
     app.start();
 
     logger.debug("initialized");
+    
   }
-});
 
-let __main__ = New(Main);
+}
+
+let __main__ = new Main();

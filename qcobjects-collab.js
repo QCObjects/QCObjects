@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * QCObjects CLI 2.3.x
+ * QCObjects CLI 2.4.x
  * ________________
  *
  * Author: Jean Machuca <correojean@gmail.com>
@@ -39,13 +39,15 @@ require(absolutePath+"/org.quickcorp.qcobjects.defaultsettings.js");
 
 require(absolutePath+"/org.quickcorp.qcobjects.collab.server.js");
 
-Class("Main",{
-  _new_:()=>{
-    const app = New(CollabServer);
+class Main extends InheritClass {
+  constructor (){
+    super (...arguments);
+    const app = new CollabServer();
     app.start();
 
     logger.debug("initialized");
-  }
-});
 
-let __main__ = New(Main);
+  }
+}
+
+let __main__ = new Main();

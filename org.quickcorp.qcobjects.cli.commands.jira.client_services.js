@@ -1,5 +1,5 @@
 /**
- * QCObjects CLI 2.3.x
+ * QCObjects CLI 2.4.x
  * ________________
  *
  * Author: Jean Machuca <correojean@gmail.com>
@@ -30,34 +30,41 @@
 /*eslint no-undef: "off"*/
 "use strict";
 Package("org.quickcorp.qcobjects.cli.commands.jira.client_services", [
-  Class("JiraCloud", Service, {
-    name: "jira_cloud",
-    external: true,
-    useHTTP2: true,
-    cached: false,
-    method: "POST",
-    headers: {
-      "accept":"application/json",
-      "content-type":"application/json"
-    },
-    basePath: "",
-    url: "",
-    withCredentials: false,
-    _new_: function(o) {
-      // service instantiated
+  class JiraCloud extends Service {
+    constructor ({
+      name= "jira_cloud",
+      external= true,
+      useHTTP2= true,
+      cached= false,
+      method= "POST",
+      headers= {
+        "accept":"application/json",
+        "content-type":"application/json"
+      },
+      basePath= "",
+      url= "",
+      withCredentials= false
+    }){
+      super(...arguments);
+      var o = this;
       this.domain = `${o.domain}`;
       this.basePath = `https://${this.domain}/`;
       this.username_password = `${o.username}:${o.password}`;
       this.headers["authorization"] = `Basic ${Buffer.from(this.username_password).toString("base64")}`;
       this.url = this.basePath + o.apiMethod;
       this.data = o.data;
-    },
-    done: function(service,standardResponse) {
+  
+    }
+
+    done(service,standardResponse) {
       // service loaded
       logger.debug(standardResponse);
-    },
-    fail: function (e){
+    }
+
+    fail (e){
         logger.debug(e);
     }
-  })
+
+  }
+
 ]);

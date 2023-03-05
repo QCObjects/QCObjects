@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * QCObjects CLI 2.3.x
+ * QCObjects CLI 2.4.x
  * ________________
  *
  * Author: Jean Machuca <correojean@gmail.com>
@@ -65,22 +65,19 @@ require(absolutePath+"/org.quickcorp.qcobjects.cli");
 
 let switchCommander;
 
-Class("Main",Object,{
-  _new_:(o)=>{
+class Main extends InheritClass {
+  constructor (){
+    super(...arguments);
     let main = this;
 
-    switchCommander = New(SwitchCommander);
+    switchCommander = new SwitchCommander();
     switchCommander.initCommand();
 
-    /*
-    let template = New(AppTemplate,{
-      compileAndSave:true
-    });
-    */
     logger.debug("initialized");
 
 
   }
-});
 
-let __main__ = New(Main,{});
+}
+
+let __main__ = new Main ();

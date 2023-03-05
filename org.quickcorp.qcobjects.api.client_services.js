@@ -1,5 +1,5 @@
 /**
- * QCObjects CLI 2.3.x
+ * QCObjects CLI 2.4.x
  * ________________
  *
  * Author: Jean Machuca <correojean@gmail.com>
@@ -30,31 +30,42 @@
 /*eslint no-undef: "off"*/
 "use strict";
 Package("org.quickcorp.qcobjects.api.client_services", [
-  Class("QuickCorpCloud", Service, {
-    name: "quickcorp_cloud",
-    external: true,
-    useHTTP2:true,
-    cached: false,
-    method: "post",
-    headers: {
-      "origin": "localhost",
-      "content-type": "application/json"
-    },
-    basePath: "https://cloud.quickcorp.org/",
-    url: "",
-    withCredentials: false,
-    _new_: function(o) {
+
+  class QuickCorpCloud extends Service {
+    constructor ({
+      name= "quickcorp_cloud",
+      external= true,
+      useHTTP2=true,
+      cached= false,
+      method= "post",
+      headers= {
+        "origin": "localhost",
+        "content-type": "application/json"
+      },
+      basePath= "https://cloud.quickcorp.org/",
+      url= "",
+      withCredentials= false
+    }) {
+      super(...arguments);
+
+    }
+
+    _new_(o) {
       // service instantiated
       this.headers["authorization"] = "Basic token";
       this.url = this.basePath + o.apiMethod;
       this.data = o.data;
-    },
-    done: function(service,standardResponse) {
+    }
+    
+    done(service,standardResponse) {
       // service loaded
       logger.debug(standardResponse);
-    },
-    fail: function (e){
+    }
+
+    fail(e){
         logger.debug(e);
     }
-  })
+
+  }
+
 ]);

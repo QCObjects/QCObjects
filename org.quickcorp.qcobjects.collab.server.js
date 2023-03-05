@@ -1,5 +1,5 @@
 /**
- * QCObjects CLI 2.3.x
+ * QCObjects CLI 2.4.x
  * ________________
  *
  * Author: Jean Machuca <correojean@gmail.com>
@@ -28,7 +28,6 @@
 /*eslint strict: "off"*/
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
-/*eslint no-global-assign: "off"*/
 "use strict";
 const os = require("os");
 const fs = require("fs");
@@ -76,335 +75,345 @@ You can also use a Unix Socket to connect yourself to the engine:
 
 }
 
-
-Class("CollabServer",{
-  runScript: function (context){
-    const runScript = (code,logOutput=false)=>{
-      const options = {filename:sandbox.__filename};
-
-      const backgroundRunScript = (code)=>{
-        var output = vm.runInContext(code,context,options);
-        return output;
-      };
-
-      var output = backgroundRunScript(code);
-
-
-      if (logOutput && typeof output !== "undefined"){
-        console.log(output);
-      }
-    };
-
-  },
-  protected_symbols: [ "clearInterval",
-    "clearTimeout",
-    "setInterval",
-    "setTimeout",      "queueMicrotask",
-     "clearImmediate",        "setImmediate",          "_asyncLoad",
-     "_fireAsyncLoad",           "asyncLoad",              "logger",
-             "_Crypt",              "CONFIG",           "waitUntil",
-            "_super_", "ComplexStorageCache",         "TagElements",
-             "onload",        "InheritClass",           "Component",
-         "Controller",                "View",             "Service",
-        "JSONService",       "ConfigService",                  "VO",
-      "serviceLoader",     "componentLoader",        "ComponentURI",
-           "SourceJS",           "SourceCSS",           "ArrayList",
-    "ArrayCollection",              "Effect",               "Timer",
-             "Export",              "Import",             "Package",
-              "Class",                 "New",                 "Tag",
-              "Ready",             "Contact",           "FormField",
-        "ButtonField",          "InputField",           "TextField",
-         "EmailField",       "GridComponent",      "GridController",
-           "GridView",                "Move",             "RotateX",
-            "RotateY",             "RotateZ",              "Rotate",
-               "Fade",              "Radius",          "CanvasTool",
-        "BasicLayout"
-  ],
-  commands: {
-    loadcmd_json:{
-      help: `
-              Executes a CMD Shell Command
-              and loads the stdout to a variable after trying to convert the result
-              to JSON format
-              The first argument is the variable name followed by an equal sign "=".
-              Example:
-               > .loadcmd_json result = cat somefile.json
-
-              The above command will save the content of somefile.json using cat into the variable global.result
-              as JSON format
-`,
-      action(args) {
-        let _rplServer = this;
-        var commandArgs = args.split(" ");
-        if (commandArgs.length>2){
-          var _variableName = commandArgs[0];
-          var _equal_sign = commandArgs[1].toString();
-          if (_equal_sign === "="){
-            var cmdArguments = commandArgs.slice(2).join(" ");
-            _rplServer.clearBufferedCommand();
-            logger.debug(`Executing... ${cmdArguments}`);
-            exec(cmdArguments, (err, stdout, stderr) => {
-              try {
-                _rplServer.context[_variableName] = JSON.parse(stdout);
-              } catch (e){
-                logger.debug("It was not possible to parse the data.");
-              }
+Package("org.quickcorp.qcobjects.collab.server",[
+  class CollabServer extends InheritClass {
+    constructor(){
+      super(...arguments);
+      this.protected_symbols= [ "clearInterval",
+      "clearTimeout",
+      "setInterval",
+      "setTimeout",      "queueMicrotask",
+       "clearImmediate",        "setImmediate",          "_asyncLoad",
+       "_fireAsyncLoad",           "asyncLoad",              "logger",
+               "_Crypt",              "CONFIG",           "waitUntil",
+              "_super_", "ComplexStorageCache",         "TagElements",
+               "onload",        "InheritClass",           "Component",
+           "Controller",                "View",             "Service",
+          "JSONService",       "ConfigService",                  "VO",
+        "serviceLoader",     "componentLoader",        "ComponentURI",
+             "SourceJS",           "SourceCSS",           "ArrayList",
+      "ArrayCollection",              "Effect",               "Timer",
+               "Export",              "Import",             "Package",
+                "Class",                 "New",                 "Tag",
+                "Ready",             "Contact",           "FormField",
+          "ButtonField",          "InputField",           "TextField",
+           "EmailField",       "GridComponent",      "GridController",
+             "GridView",                "Move",             "RotateX",
+              "RotateY",             "RotateZ",              "Rotate",
+                 "Fade",              "Radius",          "CanvasTool",
+          "BasicLayout"
+    ];
+    this.commands= {
+      loadcmd_json:{
+        help: `
+                Executes a CMD Shell Command
+                and loads the stdout to a variable after trying to convert the result
+                to JSON format
+                The first argument is the variable name followed by an equal sign "=".
+                Example:
+                 > .loadcmd_json result = cat somefile.json
+  
+                The above command will save the content of somefile.json using cat into the variable global.result
+                as JSON format
+  `,
+        action(args) {
+          let _rplServer = this;
+          var commandArgs = args.split(" ");
+          if (commandArgs.length>2){
+            var _variableName = commandArgs[0];
+            var _equal_sign = commandArgs[1].toString();
+            if (_equal_sign === "="){
+              var cmdArguments = commandArgs.slice(2).join(" ");
+              _rplServer.clearBufferedCommand();
+              logger.debug(`Executing... ${cmdArguments}`);
+              exec(cmdArguments, (err, stdout, stderr) => {
+                try {
+                  _rplServer.context[_variableName] = JSON.parse(stdout);
+                } catch (e){
+                  logger.debug("It was not possible to parse the data.");
+                }
+                _rplServer.displayPrompt();
+              }).stdout.on("data", function(data) {
+                  console.log(data);
+              });
+            } else {
+              console.log("That is no good my friend. You need to specify an equal sign.");
               _rplServer.displayPrompt();
-            }).stdout.on("data", function(data) {
-                console.log(data);
-            });
+            }
           } else {
-            console.log("That is no good my friend. You need to specify an equal sign.");
+            console.log("No enough data in the command line. Try .help");
             _rplServer.displayPrompt();
           }
-        } else {
-          console.log("No enough data in the command line. Try .help");
-          _rplServer.displayPrompt();
         }
-      }
-    },
-    loadcmd_str:{
-      help: `
-              Executes a CMD Shell Command
-              and loads the stdout to a variable.
-              The first argument is the variable name followed by an equal sign "=".
-              Example:
-               > .loadcmd_str foo = ls *
-
-              The above command will save the output of "ls *" into the variable global.foo as string
-`,
-      action(args) {
-        let _rplServer = this;
-        var commandArgs = args.split(" ");
-        if (commandArgs.length>2){
-          var _variableName = commandArgs[0];
-          var _equal_sign = commandArgs[1].toString();
-          if (_equal_sign === "="){
-            var cmdArguments = commandArgs.slice(2).join(" ");
-            _rplServer.clearBufferedCommand();
-            logger.debug(`Executing... ${cmdArguments}`);
-            exec(cmdArguments, (err, stdout, stderr) => {
-              _rplServer.context[_variableName] = stdout;
+      },
+      loadcmd_str:{
+        help: `
+                Executes a CMD Shell Command
+                and loads the stdout to a variable.
+                The first argument is the variable name followed by an equal sign "=".
+                Example:
+                 > .loadcmd_str foo = ls *
+  
+                The above command will save the output of "ls *" into the variable global.foo as string
+  `,
+        action(args) {
+          let _rplServer = this;
+          var commandArgs = args.split(" ");
+          if (commandArgs.length>2){
+            var _variableName = commandArgs[0];
+            var _equal_sign = commandArgs[1].toString();
+            if (_equal_sign === "="){
+              var cmdArguments = commandArgs.slice(2).join(" ");
+              _rplServer.clearBufferedCommand();
+              logger.debug(`Executing... ${cmdArguments}`);
+              exec(cmdArguments, (err, stdout, stderr) => {
+                _rplServer.context[_variableName] = stdout;
+                _rplServer.displayPrompt();
+              }).stdout.on("data", function(data) {
+                  console.log(data);
+              });
+            } else {
+              console.log("That is no good my friend. You need to specify an equal sign.");
               _rplServer.displayPrompt();
-            }).stdout.on("data", function(data) {
-                console.log(data);
-            });
+            }
           } else {
-            console.log("That is no good my friend. You need to specify an equal sign.");
+            console.log("No enough data in the command line. Try .help");
             _rplServer.displayPrompt();
           }
-        } else {
-          console.log("No enough data in the command line. Try .help");
-          _rplServer.displayPrompt();
         }
-      }
-    },
-    save_json:{
-      help: `
-              Serializes a variable using JSON.stringify
-              and saves it in a file.
-              The first argument is the variable name and the second argument is the name of the file.
-              Example:
-               > .save_json foo ./filename
-
-              The above command will save the stringified content of foo into ./filename
-`,
-      action(args) {
-        let _rplServer = this;
-        var commandArgs = args.split(" ");
-        if (commandArgs.length>=2){
-          var _variableName = commandArgs[0];
-          var _filename = commandArgs[1].toString();
-          logger.debug(`Saving variable ${_variableName} in ${_filename}...`);
-          var data = JSON.stringify(_rplServer.context[_variableName]);
-          fs.writeFile(_filename, data, (err) => {
-            if (err) throw err;
-            logger.debug(`The data of the file ${_filename} has been saved!`);
-            _rplServer.displayPrompt();
-          });
-
-        } else {
-          console.log("No enough data in the command line. Try .help");
-          _rplServer.displayPrompt();
-        }
-      }
-    },
-    load_json:{
-      help: `
-              Loads a json from a file and saves it into a variable.
-              The first argument is the variable name and the second argument is the name of the file.
-              Example:
-               > .load_json foo = ./filename
-
-              The above command will load a json from ./filename and save it in global.foo as an object
-`,
-      action(args) {
-        let _rplServer = this;
-        var commandArgs = args.split(" ");
-        if (commandArgs.length>2){
-          var _variableName = commandArgs[0];
-          var _equal_sign = commandArgs[1].toString();
-          if (_equal_sign === "="){
-            var _filename = commandArgs[2].toString();
-            logger.debug(`Trying to read ${_variableName} from ${_filename}...`);
-            fs.readFile(_filename,(err, data) => {
+      },
+      save_json:{
+        help: `
+                Serializes a variable using JSON.stringify
+                and saves it in a file.
+                The first argument is the variable name and the second argument is the name of the file.
+                Example:
+                 > .save_json foo ./filename
+  
+                The above command will save the stringified content of foo into ./filename
+  `,
+        action(args) {
+          let _rplServer = this;
+          var commandArgs = args.split(" ");
+          if (commandArgs.length>=2){
+            var _variableName = commandArgs[0];
+            var _filename = commandArgs[1].toString();
+            logger.debug(`Saving variable ${_variableName} in ${_filename}...`);
+            var data = JSON.stringify(_rplServer.context[_variableName]);
+            fs.writeFile(_filename, data, (err) => {
               if (err) throw err;
-              try {
-                _rplServer.context[_variableName] = JSON.parse(data.toString());
-                logger.debug(`The data of the file ${_filename} has been loaded!`);
-              } catch (e){
-                logger.debug("It was not possible to parse the data.");
-              }
+              logger.debug(`The data of the file ${_filename} has been saved!`);
               _rplServer.displayPrompt();
             });
+  
           } else {
-            console.log("That is no good my friend. You need to specify an equal sign.");
+            console.log("No enough data in the command line. Try .help");
             _rplServer.displayPrompt();
           }
-
-        } else {
-          console.log("No enough data in the command line. Try .help");
-          _rplServer.displayPrompt();
+        }
+      },
+      load_json:{
+        help: `
+                Loads a json from a file and saves it into a variable.
+                The first argument is the variable name and the second argument is the name of the file.
+                Example:
+                 > .load_json foo = ./filename
+  
+                The above command will load a json from ./filename and save it in global.foo as an object
+  `,
+        action(args) {
+          let _rplServer = this;
+          var commandArgs = args.split(" ");
+          if (commandArgs.length>2){
+            var _variableName = commandArgs[0];
+            var _equal_sign = commandArgs[1].toString();
+            if (_equal_sign === "="){
+              var _filename = commandArgs[2].toString();
+              logger.debug(`Trying to read ${_variableName} from ${_filename}...`);
+              fs.readFile(_filename,(err, data) => {
+                if (err) throw err;
+                try {
+                  _rplServer.context[_variableName] = JSON.parse(data.toString());
+                  logger.debug(`The data of the file ${_filename} has been loaded!`);
+                } catch (e){
+                  logger.debug("It was not possible to parse the data.");
+                }
+                _rplServer.displayPrompt();
+              });
+            } else {
+              console.log("That is no good my friend. You need to specify an equal sign.");
+              _rplServer.displayPrompt();
+            }
+  
+          } else {
+            console.log("No enough data in the command line. Try .help");
+            _rplServer.displayPrompt();
+          }
+        }
+      },
+      cmd:{
+        help: "Executes a CMD Shell Command",
+        action() {
+          let _rplServer = this;
+          var cmdArguments = [...arguments].join(" ");
+          _rplServer.clearBufferedCommand();
+          logger.debug(`Executing... ${cmdArguments}`);
+          exec(cmdArguments, (err, stdout, stderr) => {
+            _rplServer.displayPrompt();
+          }).stdout.on("data", function(data) {
+              console.log(data);
+          });
         }
       }
-    },
-    cmd:{
-      help: "Executes a CMD Shell Command",
-      action() {
-        let _rplServer = this;
-        var cmdArguments = [...arguments].join(" ");
-        _rplServer.clearBufferedCommand();
-        logger.debug(`Executing... ${cmdArguments}`);
-        exec(cmdArguments, (err, stdout, stderr) => {
-          _rplServer.displayPrompt();
-        }).stdout.on("data", function(data) {
-            console.log(data);
-        });
-      }
-    }
-  },
-  start:function (){
-
-    var collabServer = this;
-    const vm = require("vm");
-    let sandbox = {
-      require:require,
-      module:module,
-      __dirname:"./",
-      __filename:"qcobjects-collab"
     };
-    global = require("qcobjects");
-    global.require = require.bind(global);
-    global.module = module;
-    global.__dirname = "./";
-    global.__filename = "qcobjects-collab";
-    global = vm.createContext(global);
-
-    var net = require("net"),
-        repl = require("repl");
-
-    global.connections = 0;
-
-    function unlink_socket (){
-      try {
-        logger.debug("Trying to delete the socket... ");
-        fs.unlink(CONFIG.get("collab-unix-socket",unixsocket_default), (err) => {
-          if (err) {
-            logger.debug("Unix Socket does not exist");
-          }
-          logger.debug("Unix Socket was deleted before start");
-        });
-      } catch (e){
-        // socket doesnt exists
-        logger.debug("Unix Socket was not deleted");
-      }
+  
     }
-
-    unlink_socket();
-
-    var _defineReplCommands = function (_cmdReplServer,commands){
-      for (var _command in commands){
-        _cmdReplServer.defineCommand(_command, commands[_command]);
+  
+    runScript(context){
+      const runScript = (code,logOutput=false)=>{
+        const options = {filename:sandbox.__filename};
+  
+        const backgroundRunScript = (code)=>{
+          var output = vm.runInContext(code,context,options);
+          return output;
+        };
+  
+        var output = backgroundRunScript(code);
+  
+  
+        if (logOutput && typeof output !== "undefined"){
+          console.log(output);
+        }
+      };
+  
+    }
+  
+    start (){
+  
+      var collabServer = this;
+      const vm = require("vm");
+      let sandbox = {
+        require:require,
+        module:module,
+        __dirname:"./",
+        __filename:"qcobjects-collab"
+      };
+      global = require("qcobjects");
+      global.require = require.bind(global);
+      global.module = module;
+      global.__dirname = "./";
+      global.__filename = "qcobjects-collab";
+      global = vm.createContext(global);
+  
+      var net = require("net"),
+          repl = require("repl");
+  
+      global.connections = 0;
+  
+      function unlink_socket (){
+        try {
+          logger.debug("Trying to delete the socket... ");
+          fs.unlink(CONFIG.get("collab-unix-socket",unixsocket_default), (err) => {
+            if (err) {
+              logger.debug("Unix Socket does not exist");
+            }
+            logger.debug("Unix Socket was deleted before start");
+          });
+        } catch (e){
+          // socket doesnt exists
+          logger.debug("Unix Socket was not deleted");
+        }
       }
-    };
-
-    let replServer = repl.start({
-       useColors: true,
-       prompt:"QCObjects Collab> ",
-       terminal: true,
-       useGlobal: false
-     });
-    replServer.context = global;
-
-    replServer.on("exit", () => {
+  
       unlink_socket();
-
-      console.log("Thank you for using QCObjects Collab for Data Science!");
-      console.log("Have a nice day!");
-      process.exit();
-    });
-    _defineReplCommands(replServer,collabServer.commands);
-
-
-
-    let unixsocket_server = net.createServer(function (unixsocket) {
-      unixsocket.on("end", () => {
-        logger.debug("A Unix socket connection was ended");
+  
+      var _defineReplCommands = function (_cmdReplServer,commands){
+        for (var _command in commands){
+          _cmdReplServer.defineCommand(_command, commands[_command]);
+        }
+      };
+  
+      let replServer = repl.start({
+         useColors: true,
+         prompt:"QCObjects Collab> ",
+         terminal: true,
+         useGlobal: false
+       });
+      replServer.context = global;
+  
+      replServer.on("exit", () => {
+        unlink_socket();
+  
+        console.log("Thank you for using QCObjects Collab for Data Science!");
+        console.log("Have a nice day!");
+        process.exit();
       });
-      global.connections += 1;
-      let unixReplServer = repl.start({
-          prompt: "QCObjects Collab> "
-        , input: unixsocket
-        , output: unixsocket
-        , terminal: true
-        , useGlobal: false
+      _defineReplCommands(replServer,collabServer.commands);
+  
+  
+  
+      let unixsocket_server = net.createServer(function (unixsocket) {
+        unixsocket.on("end", () => {
+          logger.debug("A Unix socket connection was ended");
+        });
+        global.connections += 1;
+        let unixReplServer = repl.start({
+            prompt: "QCObjects Collab> "
+          , input: unixsocket
+          , output: unixsocket
+          , terminal: true
+          , useGlobal: false
+        });
+        unixReplServer.on("exit", function () {
+          unixsocket.end();
+        });
+        unixReplServer.context=global;
+        _defineReplCommands(unixReplServer,collabServer.commands);
+      }).listen(CONFIG.get("collab-unix-socket",unixsocket_default));
+  
+  
+      let http_server = net.createServer(function (httpsocket) {
+        httpsocket.on("end", () => {
+          logger.debug("A http connection was ended");
+        });
+        global.connections += 1;
+        let httpReplServer = repl.start({
+            prompt: "QCObjects Collab> "
+          , input: httpsocket
+          , output: httpsocket
+          , terminal: true
+          , useGlobal: false
+        });
+        httpReplServer.on("exit", function () {
+          httpsocket.end();
+        });
+        httpReplServer.context=global;
+        _defineReplCommands(httpReplServer,collabServer.commands);
+      }).listen(CONFIG.get("collab-port",collab_port_default),CONFIG.get("collab-domain",collab_domain_default));
+  
+  
+      http_server.on("error", function (e) {
+        if (e.code == "EADDRINUSE") {
+          console.log("Collab HTTP Address in use, retrying...");
+          setTimeout(function () {
+            http_server.close();
+            http_server.listen(CONFIG.get("collab-port",collab_port_default),CONFIG.get("collab-domain",collab_domain_default));
+          }, 1000);
+        }
       });
-      unixReplServer.on("exit", function () {
-        unixsocket.end();
+  
+      unixsocket_server.on("error", function (e) {
+        if (e.code == "EADDRINUSE") {
+          console.log("Collab Unix Socket Address in use, retrying...");
+          setTimeout(function () {
+            unixsocket_server.close();
+            unixsocket_server.listen(CONFIG.get("collab-unix-socket",unixsocket_default));
+          }, 1000);
+        }
       });
-      unixReplServer.context=global;
-      _defineReplCommands(unixReplServer,collabServer.commands);
-    }).listen(CONFIG.get("collab-unix-socket",unixsocket_default));
-
-
-    let http_server = net.createServer(function (httpsocket) {
-      httpsocket.on("end", () => {
-        logger.debug("A http connection was ended");
-      });
-      global.connections += 1;
-      let httpReplServer = repl.start({
-          prompt: "QCObjects Collab> "
-        , input: httpsocket
-        , output: httpsocket
-        , terminal: true
-        , useGlobal: false
-      });
-      httpReplServer.on("exit", function () {
-        httpsocket.end();
-      });
-      httpReplServer.context=global;
-      _defineReplCommands(httpReplServer,collabServer.commands);
-    }).listen(CONFIG.get("collab-port",collab_port_default),CONFIG.get("collab-domain",collab_domain_default));
-
-
-    http_server.on("error", function (e) {
-      if (e.code == "EADDRINUSE") {
-        console.log("Collab HTTP Address in use, retrying...");
-        setTimeout(function () {
-          http_server.close();
-          http_server.listen(CONFIG.get("collab-port",collab_port_default),CONFIG.get("collab-domain",collab_domain_default));
-        }, 1000);
-      }
-    });
-
-    unixsocket_server.on("error", function (e) {
-      if (e.code == "EADDRINUSE") {
-        console.log("Collab Unix Socket Address in use, retrying...");
-        setTimeout(function () {
-          unixsocket_server.close();
-          unixsocket_server.listen(CONFIG.get("collab-unix-socket",unixsocket_default));
-        }, 1000);
-      }
-    });
+    }
+  
+  
   }
-});
+  
+]);

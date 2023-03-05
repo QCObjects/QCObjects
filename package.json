@@ -1,27 +1,31 @@
 {
   "name": "qcobjects-cli",
-  "version": "2.3.50",
+  "version": "2.4.0",
   "description": "qcobjects cli command line tool",
   "main": "qcobjects-cli.js",
   "scripts": {
     "sync": "git add . && git commit -am ",
-    "test": "npx eslint **/*.js --fix && $(npm bin)/jasmine",
+    "test": "npx eslint **/*.js --fix && jasmine",
     "preversion": "npm i --upgrade && npm test",
     "postversion": "git push && git push --tags"
   },
   "dependencies": {
     "commander": "^2.20.3",
     "mime": "^2.4.7",
-    "qcobjects": "^2.3.66-lts",
-    "qcobjects-sdk": "latest",
+    "qcobjects": "^2.4.32-beta",
+    "qcobjects-sdk": "2.4.24",
     "yaml": "^1.10.2"
   },
   "devDependencies": {
     "eslint": "^8.2.0",
-    "eslint-config-qcobjects": "^0.0.13",
-    "jasmine": "^3.7.0",
-    "qcobjects": "^2.3.66-lts",
-    "qcobjects-cli": "latest"
+    "eslint-config-qcobjects": "^0.0.14",
+    "jasmine": "^3.99.0",
+    "qcobjects": "^2.4.32-beta",
+    "qcobjects-sdk": "2.4.24"
+  },
+  "peerDependencies": {
+    "qcobjects": "^2.4.32-beta",
+    "qcobjects-sdk": "2.4.24"
   },
   "repository": {
     "type": "file",
@@ -61,5 +65,9 @@
     "qcobjects-gae-server": "./qcobjects-gae-http-server.js",
     "qcobjects-http-server": "./qcobjects-http-server.js",
     "qcobjects-collab": "./qcobjects-collab.js"
+  },
+  "engines": {
+    "node": ">=14",
+    "npm": ">=9"
   }
 }

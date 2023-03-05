@@ -1,5 +1,5 @@
 /**
- * QCObjects CLI 2.3.x
+ * QCObjects CLI 2.4.x
  * ________________
  *
  * Author: Jean Machuca <correojean@gmail.com>
@@ -36,6 +36,8 @@ const absolutePath = path.resolve( __dirname, "./" );
 const fs = require("fs");
 const mime = require("mime");
 require(absolutePath+"/org.quickcorp.qcobjects.main.file.js");
+require(absolutePath+ "/org.qcobjects.common.pipelog.js");
+
 
 let ImportMicroservice = function (microservicePackage){
   var standardPath = findPackageNodePath(microservicePackage) || findPackageNodePath(microservicePackage+".js");
@@ -47,14 +49,50 @@ let ImportMicroservice = function (microservicePackage){
 };
 
 Package("org.quickcorp.qcobjects.main.http.server",[
-  Class("BackendMicroservice",Object,{
-    domain:CONFIG.get("domain"),
-    basePath:CONFIG.get("basePath"),
-    body:null,
-    stream:null,
-    server:null,
-    request:null,
-    cors: function (){
+
+  class BackendMicroservice extends InheritClass {
+    constructor({
+      domain=CONFIG.get("domain"),
+      basePath=CONFIG.get("basePath"),
+      body=null,
+      stream=null,
+      server=null,
+      request=null
+    }){
+      super(...arguments);
+
+      logger.debug("Executing Legacy HTTP BackendMicroservice ");
+      let microservice = this;
+      this.cors();
+      microservice.req.on("data", (data) => {
+        // data from POST, GET
+        var requestMethod = request.method.toLowerCase();
+        var supportedMethods = {"post":microservice.post,
+                              };
+        if (supportedMethods.hasOwnProperty.call(supportedMethods,requestMethod)) {
+          supportedMethods[requestMethod].call(microservice,data);
+        }
+      });
+
+      // data from POST, GET
+      var requestMethod = request.method.toLowerCase();
+      var supportedMethods = {"get":microservice.get,
+                              "head":microservice.head,
+                              "put":microservice.put,
+                              "delete":microservice.delete,
+                              "connect":microservice.connect,
+                              "options":microservice.options,
+                              "trace":microservice.trace,
+                              "patch":microservice.patch
+                            };
+      if (supportedMethods.hasOwnProperty.call(supportedMethods,requestMethod)) {
+        supportedMethods[requestMethod].call(microservice);
+      }
+
+
+    }
+
+    cors(){
       if (this.route.cors){
         let {allow_origins,allow_credentials,allow_methods,allow_headers} = this.route.cors;
         var microservice = this;
@@ -93,56 +131,24 @@ Package("org.quickcorp.qcobjects.main.http.server",[
           microservice.headers["Access-Control-Allow-Headers"] = "*";
         }
       }
-    },
-    _new_:function (o){
-      logger.debug("Executing Legacy HTTP BackendMicroservice ");
-      let microservice = this;
-      let server = microservice.server;
-      let request = microservice.request;
-      this.cors();
-      microservice.req.on("data", (data) => {
-        // data from POST, GET
-        var requestMethod = request.method.toLowerCase();
-        var supportedMethods = {"post":microservice.post,
-                              };
-        if (supportedMethods.hasOwnProperty.call(supportedMethods,requestMethod)) {
-          supportedMethods[requestMethod].call(microservice,data);
-        }
-      });
-
-      // data from POST, GET
-      var requestMethod = request.method.toLowerCase();
-      var supportedMethods = {"get":microservice.get,
-                              "head":microservice.head,
-                              "put":microservice.put,
-                              "delete":microservice.delete,
-                              "connect":microservice.connect,
-                              "options":microservice.options,
-                              "trace":microservice.trace,
-                              "patch":microservice.patch
-                            };
-      if (supportedMethods.hasOwnProperty.call(supportedMethods,requestMethod)) {
-        supportedMethods[requestMethod].call(microservice);
-      }
-
-    },
-    head:function (formData){this.done();},
-    post:function (formData){this.done();},
-    put:function (formData){this.done();},
-    delete:function (formData){this.done();},
-    connect:function (formData){this.done();},
-    options:function (formData){this.done();},
-    trace:function (formData){this.done();},
-    patch:function (formData){this.done();},
-    finishWithBody:function (stream){
+    }
+    head(formData){this.done();}
+    post(formData){this.done();}
+    put(formData){this.done();}
+    delete(formData){this.done();}
+    connect(formData){this.done();}
+    options(formData){this.done();}
+    trace(formData){this.done();}
+    patch(formData){this.done();}
+    finishWithBody(stream){
       try {
         stream.write(JSON.stringify(this.body));
         stream.end();
       } catch (e){
         logger.debug("Something wrong writing the response for microservice"+e.toString());
       }
-    },
-    done: function(){
+    }
+    done(){
       var microservice = this;
       var stream = microservice.stream;
       try {
@@ -155,33 +161,30 @@ Package("org.quickcorp.qcobjects.main.http.server",[
         microservice.finishWithBody.call(microservice,stream);
       }
     }
-  }),
-  Class("PipeLog",{
-    pipe:(o)=>{
-      var _o = [];
-      for (var k in o){
-        if (typeof o[k] !== "undefined"
-            && o[k] !== null
-            && typeof o[k] !== "function"){
-          try {
-            _o.push(""+k+"="+o[k].toString());
-          } catch (e){
-            // error logging, do nothing
-          }
-        }
-      }
-      return _o.join(" ");
+
+
+
+  },
+
+  class HTTPServerResponse extends InheritClass {
+    constructor ({
+      headers={
+        ":status": 200,
+        "content-type": "text/html"
+      },
+      body="",
+      request=null,
+      fileDispatcher=null,
+      stream=null
+    }){
+      super(...arguments);
+      var self = this;
+      self.stream = self.stream;
+      self._generateResponse();
+
     }
-  }),
-  Class("HTTPServerResponse",{
-    headers:{
-      ":status": 200,
-      "content-type": "text/html"
-    },
-    body:"",
-    request:null,
-    fileDispatcher:null,
-    sendFile: function (stream, fileName) {
+
+    sendFile(stream, fileName) {
       // read and send file content in the stream
 
       try {
@@ -232,13 +235,13 @@ Package("org.quickcorp.qcobjects.main.http.server",[
           stream.end();
         }
       }
-    },
-    _generateResponse:function (){
+    }
+    _generateResponse(){
       var response = this;
       response.fileDispatcher = New(FileDispatcher,{
         scriptname:response.request.scriptname,
         pathname:response.request.pathname,
-        done:function (headers,body,templateURI,isTemplate){
+        done(headers,body,templateURI,isTemplate){
           response.headers = headers;
           var stream = response.stream;
           if (isTemplate){
@@ -257,69 +260,44 @@ Package("org.quickcorp.qcobjects.main.http.server",[
         }
       });
 
-    },
-    _new_:function (o){
-      var self = this;
-      self.body = "";
-      self.stream = o.stream;
-      self._generateResponse();
-
     }
-  }),
-  Class("HTTPServerRequest",{
-    scriptname:"",
-    path:"",
-    method:"",
-    url:"",
-    headers:null,
-    flags:null,
-    protocol: null,
-    slashes: null,
-    auth: null,
-    host: null,
-    port: null,
-    hostname: null,
-    hash: null,
-    search: "",
-    query: "",
-    pathname: "",
-    href: ""
-  }),
-  Class("HTTPServer",{
-    request:null,
-    response:"",
-    server:null,
-    scriptname:"",
-    interceptorInstances:[],
-    showIPAddress:function (){
-      var _ret_ = "";
-      var os = require("os");
-      var ifaces = os.networkInterfaces();
-      Object.keys(ifaces).forEach(function (iface){
-        ifaces[iface].map(function (ipGroup){
-          _ret_ += iface +": " + PipeLog.pipe(ipGroup)+"\n";
-        });
-      });
-      return _ret_;
-    },
-    showPossibleURL: function (){
-      var _ret_ = "";
-      var os = require("os");
-      var ifaces = os.networkInterfaces();
-      Object.keys(ifaces).forEach(function (iface){
-        ifaces[iface].map(function (ipGroup){
-          if (ipGroup["family"].toLowerCase()=="ipv4"){
-            _ret_ += "http://"+ipGroup["address"]+":"+CONFIG.get("serverPortHTTP").toString()+"/\n";
-          }
-        });
-      });
-      return _ret_;
-    },
-    start:function (){
-      var server = this.server;
-      server.listen(process.env.PORT || CONFIG.get("serverPortHTTP"));
-    },
-    _new_:function (){
+
+  },
+
+  class HTTPServerRequest extends InheritClass {
+    constructor ({
+      scriptname="",
+      path="",
+      method="",
+      url="",
+      headers=null,
+      flags=null,
+      protocol= null,
+      slashes= null,
+      auth= null,
+      host= null,
+      port= null,
+      hostname= null,
+      hash= null,
+      search= "",
+      query= "",
+      pathname= "",
+      href= ""
+    }){
+      super(...arguments);
+    }
+  },
+
+  class HTTPServer extends InheritClass {
+    constructor ({
+      request=null,
+      response="",
+      server=null,
+      scriptname="",
+      interceptorInstances=[]
+    }){
+      super(...arguments);
+
       let oHTTPServer = this;
       const welcometo = "Welcome to \n";
       const instructions = "QCObjects Legacy HTTPServer \n";
@@ -404,7 +382,7 @@ Package("org.quickcorp.qcobjects.main.http.server",[
         }
         this.request.pathname = this.request.pathname.substr(0,this.request.pathname.lastIndexOf("/"));
 
-        logger.debug(PipeLog.pipe(this.request));
+        logger.debug((new PipeLog()).pipe(this.request));
 
         if (global.get("backendAvailable")){
           logger.info("Backend Legacy Microservices Available");
@@ -450,5 +428,37 @@ Package("org.quickcorp.qcobjects.main.http.server",[
       });
 
     }
-  })
+
+
+    showIPAddress(){
+      var _ret_ = "";
+      var os = require("os");
+      var ifaces = os.networkInterfaces();
+      Object.keys(ifaces).forEach(function (iface){
+        ifaces[iface].map(function (ipGroup){
+          _ret_ += iface +": " + (new PipeLog()).pipe(ipGroup)+"\n";
+        });
+      });
+      return _ret_;
+    }
+    showPossibleURL(){
+      var _ret_ = "";
+      var os = require("os");
+      var ifaces = os.networkInterfaces();
+      Object.keys(ifaces).forEach(function (iface){
+        ifaces[iface].map(function (ipGroup){
+          if (ipGroup["family"].toLowerCase()=="ipv4"){
+            _ret_ += "http://"+ipGroup["address"]+":"+CONFIG.get("serverPortHTTP").toString()+"/\n";
+          }
+        });
+      });
+      return _ret_;
+    }
+    start(){
+      var server = this.server;
+      server.listen(process.env.PORT || CONFIG.get("serverPortHTTP"));
+    }
+    
+  }
+
 ]);

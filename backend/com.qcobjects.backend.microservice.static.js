@@ -36,9 +36,13 @@ const absolutePath = path.resolve(__dirname, "./");
 const mime = require("mime");
 
 Package("com.qcobjects.backend.microservice.static", [
-  Class("Microservice", BackendMicroservice, {
-    finishWithBody: function(stream) {},
-    done: function() {
+  class Microservice extends BackendMicroservice {
+    constructor (){
+      super(...arguments);
+    }
+
+    finishWithBody (){}
+    done() {
       // read and send file content in the stream
 
       let microservice = this;
@@ -140,8 +144,9 @@ Package("com.qcobjects.backend.microservice.static", [
         sendFileLegacyHTTP(stream, fileName);
       }
 
-    },
-    static: function(method, data) {
+    }
+
+    static(method, data) {
       var microservice = this;
       var redirect_to = microservice.route.redirect_to;
       return new Promise(function(resolve, reject) {
@@ -178,69 +183,80 @@ Package("com.qcobjects.backend.microservice.static", [
         }
 
       });
-    },
-    head: function(formData) {
+    }
+
+    head(formData) {
       var microservice = this;
       microservice.static("head", formData).then(response => {
         microservice.body = response;
         microservice.done();
       });
-    },
-    get: function(formData) {
+    }
+
+    get(formData) {
       var microservice = this;
       microservice.static("get", formData).then(response => {
         microservice.body = response;
         microservice.done();
       });
-    },
-    post: function(formData) {
+    }
+
+    post(formData) {
       var microservice = this;
       microservice.static("post", formData).then(response => {
         microservice.body = response;
         microservice.done();
       });
-    },
-    put: function(formData) {
+    }
+
+    put(formData) {
       var microservice = this;
       microservice.static("put", formData).then(response => {
         microservice.body = response;
         microservice.done();
       });
-    },
-    delete: function(formData) {
+    }
+    
+    delete(formData) {
       var microservice = this;
       microservice.static("delete", formData).then(response => {
         microservice.body = response;
         microservice.done();
       });
-    },
-    connect: function(formData) {
+    }
+
+    connect(formData) {
       var microservice = this;
       microservice.static("connect", formData).then(response => {
         microservice.body = response;
         microservice.done();
       });
-    },
-    options: function(formData) {
+    }
+
+    options(formData) {
       var microservice = this;
       microservice.static("options", formData).then(response => {
         microservice.body = response;
         microservice.done();
       });
-    },
-    trace: function(formData) {
+    }
+
+    trace(formData) {
       var microservice = this;
       microservice.static("trace", formData).then(response => {
         microservice.body = response;
         microservice.done();
       });
-    },
-    patch: function(formData) {
+    }
+
+    patch(formData) {
       var microservice = this;
       microservice.static("patch", formData).then(response => {
         microservice.body = response;
         microservice.done();
       });
     }
-  })
+
+  }
+
 ]);
