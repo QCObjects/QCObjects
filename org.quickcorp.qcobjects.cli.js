@@ -43,7 +43,7 @@ CONFIG.set("qcobjectsnewapp_path",CONFIG.get("node_modules_path")+"/qcobjectsnew
 
 require(absolutePath+"/org.qcobjects.enterprise.commands");
 require(absolutePath+"/org.quickcorp.qcobjects.api.client_services");
-require(absolutePath+"/org.quickcorp.qcobjects.cli.commands");
+require(absolutePath+"/com.qcobjects.cli.commands");
 
 let ImportCustomCommand = function (commandName, commandPackage){
   let _ret_;
@@ -72,7 +72,7 @@ Package("org.quickcorp.qcobjects.cli",[
           switchCommander.generateServiceWorker(appName);
   
         },
-        create:function (_appName, options){
+        create(_appName, options){
           const version = global.__get_version__();
           let switchCommander = this;
           let appName = (typeof _appName ==="undefined" || _appName === true)?("MyAppName"):(_appName);
@@ -520,11 +520,9 @@ Package("org.quickcorp.qcobjects.cli",[
 
         let importPluginCommands = function (){
           this.pluginCommandsList = [];
-          let _pluginCommandsList = global.ClassesList.filter(c=>c.packageName.startsWith("org.quickcorp.qcobjects.cli.commands."));
-          _pluginCommandsList.filter(pluginCommand=>pluginCommand.className.endsWith(".CommandHandler")).map(pluginCommand => {
-            this.pluginCommandsList.push(New(pluginCommand.classFactory,{
-              switchCommander:this
-            }));
+          let _pluginCommandsList = global.ClassesList.filter(c=>c.packageName.startsWith("com.qcobjects.cli.commands."));
+          _pluginCommandsList.filter(p=>p.classFactory.name.endsWith("CommandHandler")).map(pluginCommand => {
+            this.pluginCommandsList.push(new pluginCommand.classFactory({switchCommander:switchCommander}));
           });
         };
         importPluginCommands.call(switchCommander);

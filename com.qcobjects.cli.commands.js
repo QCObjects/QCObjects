@@ -29,42 +29,14 @@
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
 "use strict";
-Package("org.quickcorp.qcobjects.cli.commands.jira.client_services", [
-  class JiraCloud extends Service {
-    constructor ({
-      name= "jira_cloud",
-      external= true,
-      useHTTP2= true,
-      cached= false,
-      method= "POST",
-      headers= {
-        "accept":"application/json",
-        "content-type":"application/json"
-      },
-      basePath= "",
-      url= "",
-      withCredentials= false
-    }){
-      super(...arguments);
-      var o = this;
-      this.domain = `${o.domain}`;
-      this.basePath = `https://${this.domain}/`;
-      this.username_password = `${o.username}:${o.password}`;
-      this.headers["authorization"] = `Basic ${Buffer.from(this.username_password).toString("base64")}`;
-      this.url = this.basePath + o.apiMethod;
-      this.data = o.data;
-  
-    }
+const fs = require("fs");
+const path = require("path");
+const absolutePath = path.resolve( __dirname, "./" );
+const templatePath = path.resolve( __dirname, "./templates/apps/" )+"/";
+const templatePwaPath = path.resolve( __dirname, "./templates/pwa/" )+"/";
+const package_config = require(absolutePath+"/package.json");
+const { exec,execSync } = require("child_process");
 
-    done(service,standardResponse) {
-      // service loaded
-      logger.debug(standardResponse);
-    }
-
-    fail (e){
-        logger.debug(e);
-    }
-
-  }
-
-]);
+// plugin commands here
+require(absolutePath+"/com.qcobjects.cli.commands.version");
+require(absolutePath+"/com.qcobjects.cli.commands.jira");

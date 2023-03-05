@@ -37,7 +37,7 @@ const templatePwaPath = path.resolve( __dirname, "./templates/pwa/" )+"/";
 const package_config = require(absolutePath+"/package.json");
 const { exec,execSync } = require("child_process");
 
-Package("org.quickcorp.qcobjects.cli.commands.version",[
+Package("com.qcobjects.cli.commands.version",[
 
   class CommandHandler extends InheritClass {
 
@@ -45,7 +45,6 @@ Package("org.quickcorp.qcobjects.cli.commands.version",[
       super(...arguments);
 
       let commandHandler = this;
-      this.switchCommander = switchCommander;
 
       this.choiceOption={
         v_major(filename,options){

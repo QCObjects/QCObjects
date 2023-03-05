@@ -40,9 +40,9 @@ const {
   execSync
 } = require("child_process");
 
-require(absolutePath + "/org.quickcorp.qcobjects.cli.commands.jira.client_services");
+require(absolutePath + "/com.qcobjects.cli.commands.jira.client_services");
 
-Package("org.quickcorp.qcobjects.cli.commands.jira", [
+Package("com.qcobjects.cli.commands.jira", [
 
   class CommandHandler extends InheritClass {
     constructor({
@@ -63,7 +63,6 @@ Package("org.quickcorp.qcobjects.cli.commands.jira", [
       };
 
       let commandHandler = this;
-      this.switchCommander = switchCommander;
 
       switchCommander.program.command("jira <subcommand>")
         .option("-u, --from-user [username]", "User name")
