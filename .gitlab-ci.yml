@@ -11,5 +11,5 @@ deploy:
         - package.json
   script:
     - echo "registry=https://registry.npmjs.org/:_authToken=${NPM_TOKEN}">.npmrc
-    - npm ci
+    - npm ci --force
     - npm publish
