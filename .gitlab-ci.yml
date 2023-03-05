@@ -13,4 +13,4 @@ deploy:
     - npm config set @scope:registry https://registry.npmjs.org/
     - npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
     - npm ci
-    - npm publish --verbose
+#    - npm publish --verbose
