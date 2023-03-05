@@ -17,7 +17,7 @@
     "yaml": "^1.10.2"
   },
   "devDependencies": {
-    "eslint": "^8.2.0",
+    "eslint": "^8.35.0",
     "eslint-config-qcobjects": "^0.0.23",
     "jasmine": "^3.99.0",
     "qcobjects": "^2.4.32-beta",
