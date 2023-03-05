@@ -6,7 +6,7 @@
   "scripts": {
     "sync": "git add . && git commit -am ",
     "test": "npx eslint **/*.js --fix && jasmine",
-    "preversion": "npm i --upgrade && npm test",
+    "preversion": "npm cache verify && npm test",
     "postversion": "git push && git push --tags"
   },
   "dependencies": {
