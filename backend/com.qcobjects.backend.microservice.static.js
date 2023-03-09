@@ -74,7 +74,8 @@ Package("com.qcobjects.backend.microservice.static", [
           stream.end();
 
         } catch (e) {
-          logger.debug("[ERROR] something went wrong when trying to send the response as file " + fileName);
+          console.log(e);
+          logger.debug("[ERROR] Something went wrong when trying to send the response as file " + fileName);
           if (e.errno == -2) {
             const headers = {
               ":status": 404,
@@ -198,6 +199,8 @@ Package("com.qcobjects.backend.microservice.static", [
       microservice.static("get", formData).then(response => {
         microservice.body = response;
         microservice.done();
+      }).catch(error => {
+        console.error(error);
       });
     }
 

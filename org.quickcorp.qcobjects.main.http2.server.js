@@ -287,17 +287,23 @@ Package("org.quickcorp.qcobjects.main.http2.server", [
                 ...[...request.path.matchAll((new RegExp(standardRoutePath, "g")))][0]["groups"]
               };
               ImportMicroservice(route.microservice);
+              logger.debug(`Trying to execute ${route.microservice + ".Microservice"}...`);
               var microServiceClassFactory = ClassFactory(route.microservice + ".Microservice");
-              http2ServerInstance.response = New(microServiceClassFactory, {
-                domain: CONFIG.get("domain"),
-                basePath: CONFIG.get("basePath"),
-                projectPath: CONFIG.get("projectPath"),
-                route: route,
-                routeParams: selectedRouteParams,
-                server: server,
-                stream: stream,
-                request: request
-              });
+              if (typeof microServiceClassFactory !== "undefined"){
+                http2ServerInstance.response = New(microServiceClassFactory, {
+                  domain: CONFIG.get("domain"),
+                  basePath: CONFIG.get("basePath"),
+                  projectPath: CONFIG.get("projectPath"),
+                  route: route,
+                  routeParams: selectedRouteParams,
+                  server: server,
+                  stream: stream,
+                  request: request
+                });
+  
+              } else {
+                throw Error (`${route.microservice + ".Microservice"} not defined.`);
+              }
             });
           } else {
             this.response = New(HTTP2ServerResponse, {
