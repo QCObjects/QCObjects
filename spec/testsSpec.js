@@ -8,7 +8,7 @@ describe("QCObjects Integrity", function () {
 
   it("Verifying the version of CLI Tool", function () {
 
-    expect(typeof execSync("node ./qcobjects-cli.js --version").toString().split("\n").reverse()[1]).toEqual("string");
+    expect(typeof execSync("npx qcobjects --version").toString().split("\n").reverse()[1]).toEqual("string");
     console.log("Verifying the version of CLI Tool... OK");
   });
 
