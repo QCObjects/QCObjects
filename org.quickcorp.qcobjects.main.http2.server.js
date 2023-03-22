@@ -40,12 +40,14 @@ require(absolutePath + "/org.quickcorp.qcobjects.main.file.js");
 require(absolutePath + "/org.qcobjects.common.pipelog.js");
 
 let ImportMicroservice = function (microservicePackage) {
+  var _ret_;
   var standardPath = findPackageNodePath(microservicePackage) || findPackageNodePath(microservicePackage + ".js");
   if (standardPath !== null) {
-    Import(microservicePackage);
+    _ret_ = Import(microservicePackage);
   } else {
-    Import(absolutePath + "/backend/" + microservicePackage);
+    _ret_ = Import(absolutePath + "/backend/" + microservicePackage);
   }
+  return _ret_;
 };
 
 Package("org.quickcorp.qcobjects.main.http2.server", [
@@ -88,7 +90,7 @@ Package("org.quickcorp.qcobjects.main.http2.server", [
         stream.end();
 
       } catch (e) {
-        logger.debug("[ERROR] something went wrong when trying to send the response as file " + fileName);
+        logger.debug("[HTTP2ServerResponse][sendFile][ERROR] Something went wrong when trying to send the response as file " + fileName);
         if (e.errno == -2) {
           const headers = {
             ":status": 404,
@@ -286,24 +288,27 @@ Package("org.quickcorp.qcobjects.main.http2.server", [
               let selectedRouteParams = {
                 ...[...request.path.matchAll((new RegExp(standardRoutePath, "g")))][0]["groups"]
               };
-              ImportMicroservice(route.microservice);
-              logger.debug(`Trying to execute ${route.microservice + ".Microservice"}...`);
-              var microServiceClassFactory = ClassFactory(route.microservice + ".Microservice");
-              if (typeof microServiceClassFactory !== "undefined"){
-                http2ServerInstance.response = New(microServiceClassFactory, {
-                  domain: CONFIG.get("domain"),
-                  basePath: CONFIG.get("basePath"),
-                  projectPath: CONFIG.get("projectPath"),
-                  route: route,
-                  routeParams: selectedRouteParams,
-                  server: server,
-                  stream: stream,
-                  request: request
-                });
-  
-              } else {
-                throw Error (`${route.microservice + ".Microservice"} not defined.`);
-              }
+              ImportMicroservice(route.microservice).then (function (){
+                logger.debug(`Trying to execute ${route.microservice + ".Microservice"}...`);
+                var microServiceClassFactory = ClassFactory(route.microservice + ".Microservice");
+                if (typeof microServiceClassFactory !== "undefined"){
+                  http2ServerInstance.response = New(microServiceClassFactory, {
+                    domain: CONFIG.get("domain"),
+                    basePath: CONFIG.get("basePath"),
+                    projectPath: CONFIG.get("projectPath"),
+                    route: route,
+                    routeParams: selectedRouteParams,
+                    server: server,
+                    stream: stream,
+                    request: request
+                  });
+    
+                } else {
+                  throw Error (`${route.microservice + ".Microservice"} not defined.`);
+                }
+              }).catch (e=> {
+                throw Error (e);
+              });
             });
           } else {
             this.response = New(HTTP2ServerResponse, {
