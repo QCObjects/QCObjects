@@ -12,7 +12,7 @@
   "dependencies": {
     "commander": "^2.20.3",
     "mime": "^2.4.7",
-    "qcobjects": "^2.4.38",
+    "qcobjects": "^2.4.52",
     "qcobjects-sdk": "^2.4.26",
     "yaml": "^1.10.2"
   },
