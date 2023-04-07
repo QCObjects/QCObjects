@@ -20,11 +20,11 @@
     "eslint": "^8.35.0",
     "eslint-config-qcobjects": "^0.0.23",
     "jasmine": "^3.99.0",
-    "qcobjects": "^2.4.38",
+    "qcobjects": "^2.4.52",
     "qcobjects-sdk": "^2.4.26"
   },
   "peerDependencies": {
-    "qcobjects": "^2.4.38",
+    "qcobjects": "^2.4.52",
     "qcobjects-sdk": "^2.4.26"
   },
   "repository": {

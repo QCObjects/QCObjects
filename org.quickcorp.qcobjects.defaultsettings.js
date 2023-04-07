@@ -129,6 +129,62 @@ try {
 }
 
 (async function (){
+  const path = require("path");
+  const projectPath = CONFIG.get("projectPath", `${process.cwd()}/`);
+  const loadDefaultRoutes = async () => {
+    let backend = CONFIG.get("backend");
+    if (typeof backend === "undefined"){
+      backend = {};
+    }
+    if (typeof backend.routes === "undefined"){
+      backend.routes = [];
+    }
+    backend.routes = backend.routes.concat([
+      {
+        "name":"QCObjects.js",
+        "description":"Redirection of QCObjects.js",
+        "path":"^/QCObjects.js$",
+        "microservice":"com.qcobjects.backend.microservice.static",
+        "redirect_to": "./node_modules/qcobjects/QCObjects.js",
+        "responseHeaders":{
+        },
+        "cors":{
+          "allow_origins":"*"
+        }
+      },
+      {
+        "name":"QCObjects-SDK.js",
+        "description":"Redirection of QCObjects SDK",
+        "path":"^/js/packages/QCObjects-SDK.js$",
+        "microservice":"com.qcobjects.backend.microservice.static",
+        "redirect_to": "./node_modules/qcobjects-sdk/QCObjects-SDK.js",
+        "responseHeaders":{
+        },
+        "cors":{
+          "allow_origins":"*"
+        }
+      },
+      {
+        "name":"QCObjects-SDK Components",
+        "description":"Redirection of QCObjects SDK",
+        "path":"^/qcobjects-sdk/(.*)$",
+        "microservice":"com.qcobjects.backend.microservice.static",
+        "redirect_to": "./node_modules/qcobjects-sdk/$1",
+        "responseHeaders":{},
+        "cors":{
+          "allow_origins":"*"
+        }
+      }
+
+    ]);
+    CONFIG.set("backend", backend);
+
+    return;
+  };
+  await loadDefaultRoutes();
+})().then (()=>logger.info("Default routes loaded"));
+
+(async function (){
   /* Auto Discover dependencies (lib, handlers, commands) */
   const path = require("path");
   const projectPath = CONFIG.get("projectPath", `${process.cwd()}/`);
