@@ -12,7 +12,7 @@
   "dependencies": {
     "commander": "^2.20.3",
     "mime": "^2.4.7",
-    "qcobjects": "^2.4.54",
+    "qcobjects": "^2.4.55",
     "qcobjects-sdk": "^2.4.26",
     "yaml": "^1.10.2"
   },
@@ -20,11 +20,11 @@
     "eslint": "^8.35.0",
     "eslint-config-qcobjects": "^0.0.23",
     "jasmine": "^3.99.0",
-    "qcobjects": "^2.4.54",
+    "qcobjects": "^2.4.55",
     "qcobjects-sdk": "^2.4.26"
   },
   "peerDependencies": {
-    "qcobjects": "^2.4.54",
+    "qcobjects": "^2.4.55",
     "qcobjects-sdk": "^2.4.26"
   },
   "repository": {
