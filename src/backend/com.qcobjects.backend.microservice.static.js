@@ -22,13 +22,13 @@
  * Everyone is permitted to copy and distribute verbatim copies of this
  * license document, but changing it is not allowed.
  */
-/*eslint no-unused-vars: "off"*/
-/*eslint no-redeclare: "off"*/
-/*eslint no-empty: "off"*/
-/*eslint strict: "off"*/
-/*eslint no-mixed-operators: "off"*/
-/*eslint no-undef: "off"*/
-/*eslint no-useless-escape: "off"*/
+/* eslint no-unused-vars: "off" */
+/* eslint no-redeclare: "off" */
+/* eslint no-empty: "off" */
+/* eslint strict: "off" */
+/* eslint no-mixed-operators: "off" */
+/* eslint no-undef: "off" */
+/* eslint no-useless-escape: "off" */
 "use strict";
 const fs = require("fs");
 const path = require("path");
@@ -45,9 +45,9 @@ Package("com.qcobjects.backend.microservice.static", [
     done() {
       // read and send file content in the stream
 
-      let microservice = this;
-      let stream = microservice.stream;
-      let fileName = `${process.cwd()}/${microservice.fileName}`;
+      const microservice = this;
+      const stream = microservice.stream;
+      const fileName = `${process.cwd()}/${microservice.fileName}`;
 
       const sendFileHTTP2 = function(stream, fileName) {
         // read and send file content in the stream
@@ -148,13 +148,13 @@ Package("com.qcobjects.backend.microservice.static", [
     }
 
     static(method, data) {
-      var microservice = this;
-      var redirect_to = microservice.route.redirect_to;
+      const microservice = this;
+      const redirect_to = microservice.route.redirect_to;
       return new Promise(function(resolve, reject) {
-        var supported_methods = microservice.route.supported_methods;
-        var _method_allowed_ = false;
+        const supported_methods = microservice.route.supported_methods;
+        let _method_allowed_ = false;
         if (typeof supported_methods !== "undefined") {
-          if (supported_methods == "*" || (typeof method == "undefined") || [...supported_methods].map(m => m.toLowerCase()).indexOf(method.toLowerCase()) !== -1) {
+          if (supported_methods == "*" || (typeof method === "undefined") || [...supported_methods].map(m => m.toLowerCase()).indexOf(method.toLowerCase()) !== -1) {
             _method_allowed_ = true;
           }
         } else {
@@ -165,8 +165,8 @@ Package("com.qcobjects.backend.microservice.static", [
         if (_method_allowed_) {
           logger.info("I'm going to deliver a static path...");
           if (redirect_to) {
-            let request_path = microservice.request.path;
-            let re = (new RegExp(microservice.route.path.replace(/{(.*?)}/g, "\(\?\<$1\>\.\*\)"), "g"));
+            const request_path = microservice.request.path;
+            const re = (new RegExp(microservice.route.path.replace(/{(.*?)}/g, "\(\?\<$1\>\.\*\)"), "g"));
             microservice.fileName = request_path.replace(re, microservice.route.redirect_to);
             try {
               resolve();
@@ -187,7 +187,7 @@ Package("com.qcobjects.backend.microservice.static", [
     }
 
     head(formData) {
-      var microservice = this;
+      const microservice = this;
       microservice.static("head", formData).then(response => {
         microservice.body = response;
         microservice.done();
@@ -195,7 +195,7 @@ Package("com.qcobjects.backend.microservice.static", [
     }
 
     get(formData) {
-      var microservice = this;
+      const microservice = this;
       microservice.static("get", formData).then(response => {
         microservice.body = response;
         microservice.done();
@@ -205,7 +205,7 @@ Package("com.qcobjects.backend.microservice.static", [
     }
 
     post(formData) {
-      var microservice = this;
+      const microservice = this;
       microservice.static("post", formData).then(response => {
         microservice.body = response;
         microservice.done();
@@ -213,7 +213,7 @@ Package("com.qcobjects.backend.microservice.static", [
     }
 
     put(formData) {
-      var microservice = this;
+      const microservice = this;
       microservice.static("put", formData).then(response => {
         microservice.body = response;
         microservice.done();
@@ -221,7 +221,7 @@ Package("com.qcobjects.backend.microservice.static", [
     }
     
     delete(formData) {
-      var microservice = this;
+      const microservice = this;
       microservice.static("delete", formData).then(response => {
         microservice.body = response;
         microservice.done();
@@ -229,7 +229,7 @@ Package("com.qcobjects.backend.microservice.static", [
     }
 
     connect(formData) {
-      var microservice = this;
+      const microservice = this;
       microservice.static("connect", formData).then(response => {
         microservice.body = response;
         microservice.done();
@@ -237,7 +237,7 @@ Package("com.qcobjects.backend.microservice.static", [
     }
 
     options(formData) {
-      var microservice = this;
+      const microservice = this;
       microservice.static("options", formData).then(response => {
         microservice.body = response;
         microservice.done();
@@ -245,7 +245,7 @@ Package("com.qcobjects.backend.microservice.static", [
     }
 
     trace(formData) {
-      var microservice = this;
+      const microservice = this;
       microservice.static("trace", formData).then(response => {
         microservice.body = response;
         microservice.done();
@@ -253,7 +253,7 @@ Package("com.qcobjects.backend.microservice.static", [
     }
 
     patch(formData) {
-      var microservice = this;
+      const microservice = this;
       microservice.static("patch", formData).then(response => {
         microservice.body = response;
         microservice.done();

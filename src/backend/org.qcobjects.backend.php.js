@@ -22,12 +22,12 @@
  * Everyone is permitted to copy and distribute verbatim copies of this
  * license document, but changing it is not allowed.
  */
-/*eslint no-unused-vars: "off"*/
-/*eslint no-redeclare: "off"*/
-/*eslint no-empty: "off"*/
-/*eslint strict: "off"*/
-/*eslint no-mixed-operators: "off"*/
-/*eslint no-undef: "off"*/
+/* eslint no-unused-vars: "off" */
+/* eslint no-redeclare: "off" */
+/* eslint no-empty: "off" */
+/* eslint strict: "off" */
+/* eslint no-mixed-operators: "off" */
+/* eslint no-undef: "off" */
 "use strict";
 const fs = require("fs");
 const os = require("os");
@@ -37,7 +37,7 @@ const {
 } = require("child_process");
 // MY_ENV_VAR="HELLO WORLD" php -f index.php
 
-let fixWinCmd = function (commandline) {
+const fixWinCmd = function (commandline) {
   if (!process.platform.toLowerCase().startsWith("win")) {
     commandline = commandline.replace(/(")/g, String.fromCharCode(92) + "\"");
   }
@@ -49,17 +49,17 @@ Package("org.quickcorp.backend.php", [
   class PHPMicroservice extends BackendMicroservice {
     constructor() {
       super(...arguments);
-      var o = this;
+      const o = this;
 
       logger.debug("PHP Microservice executing");
-      let microservice = this;
-      let request = microservice.request;
-      let stream = o.stream;
+      const microservice = this;
+      const request = microservice.request;
+      const stream = o.stream;
       microservice.stream = stream;
       stream.on("data", (data) => {
         // data from POST, GET
-        var requestMethod = request.method.toLowerCase();
-        var supportedMethods = {
+        const requestMethod = request.method.toLowerCase();
+        const supportedMethods = {
           "post": microservice.post,
         };
         if (supportedMethods.hasOwnProperty.call(supportedmethods, requestMethod)) {
@@ -68,8 +68,8 @@ Package("org.quickcorp.backend.php", [
       });
 
       // data from POST, GET
-      var requestMethod = request.method.toLowerCase();
-      var supportedMethods = {
+      const requestMethod = request.method.toLowerCase();
+      const supportedMethods = {
         "get": microservice.get,
         "head": microservice.head,
         "put": microservice.put,
@@ -86,7 +86,7 @@ Package("org.quickcorp.backend.php", [
     }
 
     get_php_headers_list() {
-      var phpheaders = {
+      const phpheaders = {
         "QUERY_STRING": `${this.request.query}`,
         "REDIRECT_STATUS": "200",
         "REQUEST_METHOD": `${this.request.method}`,
@@ -102,11 +102,11 @@ Package("org.quickcorp.backend.php", [
       function fixedEncodeURIComponent(str) {
         return encodeURIComponent(str).replace(/[!'()]/g, escape).replace(/\*/g, "%2A");
       }
-      for (var headername in this.request.headers) {
+      for (const headername in this.request.headers) {
         if (!headername.startsWith(":")) {
-          var phpheadername = headername.toUpperCase().replace(new RegExp("-", "g"), "_");
-          var headervalue = this.request.headers[headername];
-          if (typeof headervalue != "string") {
+          const phpheadername = headername.toUpperCase().replace(new RegExp("-", "g"), "_");
+          let headervalue = this.request.headers[headername];
+          if (typeof headervalue !== "string") {
             headervalue = JSON.stringify(headervalue);
           }
           phpheaders["HTTP_" + phpheadername] = fixedEncodeURIComponent(headervalue);
@@ -117,7 +117,7 @@ Package("org.quickcorp.backend.php", [
     }
 
     saveTempData(data, done) {
-      var filename = os.tmpdir() + this.tempFileName;
+      const filename = os.tmpdir() + this.tempFileName;
       fs.writeFile(filename, data, (err) => {
         if (err) throw err;
         logger.debug("A temp data file has been saved!");
@@ -141,7 +141,7 @@ Package("org.quickcorp.backend.php", [
     }
 
     get() {
-      var microservice = this;
+      const microservice = this;
       microservice.generateTempFileName();
 
       microservice.saveTempData(this.request.query, function () {
@@ -149,15 +149,15 @@ Package("org.quickcorp.backend.php", [
           process.chdir(CONFIG.get("documentRoot") + microservice.request.pathname.slice(1));
         } catch (e) {}
 
-        var scriptFileName = (microservice.route.hasOwnProperty.call(microservice.route, "redirect_to") &&
+        const scriptFileName = (microservice.route.hasOwnProperty.call(microservice.route, "redirect_to") &&
           microservice.route.redirect_to !== "") ? (microservice.route.redirect_to) : (microservice.request.scriptname);
-        var pathname = this.trimSlash(microservice.request.pathname);
-        var documentRoot = CONFIG.get("documentRoot", "");
+        const pathname = this.trimSlash(microservice.request.pathname);
+        let documentRoot = CONFIG.get("documentRoot", "");
         if (documentRoot == "./") {
           documentRoot = "";
         }
 
-        var scriptFilePath;
+        let scriptFilePath;
         if (documentRoot !== "") {
           scriptFilePath = `${documentRoot}/${pathname}/${scriptFileName}`;
         } else {
@@ -170,11 +170,11 @@ Package("org.quickcorp.backend.php", [
         }
 
         logger.debug(`Loading PHP file: ${scriptFilePath}`);
-        var PHPIncludePath = `.:${CONFIG.get("documentRoot")}:${CONFIG.get("projectPath")}`;
+        const PHPIncludePath = `.:${CONFIG.get("documentRoot")}:${CONFIG.get("projectPath")}`;
 
         microservice.scriptFilePath = scriptFilePath;
 
-        var commandline = `echo $(cat ${os.tmpdir()}${microservice.tempFileName}) |` + microservice.get_php_headers_list() + ` php -d include_path="${PHPIncludePath}" -q <<- 'EOF'
+        let commandline = `echo $(cat ${os.tmpdir()}${microservice.tempFileName}) |` + microservice.get_php_headers_list() + ` php -d include_path="${PHPIncludePath}" -q <<- 'EOF'
 <?php
 $_payload = file_get_contents(sys_get_temp_dir().'${microservice.tempFileName}');
 foreach ($_SERVER as $_k => $_v) {
@@ -194,7 +194,7 @@ EOF`;
         commandline = fixWinCmd(commandline);
         logger.debug(commandline);
         try {
-          let php = exec(commandline, (err, stdout, stderr) => {
+          const php = exec(commandline, (err, stdout, stderr) => {
             microservice.body = stdout;
             console.log(stderr);
             microservice.done();
@@ -213,9 +213,10 @@ EOF`;
     head(formData) {
       this.done();
     }
+
     post(formData) {
       logger.debug("POST DATA");
-      var microservice = this;
+      const microservice = this;
       microservice.generateTempFileName();
 
       microservice.saveTempData(formData, function () {
@@ -223,15 +224,15 @@ EOF`;
           process.chdir(CONFIG.get("documentRoot") + microservice.request.pathname.slice(1));
         } catch (e) {}
 
-        var scriptFileName = (microservice.route.hasOwnProperty.call(microservice.route, "redirect_to") &&
+        const scriptFileName = (microservice.route.hasOwnProperty.call(microservice.route, "redirect_to") &&
           microservice.route.redirect_to !== "") ? (microservice.route.redirect_to) : (microservice.request.scriptname);
-        var pathname = this.trimSlash(microservice.request.pathname);
-        var documentRoot = CONFIG.get("documentRoot", "");
+        const pathname = this.trimSlash(microservice.request.pathname);
+        let documentRoot = CONFIG.get("documentRoot", "");
         if (documentRoot == "./") {
           documentRoot = "";
         }
 
-        var scriptFilePath;
+        let scriptFilePath;
         if (documentRoot !== "") {
           scriptFilePath = `${documentRoot}/${pathname}/${scriptFileName}`;
         } else {
@@ -244,11 +245,11 @@ EOF`;
         }
 
         logger.debug(`Loading PHP file: ${scriptFilePath}`);
-        var PHPIncludePath = `.:${CONFIG.get("documentRoot")}:${CONFIG.get("projectPath")}`;
+        const PHPIncludePath = `.:${CONFIG.get("documentRoot")}:${CONFIG.get("projectPath")}`;
 
         microservice.scriptFilePath = scriptFilePath;
 
-        var commandline = `echo $(cat ${os.tmpdir()}${microservice.tempFileName}) |` + microservice.get_php_headers_list() + ` php -d include_path="${PHPIncludePath}" -q <<- 'EOF'
+        let commandline = `echo $(cat ${os.tmpdir()}${microservice.tempFileName}) |` + microservice.get_php_headers_list() + ` php -d include_path="${PHPIncludePath}" -q <<- 'EOF'
 <?php
 $_payload = file_get_contents(sys_get_temp_dir().'${microservice.tempFileName}');
 foreach ($_SERVER as $_k => $_v) {
@@ -283,24 +284,30 @@ EOF`;
     put(formData) {
       this.done();
     }
+
     delete(formData) {
       this.done();
     }
+
     connect(formData) {
       this.done();
     }
+
     options(formData) {
       this.done();
     }
+
     trace(formData) {
       this.done();
     }
+
     patch(formData) {
       this.done();
     }
+
     done() {
-      var microservice = this;
-      var stream = microservice.stream;
+      const microservice = this;
+      const stream = microservice.stream;
       try {
         stream.respond(microservice.headers);
       } catch (e) {

@@ -34,7 +34,7 @@ const path = require("path");
 const absolutePath = path.resolve( __dirname, "./" );
 const templatePath = path.resolve( __dirname, "./templates/apps/" )+"/";
 const templatePwaPath = path.resolve( __dirname, "./templates/pwa/" )+"/";
-const package_config = require(absolutePath+"/package.json");
+const package_config = require(absolutePath+"/../package.json");
 const { exec,execSync } = require("child_process");
 
 Package ("org.qcobjects.enterprise.commands", [

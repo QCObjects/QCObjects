@@ -34,10 +34,9 @@ const path = require("path");
 const absolutePath = path.resolve( __dirname, "./" );
 const templatePath = path.resolve( __dirname, "./templates/apps/" )+"/";
 const templatePwaPath = path.resolve( __dirname, "./templates/pwa/" )+"/";
-const package_config = require(absolutePath+"/package.json");
+const package_config = require(absolutePath+"/../package.json");
 const { exec,execSync } = require("child_process");
 
-logger.debugEnabled=false;
 CONFIG.set("node_modules_path","./node_modules/");
 CONFIG.set("qcobjectsnewapp_path",CONFIG.get("node_modules_path")+"/qcobjectsnewapp");
 
@@ -61,267 +60,266 @@ let ImportCustomCommand = function (commandName, commandPackage){
 Package("org.quickcorp.qcobjects.cli",[
 
   class SwitchCommander extends InheritClass {
-    constructor (){
-      super(...arguments);
-      this.program = require("commander");
 
-      this.choiceOption={
-        generateSw(_appName){
-          let switchCommander = this;
-          let appName = (typeof _appName ==="undefined" || _appName === true)?("MyAppName"):(_appName);
-          switchCommander.generateServiceWorker(appName);
-  
-        },
-        create(_appName, options){
-          const version = global.__get_version__();
-          let switchCommander = this;
-          let appName = (typeof _appName ==="undefined" || _appName === true)?("MyAppName"):(_appName);
-  
-          const readline = require("readline");
-  
-          const rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout
-          });
-  
-          rl.question(`Please tell me your git repository url
-  [press ENTER \u{21b5} to leave it blank or Ctrl+C to cancel]:
-  `, (answer) => {
-            logger.info(`your git repository url is ${answer}`);
-            rl.close();
-            let giturl = answer;
-  
-            let createAppCommandCustom = `
-  {
-        "name": "${appName.toLowerCase()}",
-        "version": "0.0.1",
-        "repository": {
+    choiceOption = {
+      generateSw(_appName){
+        let switchCommander = this;
+        let appName = (typeof _appName ==="undefined" || _appName === true)?("MyAppName"):(_appName);
+        switchCommander.generateServiceWorker(appName);
+
+      },
+      create(_appName, options){
+        const version = global.__get_version__();
+        let switchCommander = this;
+        let appName = (typeof _appName ==="undefined" || _appName === true)?("MyAppName"):(_appName);
+
+        const readline = require("readline");
+
+        const rl = readline.createInterface({
+          input: process.stdin,
+          output: process.stdout
+        });
+
+        rl.question(`Please tell me your git repository url
+[press ENTER \u{21b5} to leave it blank or Ctrl+C to cancel]:
+`, (answer) => {
+          logger.info(`your git repository url is ${answer}`);
+          rl.close();
+          let giturl = answer;
+
+          let createAppCommandCustom = `
+{
+      "name": "${appName.toLowerCase()}",
+      "version": "0.0.1",
+      "repository": {
+        "type": "git",
+        "url": "${giturl}"
+      },
+      "description": "This is a custom NPM template app from ${options.createCustom} generated with QCObjects.",
+      "main": "js/init.js",
+      "license": "LGPL-3.0-or-later",
+      "scripts": {
+        "test": "(npx eslint *.js js/*.js js/packages/*.js --fix) && (npx jasmine)",
+        "sync": "git add . && git commit -am ",
+        "preversion": "npm i --upgrade && npm test",
+        "postversion": "git push && git push --tags",
+        "coverage": "nyc --reporter=lcov --reporter=text-summary npm run test",
+        "start": "node app.js",
+        "build": "exit 0"
+      },
+      "dependencies": {
+        "${options.createCustom}": "latest",
+        "qcobjects": "^${version.qcobjects}",
+        "qcobjects-sdk": "^${version.sdk}"
+      },
+      "devDependencies": {
+        "eslint": "^8.2.0",
+        "eslint-config-qcobjects": "latest",
+        "jasmine": "latest",
+        "qcobjects-cli": "^${version.cli}",
+        "grunt": "^1.4.1",
+        "grunt-contrib-jasmine": "^2.0.2",
+        "nyc": "^15.1.0"
+      }
+}`;
+
+          let createAppCommandPWA = `
+{
+      "name": "${appName.toLowerCase()}",
+      "version": "0.0.1",
+      "repository": {
+        "type": "git",
+        "url": "${giturl}"
+      },
+      "description": "Awesome PWA application that will help you achieve your dreams.",
+      "main": "js/init.js",
+      "license": "LGPL-3.0-or-later",
+      "scripts": {
+        "test": "(npx eslint *.js js/*.js js/packages/*.js --fix) && (npx jasmine)",
+        "sync": "git add . && git commit -am ",
+        "preversion": "npm i --upgrade && npm test",
+        "postversion": "git push && git push --tags",
+        "coverage": "nyc --reporter=lcov --reporter=text-summary npm run test",
+        "start": "node app.js",
+        "build": "exit 0"
+      },
+      "dependencies": {
+        "qcobjectsnewapp": "latest",
+        "qcobjects": "^${version.qcobjects}",
+        "qcobjects-sdk": "^${version.sdk}"
+      },
+      "devDependencies": {
+        "eslint": "^8.2.0",
+        "eslint-config-qcobjects": "latest",
+        "jasmine": "latest",
+        "qcobjects-cli": "^${version.cli}",
+        "grunt": "^1.4.1",
+        "grunt-contrib-jasmine": "^2.0.2",
+        "nyc": "^15.1.0"
+      }
+}`;
+
+          let createAppCommandAMP = `echo
+{
+      "name": "${appName.toLowerCase()}",
+      "version": "0.0.1",
+      "repository": {
+        "type": "git",
+        "url": "${giturl}"
+      },
+      "description": "Awesome AMP application that will help you achieve your dreams.",
+      "main": "js/init.js",
+      "license": "LGPL-3.0-or-later",
+      "scripts": {
+        "test": "(npx eslint *.js js/*.js js/packages/*.js --fix) && (npx jasmine)",
+        "sync": "git add . && git commit -am ",
+        "preversion": "npm i --upgrade && npm test",
+        "postversion": "git push && git push --tags",
+        "coverage": "nyc --reporter=lcov --reporter=text-summary npm run test",
+        "start": "node app.js",
+        "build": "exit 0"
+      },
+      "dependencies": {
+        "qcobjects-ecommerce-amp": "latest",
+        "qcobjects": "^${version.qcobjects}",
+        "qcobjects-sdk": "^${version.sdk}"
+      },
+      "devDependencies": {
+        "eslint": "^8.2.0",
+        "eslint-config-qcobjects": "latest",
+        "jasmine": "latest",
+        "qcobjects-cli": "^${version.cli}",
+        "grunt": "^1.4.1",
+        "grunt-contrib-jasmine": "^2.0.2",
+        "nyc": "^15.1.0"
+      }
+}`;
+
+          let createAppCommandPHP = `
+{
+      "name": "${appName.toLowerCase()}",
+      "version": "0.0.1",
+      "repository": {
           "type": "git",
           "url": "${giturl}"
-        },
-        "description": "This is a custom NPM template app from ${options.createCustom} generated with QCObjects.",
-        "main": "js/init.js",
-        "license": "LGPL-3.0-or-later",
-        "scripts": {
-          "test": "(npx eslint *.js js/*.js js/packages/*.js --fix) && (npx jasmine)",
-          "sync": "git add . && git commit -am ",
-          "preversion": "npm i --upgrade && npm test",
-          "postversion": "git push && git push --tags",
-          "coverage": "nyc --reporter=lcov --reporter=text-summary npm run test",
-          "start": "node app.js",
-          "build": "exit 0"
-        },
-        "dependencies": {
-          "${options.createCustom}": "latest",
-          "qcobjects": "^${version.qcobjects}",
-          "qcobjects-sdk": "^${version.sdk}"
-        },
-        "devDependencies": {
-          "eslint": "^8.2.0",
-          "eslint-config-qcobjects": "latest",
-          "jasmine": "latest",
-          "qcobjects-cli": "^${version.cli}",
-          "grunt": "^1.4.1",
-          "grunt-contrib-jasmine": "^2.0.2",
-          "nyc": "^15.1.0"
-        }
-  }`;
-  
-            let createAppCommandPWA = `
-  {
-        "name": "${appName.toLowerCase()}",
-        "version": "0.0.1",
-        "repository": {
-          "type": "git",
-          "url": "${giturl}"
-        },
-        "description": "Awesome PWA application that will help you achieve your dreams.",
-        "main": "js/init.js",
-        "license": "LGPL-3.0-or-later",
-        "scripts": {
-          "test": "(npx eslint *.js js/*.js js/packages/*.js --fix) && (npx jasmine)",
-          "sync": "git add . && git commit -am ",
-          "preversion": "npm i --upgrade && npm test",
-          "postversion": "git push && git push --tags",
-          "coverage": "nyc --reporter=lcov --reporter=text-summary npm run test",
-          "start": "node app.js",
-          "build": "exit 0"
-        },
-        "dependencies": {
-          "qcobjectsnewapp": "latest",
-          "qcobjects": "^${version.qcobjects}",
-          "qcobjects-sdk": "^${version.sdk}"
-        },
-        "devDependencies": {
-          "eslint": "^8.2.0",
-          "eslint-config-qcobjects": "latest",
-          "jasmine": "latest",
-          "qcobjects-cli": "^${version.cli}",
-          "grunt": "^1.4.1",
-          "grunt-contrib-jasmine": "^2.0.2",
-          "nyc": "^15.1.0"
-        }
-  }`;
-  
-            let createAppCommandAMP = `echo
-  {
-        "name": "${appName.toLowerCase()}",
-        "version": "0.0.1",
-        "repository": {
-          "type": "git",
-          "url": "${giturl}"
-        },
-        "description": "Awesome AMP application that will help you achieve your dreams.",
-        "main": "js/init.js",
-        "license": "LGPL-3.0-or-later",
-        "scripts": {
-          "test": "(npx eslint *.js js/*.js js/packages/*.js --fix) && (npx jasmine)",
-          "sync": "git add . && git commit -am ",
-          "preversion": "npm i --upgrade && npm test",
-          "postversion": "git push && git push --tags",
-          "coverage": "nyc --reporter=lcov --reporter=text-summary npm run test",
-          "start": "node app.js",
-          "build": "exit 0"
-        },
-        "dependencies": {
-          "qcobjects-ecommerce-amp": "latest",
-          "qcobjects": "^${version.qcobjects}",
-          "qcobjects-sdk": "^${version.sdk}"
-        },
-        "devDependencies": {
-          "eslint": "^8.2.0",
-          "eslint-config-qcobjects": "latest",
-          "jasmine": "latest",
-          "qcobjects-cli": "^${version.cli}",
-          "grunt": "^1.4.1",
-          "grunt-contrib-jasmine": "^2.0.2",
-          "nyc": "^15.1.0"
-        }
-  }`;
-  
-            let createAppCommandPHP = `
-  {
-        "name": "${appName.toLowerCase()}",
-        "version": "0.0.1",
-        "repository": {
-            "type": "git",
-            "url": "${giturl}"
-        },
-        "description": "Awesome PHP application that will help you achieve your dreams.",
-        "main": "js/init.js",
-        "license": "LGPL-3.0-or-later",
-        "scripts": {
-          "test": "(npx eslint *.js js/*.js js/packages/*.js --fix) && (npx jasmine)",
-          "sync": "git add . && git commit -am ",
-          "preversion": "npm i --upgrade && npm test",
-          "postversion": "git push && git push --tags",
-          "coverage": "nyc --reporter=lcov --reporter=text-summary npm run test",
-          "start": "node app.js",
-          "build": "exit 0"
-        },
-        "dependencies": {
-          "qcobjectsnewphp": "latest",
-          "qcobjects": "^${version.qcobjects}",
-          "qcobjects-sdk": "^${version.sdk}"
-        },
-        "devDependencies": {
-          "eslint": "^8.2.0",
-          "eslint-config-qcobjects": "latest",
-          "jasmine": "latest",
-          "qcobjects-cli": "^${version.cli}",
-          "grunt": "^1.4.1",
-          "grunt-contrib-jasmine": "^2.0.2",
-          "nyc": "^15.1.0"
-        }
-  }`;
-  
-            let createAppCommand;
-            let appTemplateName;
-            let _package_json_content;
-  
-            if (options.createAmp){
-              appTemplateName = "qcobjects-ecommerce-amp";
-              _package_json_content = createAppCommandAMP;
-            } else if (options.createPwa){
-              appTemplateName = "qcobjectsnewapp";
-              _package_json_content = createAppCommandPWA;
-            } else if (options.createPhp){
-              appTemplateName = "qcobjectsnewphp";
-              _package_json_content = createAppCommandPHP;
-            } else if (options.createCustom){
-              appTemplateName = options.createCustom;
-              _package_json_content = createAppCommandCustom;
-            } else {
-              appTemplateName = "qcobjectsnewapp";
-              _package_json_content = createAppCommandPWA;
+      },
+      "description": "Awesome PHP application that will help you achieve your dreams.",
+      "main": "js/init.js",
+      "license": "LGPL-3.0-or-later",
+      "scripts": {
+        "test": "(npx eslint *.js js/*.js js/packages/*.js --fix) && (npx jasmine)",
+        "sync": "git add . && git commit -am ",
+        "preversion": "npm i --upgrade && npm test",
+        "postversion": "git push && git push --tags",
+        "coverage": "nyc --reporter=lcov --reporter=text-summary npm run test",
+        "start": "node app.js",
+        "build": "exit 0"
+      },
+      "dependencies": {
+        "qcobjectsnewphp": "latest",
+        "qcobjects": "^${version.qcobjects}",
+        "qcobjects-sdk": "^${version.sdk}"
+      },
+      "devDependencies": {
+        "eslint": "^8.2.0",
+        "eslint-config-qcobjects": "latest",
+        "jasmine": "latest",
+        "qcobjects-cli": "^${version.cli}",
+        "grunt": "^1.4.1",
+        "grunt-contrib-jasmine": "^2.0.2",
+        "nyc": "^15.1.0"
+      }
+}`;
+
+          let createAppCommand;
+          let appTemplateName;
+          let _package_json_content;
+
+          if (options.createAmp){
+            appTemplateName = "qcobjects-ecommerce-amp";
+            _package_json_content = createAppCommandAMP;
+          } else if (options.createPwa){
+            appTemplateName = "qcobjectsnewapp";
+            _package_json_content = createAppCommandPWA;
+          } else if (options.createPhp){
+            appTemplateName = "qcobjectsnewphp";
+            _package_json_content = createAppCommandPHP;
+          } else if (options.createCustom){
+            appTemplateName = options.createCustom;
+            _package_json_content = createAppCommandCustom;
+          } else {
+            appTemplateName = "qcobjectsnewapp";
+            _package_json_content = createAppCommandPWA;
+          }
+          CONFIG.set("qcobjectsnewapp_path",CONFIG.get("node_modules_path")+"/"+appTemplateName);
+/*          if (!process.platform.toLowerCase().startsWith("win")){
+            _package_json_content = _package_json_content.replace(/(")/g, String.fromCharCode(92)+"\"");
+          }*/
+          createAppCommand = "npm init -y";
+          let _package_json_file = path.resolve(CONFIG.get("projectPath"),"./package.json");
+          logger.debug("_package_json_file: "+_package_json_file);
+          logger.debug(createAppCommand);
+
+          exec(createAppCommand, (err, stdout, stderr) => {
+            if (err) {
+              logger.warn(err);
+              process.exit(1);
+              return;
             }
-            CONFIG.set("qcobjectsnewapp_path",CONFIG.get("node_modules_path")+"/"+appTemplateName);
-  /*          if (!process.platform.toLowerCase().startsWith("win")){
-              _package_json_content = _package_json_content.replace(/(")/g, String.fromCharCode(92)+"\"");
-            }*/
-            createAppCommand = "npm init -y";
-            let _package_json_file = path.resolve(CONFIG.get("projectPath"),"./package.json");
-            logger.debug("_package_json_file: "+_package_json_file);
-            logger.debug(createAppCommand);
-  
-            exec(createAppCommand, (err, stdout, stderr) => {
+            fs.writeFile(_package_json_file, _package_json_content, err => {
               if (err) {
                 logger.warn(err);
                 process.exit(1);
                 return;
               }
-              fs.writeFile(_package_json_file, _package_json_content, err => {
+
+              exec("npm cache verify && npm i --save-dev --legacy-peer-deps", (err, stdout, stderr) => {
                 if (err) {
                   logger.warn(err);
                   process.exit(1);
                   return;
                 }
-  
-                exec("npm cache verify && npm i --save-dev --legacy-peer-deps", (err, stdout, stderr) => {
-                  if (err) {
-                    logger.warn(err);
-                    process.exit(1);
-                    return;
-                  }
-  
-                  Promise.resolve(switchCommander.copyTemplate())
-                  .then(()=>{
-                    logger.info("Good! Your application is getting done. You can play with QCObjects now!");
-                    logger.info("In about five seconds your server will start...");
-                    exec("qcobjects-createcert",(err,stdout,stderr)=>{
-                      logger.info("Test certificates generated");
-  
-                      exec("npm uninstall "+appTemplateName+" --save && npm cache verify",(err,stdout,stderr)=>{
-                        switchCommander.generateServiceWorker(appName);
-                      });
-  
-                    }).stdout.on("data", function(data) {
-                        console.log(data);
-                    });
-                  });
-                }).stdout.on("data", function(data) {
-                    console.log(data);
-                });
-  
-              });
-  
-            }).stdout.on("data", function(data) {
-                console.log("App generation started...");
-            });
-  
-          });
-  
-        },
-        publish(_appName){
-          logger.debug("publish is not yet implemented");
-        },
-        upgradeToEnterprise (){
-          let switchCommander = this;
-          QCObjectsEnterprise.upgrade(switchCommander);
-        }
-      };
-  
 
+                Promise.resolve(switchCommander.copyTemplate())
+                .then(()=>{
+                  logger.info("Good! Your application is getting done. You can play with QCObjects now!");
+                  logger.info("In about five seconds your server will start...");
+                  exec("qcobjects-createcert",(err,stdout,stderr)=>{
+                    logger.info("Test certificates generated");
+
+                    exec("npm uninstall "+appTemplateName+" --save && npm cache verify",(err,stdout,stderr)=>{
+                      switchCommander.generateServiceWorker(appName);
+                    });
+
+                  }).stdout.on("data", function(data) {
+                      console.log(data);
+                  });
+                });
+              }).stdout.on("data", function(data) {
+                  console.log(data);
+              });
+
+            });
+
+          }).stdout.on("data", function(data) {
+              console.log("App generation started...");
+          });
+
+        });
+
+      },
+      publish(_appName){
+        logger.debug("publish is not yet implemented");
+      },
+      upgradeToEnterprise (){
+        let switchCommander = this;
+        QCObjectsEnterprise.upgrade(switchCommander);
+      }
+    };
+
+    constructor (){
+      super(...arguments);
+      this.program = require("commander");
     }
 
     shellCommands(_shell_commands){
@@ -492,6 +490,7 @@ Package("org.quickcorp.qcobjects.cli",[
     initCommand(){
       let switchCommander = this;
       if (process.argv.length>1){
+        logger.debug("Installing Commands...");
 
         switchCommander.program
           .version(global.__get_version_string__());
@@ -506,6 +505,30 @@ Package("org.quickcorp.qcobjects.cli",[
           .action(function(args, options){
               switchCommander.choiceOption.create.call(switchCommander,args,options);
           });
+
+
+          try {
+            logger.debug("Loading Plugin Commands...");
+            const importPluginCommands = function (switchCommander){
+              return global.ClassesList
+              .filter(c=>c.packageName.startsWith("com.qcobjects.cli.commands."))
+              .filter(p=>p.classFactory.name.endsWith("CommandHandler"))
+              .map(pluginCommand => {
+                try {
+                  logger.debug(`Loading plugin ${pluginCommand.packageName}`);
+                  const classFactory = pluginCommand.classFactory;
+                  pluginCommand.plugin = New(classFactory,{switchCommander:switchCommander});
+                } catch (e){
+                  throw Error(`Something went wrong loading ${pluginCommand.packageName}`);
+                }
+                return pluginCommand;
+              });
+            };
+            importPluginCommands(switchCommander);  
+          } catch (e){
+            throw Error (`Something went wrong loading plugins: ${e.message}`);
+          }
+
         switchCommander.program.command("publish <appname>")
           .description("Publishes an app with <appname>")
           .option("--pwa, --create-pwa", "Publishes the progressive web app assets")
@@ -516,16 +539,6 @@ Package("org.quickcorp.qcobjects.cli",[
           .action(function(args, options){
               switchCommander.choiceOption.publish.call(switchCommander,args,options);
           });
-
-
-        let importPluginCommands = function (){
-          this.pluginCommandsList = [];
-          let _pluginCommandsList = global.ClassesList.filter(c=>c.packageName.startsWith("com.qcobjects.cli.commands."));
-          _pluginCommandsList.filter(p=>p.classFactory.name.endsWith("CommandHandler")).map(pluginCommand => {
-            this.pluginCommandsList.push(new pluginCommand.classFactory({switchCommander:switchCommander}));
-          });
-        };
-        importPluginCommands.call(switchCommander);
 
         switchCommander.program.command("upgrade-to-enterprise")
           .description("Upgrades to QCObjects Enterprise Edition")

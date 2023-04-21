@@ -33,12 +33,10 @@
 const path = require("path");
 const absolutePath = path.resolve( __dirname, "./" );
 const templatePath = path.resolve( __dirname, "./templates/apps/" )+"/";
-const package_config = require(absolutePath+"/package.json");
+const package_config = require(absolutePath+"/../package.json");
 
 
 require("qcobjects");
-
-require(absolutePath+"/org.quickcorp.qcobjects.defaultsettings.js");
 
 logger.debugEnabled = false;
 const welcometo = "Welcome to \n";
@@ -59,6 +57,10 @@ if (process.argv.length<3 || process.argv[2] === "create"){
   console.log(logo);
   console.log(instructions);
 }
+logger.debugEnabled = false;
+logger.warnEnabled = false;
+logger.infoEnabled = false;
+
 require(absolutePath+"/org.quickcorp.qcobjects.defaultsettings.js");
 
 require(absolutePath+"/org.quickcorp.qcobjects.cli");
