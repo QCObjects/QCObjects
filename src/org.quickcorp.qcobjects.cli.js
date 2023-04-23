@@ -133,7 +133,18 @@ Package("org.quickcorp.qcobjects.cli",[
             .then(()=>{
 
               exec("npm uninstall "+appTemplateName+" --save && npm cache verify",(err,stdout,stderr)=>{
-                switchCommander.generateServiceWorker(appName);
+                if (err) {
+                  throw Error (err.message);
+                  process.exit(1);
+                  return;
+                }
+
+                /*
+                switchCommander.generateServiceWorker(appName)
+                .then(()=>{
+                  execSync("npm install --save-dev qcobjects-cli ");
+                });
+                */
                 execSync("npm install --save-dev qcobjects-cli ");
               });
         
@@ -272,42 +283,45 @@ Package("org.quickcorp.qcobjects.cli",[
     }
 
     generateServiceWorker(appName){
-      var filelist = ["/"].concat(this.fileListRecursive("./"));
-      filelist = filelist.filter(function (fl){return fl !== "sw.js" && (!fl.startsWith("node_modules/")); });
-      filelist = filelist.filter(fname => !fname.endsWith(".pem"));
-      filelist = filelist.filter(fname => !fname.endsWith(".sh"));
-      filelist = filelist.filter(fname => !(new RegExp("^package(.*).json$")).test(fname));
-      filelist = filelist.filter(fname => !fname.startsWith("."));
-      var fileListString = "\n\t\""+filelist.join("\",\n\t\"")+"\"";
-      var component = New(Component, {
-        templateURI: "sw.js",
-        basePath:templatePwaPath,
-        name:"sw",
-        cached:false,
-        tplsource: "default",
-        data: {
-          appName: appName,
-          appVersion: "0.0.1",
-          filelist: fileListString
-        },
-        done ({request, component}) {
-          fs.writeFile("./sw.js", component.parsedAssignmentText, err => {
-            logger.info("Service Worker Generated");
-            console.log("");
-            console.log("Now simply put:");
-            console.log("CONFIG.set('serviceWorkerURI','/sw.js');");
-            console.log(" In your init.js file ");
-            console.log("");
-            console.log("To start your app in a local server ");
-            console.log("Execute the command: ");
-            console.log("> qcobjects launch <appname>");
-            console.log("");
-            process.exit(0);
-          });
-          return Promise.resolve({request, component});
-        }
-      });
-      return component;
+      return new Promise( (resolve, reject) => {
+        var filelist = ["/"].concat(this.fileListRecursive("./"));
+        filelist = filelist.filter(function (fl){return fl !== "sw.js" && (!fl.startsWith("node_modules/")); });
+        filelist = filelist.filter(fname => !fname.endsWith(".pem"));
+        filelist = filelist.filter(fname => !fname.endsWith(".sh"));
+        filelist = filelist.filter(fname => !(new RegExp("^package(.*).json$")).test(fname));
+        filelist = filelist.filter(fname => !fname.startsWith("."));
+        var fileListString = "\n\t\""+filelist.join("\",\n\t\"")+"\"";
+        var component = New(Component, {
+          templateURI: "sw.js",
+          basePath:templatePwaPath,
+          name:"sw",
+          cached:false,
+          tplsource: "default",
+          data: {
+            appName: appName,
+            appVersion: "1.0.0",
+            filelist: fileListString
+          },
+          done ({request, component}) {
+            return new Promise ((resolve, reject)=> {
+              fs.writeFile("./sw.js", component.parsedAssignmentText, err => {
+                logger.info("Service Worker Generated");
+                console.log("");
+                console.log("Now simply put:");
+                console.log("CONFIG.set('serviceWorkerURI','/sw.js');");
+                console.log(" In your init.js file ");
+                console.log("");
+                console.log("To start your app in a local server ");
+                console.log("Execute the command: ");
+                console.log("> qcobjects launch <appname>");
+                console.log("");
+              });
+              resolve({request, component});  
+            });
+          }
+        });
+  
+      } );
     }
 
     copyTemplate(source, dest){
