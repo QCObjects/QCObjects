@@ -43,7 +43,8 @@
     "eslint-plugin-promise": "^6.1.1",
     "jasmine": "^3.99.0",
     "qcobjects": "^2.4.67",
-    "qcobjects-sdk": "^2.4.30"
+    "qcobjects-sdk": "^2.4.30",
+    "qcobjects-tsconfig": "^2.4.10"
   },
   "peerDependencies": {
     "qcobjects": "^2.4.67",
