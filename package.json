@@ -1,6 +1,6 @@
 {
   "name": "qcobjects-cli",
-  "version": "2.4.34",
+  "version": "2.4.35",
   "description": "qcobjects cli command line tool",
   "main": "src/index.cjs",
   "module": "src/index.mjs",
@@ -36,6 +36,7 @@
     "eslint": "^8.38.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-config-qcobjects": "^0.0.26",
+    "eslint-config-qcobjects-typescript": "^2.4.5",
     "eslint-config-semistandard": "^17.0.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.27.5",
@@ -43,7 +44,8 @@
     "eslint-plugin-promise": "^6.1.1",
     "jasmine": "^3.99.0",
     "qcobjects": "^2.4.67",
-    "qcobjects-sdk": "^2.4.30"
+    "qcobjects-sdk": "^2.4.30",
+    "qcobjects-tsconfig": "^2.4.10"
   },
   "peerDependencies": {
     "qcobjects": "^2.4.67",
