@@ -184,26 +184,56 @@ try {
 (function () {
   /* Auto Discover dependencies (lib, handlers, commands) */
   const path = require("path");
+  const fs = require ("fs");
   const projectPath = CONFIG.get("projectPath", `${process.cwd()}/`);
   logger.debug(`CONFIG.projectPath is set to ${projectPath}`);
+  const findPath = (p) => {
+    const packagePath = path.resolve(findPackageNodePath(p), p);
+    return packagePath;
+  };
+
+  const getPackageJSON = (p) => {
+    let _json;
+    try {
+      let packagePath = findPath(p);
+      if (typeof packagePath !== "undefined"){
+        _json = JSON.parse(fs.readFileSync(path.resolve(`${packagePath}`,"./package.json")).toString());
+      } else {
+        _json = {};
+      }
+    } catch (e){
+      logger.debug(`It was impossible to get the package.json from ${p}: ${e}`);
+      _json = {}
+    }
+    return _json;
+  };
+
   const hasKeyword = (p, keyword) => {
     if (typeof hasKeyword.keywords === "undefined"){
       hasKeyword.keywords = {};
     }
-    if (typeof hasKeyword.keywords[p] === "undefined"){
-      const {
-        keywords
-      } = require(`${findPackageNodePath(p)}/${p}/package.json`);
-      hasKeyword.keywords[p] = keywords;
+    try {
+      if (typeof hasKeyword.keywords[p] === "undefined"){
+        hasKeyword.keywords[p] = getPackageJSON(p).keywords;
+      }  
+    } catch (e){
+      throw Error (`Something went wrong when trying to get the keywords of ${p}`);
     }
     return typeof hasKeyword.keywords[p] !== "undefined" && hasKeyword.keywords[p].includes(keyword);
   };
 
   const dependencies = () => {
     if (typeof dependencies.deps === "undefined"){
-      dependencies.deps = Object.keys(require(`${projectPath}/package.json`).dependencies);
+      dependencies.deps = Object.keys(JSON.parse(fs.readFileSync(path.resolve(`${projectPath}`,"./package.json")).toString()).dependencies);
     }
     return dependencies.deps;
+  };
+
+  const devDependencies = () => {
+    if (typeof devDependencies.deps === "undefined"){
+      devDependencies.deps = Object.keys(JSON.parse(fs.readFileSync(path.resolve(`${projectPath}`,"./package.json")).toString()).devDependencies);
+    }
+    return devDependencies.deps;
   };
 
   const loadLibs = () => {
@@ -212,7 +242,7 @@ try {
       const libs = dependencies().filter((p) => hasKeyword(p, "qcobjects-lib"));
       if (libs.length>0){
         logger.debug(`Plugin Libs found: ${libs}`);
-        _ret_ = Promise.all(libs.map((p) => {return Import(p);})).then(() => logger.info("Libs loaded"));
+        _ret_ = Promise.all(libs.map((p) => {return require(findPath(p));})).then(() => logger.info("Libs loaded"));
       } else {
         logger.debug("No Plugin Libs found.");
         _ret_ = Promise.resolve();
@@ -229,7 +259,7 @@ try {
       const handlers = dependencies().filter((p) => hasKeyword(p, "qcobjects-handler"));
       if (handlers.length>0){
         logger.debug(`Plugin Handlers found: ${handlers}`);
-        _ret_ = Promise.all(handlers.map((p) => {return Import(p);})).then(() => logger.info("Handlers loaded"));
+        _ret_ = Promise.all(handlers.map((p) => {return require(findPath(p));})).then(() => logger.info("Handlers loaded"));
       } else {
         logger.debug("No Plugin Handlers found.");
         _ret_ = Promise.resolve();
@@ -247,7 +277,7 @@ try {
       const commands = dependencies().filter((p) => hasKeyword(p, "qcobjects-command"));
       if (commands.length>0){
         logger.debug(`Plugin Commands found: ${commands}`);
-        _ret_ = Promise.all(commands.map((p) => {return Import(p);})).then(() => logger.info("Commands loaded"));  
+        _ret_ = Promise.all(commands.map((p) => {return require(findPath(p));})).then(() => logger.info("Commands loaded"));  
       } else {
         logger.debug("No Plugin Commands found.");
         _ret_ = Promise.resolve();
@@ -258,6 +288,25 @@ try {
     }
     return _ret_;
   };
+  const loadDevCommands = () => {
+    let _ret_;
+    logger.debug(`Looking for custom commands as dev dependencies in: ${projectPath}/package.json`);
+    if (CONFIG.get("autodiscover", false) || CONFIG.get("autodiscover_commands", false)) {
+      const commands = devDependencies().filter((p) => hasKeyword(p, "qcobjects-command"));
+      if (commands.length>0){
+        logger.debug(`Dev Plugin Commands found: ${commands}`);
+        _ret_ = Promise.all(commands.map((p) => {return require(findPath(p));})).then(() => logger.info("Commands loaded"));  
+      } else {
+        logger.debug("No Plugin Commands found in dev dependencies.");
+        _ret_ = Promise.resolve();
+      }
+    } else {
+      logger.debug("To load commands, set autodiscover_commands to true in your config.json");
+      _ret_ = Promise.resolve();
+    }
+    return _ret_;
+  };
+
   if (CONFIG.get("autodiscover", false) ||
     CONFIG.get("autodiscover_libs", false) ||
     CONFIG.get("autodiscover_handlers", false) ||
@@ -289,5 +338,12 @@ try {
   } catch (e) {
     throw Error(`Something went wrong trying to load commands: ${e.message}`);
   }
+  try {
+    logger.debug("Loading Dev Commands...");
+    loadDevCommands();
+  } catch (e) {
+    throw Error(`Something went wrong trying to load Dev commands: ${e.message}`);
+  }
+
   logger.info("Dependencies loaded");
 })();

@@ -73,238 +73,122 @@ Package("org.quickcorp.qcobjects.cli",[
         let switchCommander = this;
         let appName = (typeof _appName ==="undefined" || _appName === true)?("MyAppName"):(_appName);
 
-        const readline = require("readline");
+        let _package_json_content;
 
-        const rl = readline.createInterface({
-          input: process.stdin,
-          output: process.stdout
-        });
-
-        rl.question(`Please tell me your git repository url
-[press ENTER \u{21b5} to leave it blank or Ctrl+C to cancel]:
-`, (answer) => {
-          logger.info(`your git repository url is ${answer}`);
-          rl.close();
-          let giturl = answer;
-
-          let createAppCommandCustom = `
-{
-      "name": "${appName.toLowerCase()}",
-      "version": "0.0.1",
-      "repository": {
-        "type": "git",
-        "url": "${giturl}"
-      },
-      "description": "This is a custom NPM template app from ${options.createCustom} generated with QCObjects.",
-      "main": "js/init.js",
-      "license": "LGPL-3.0-or-later",
-      "scripts": {
-        "test": "(npx eslint *.js js/*.js js/packages/*.js --fix) && (npx jasmine)",
-        "sync": "git add . && git commit -am ",
-        "preversion": "npm i --upgrade && npm test",
-        "postversion": "git push && git push --tags",
-        "coverage": "nyc --reporter=lcov --reporter=text-summary npm run test",
-        "start": "node app.js",
-        "build": "exit 0"
-      },
-      "dependencies": {
-        "${options.createCustom}": "latest",
-        "qcobjects": "^${version.qcobjects}",
-        "qcobjects-sdk": "^${version.sdk}"
-      },
-      "devDependencies": {
-        "eslint": "^8.2.0",
-        "eslint-config-qcobjects": "latest",
-        "jasmine": "latest",
-        "qcobjects-cli": "^${version.cli}",
-        "grunt": "^1.4.1",
-        "grunt-contrib-jasmine": "^2.0.2",
-        "nyc": "^15.1.0"
-      }
-}`;
-
-          let createAppCommandPWA = `
-{
-      "name": "${appName.toLowerCase()}",
-      "version": "0.0.1",
-      "repository": {
-        "type": "git",
-        "url": "${giturl}"
-      },
-      "description": "Awesome PWA application that will help you achieve your dreams.",
-      "main": "js/init.js",
-      "license": "LGPL-3.0-or-later",
-      "scripts": {
-        "test": "(npx eslint *.js js/*.js js/packages/*.js --fix) && (npx jasmine)",
-        "sync": "git add . && git commit -am ",
-        "preversion": "npm i --upgrade && npm test",
-        "postversion": "git push && git push --tags",
-        "coverage": "nyc --reporter=lcov --reporter=text-summary npm run test",
-        "start": "node app.js",
-        "build": "exit 0"
-      },
-      "dependencies": {
-        "qcobjectsnewapp": "latest",
-        "qcobjects": "^${version.qcobjects}",
-        "qcobjects-sdk": "^${version.sdk}"
-      },
-      "devDependencies": {
-        "eslint": "^8.2.0",
-        "eslint-config-qcobjects": "latest",
-        "jasmine": "latest",
-        "qcobjects-cli": "^${version.cli}",
-        "grunt": "^1.4.1",
-        "grunt-contrib-jasmine": "^2.0.2",
-        "nyc": "^15.1.0"
-      }
-}`;
-
-          let createAppCommandAMP = `echo
-{
-      "name": "${appName.toLowerCase()}",
-      "version": "0.0.1",
-      "repository": {
-        "type": "git",
-        "url": "${giturl}"
-      },
-      "description": "Awesome AMP application that will help you achieve your dreams.",
-      "main": "js/init.js",
-      "license": "LGPL-3.0-or-later",
-      "scripts": {
-        "test": "(npx eslint *.js js/*.js js/packages/*.js --fix) && (npx jasmine)",
-        "sync": "git add . && git commit -am ",
-        "preversion": "npm i --upgrade && npm test",
-        "postversion": "git push && git push --tags",
-        "coverage": "nyc --reporter=lcov --reporter=text-summary npm run test",
-        "start": "node app.js",
-        "build": "exit 0"
-      },
-      "dependencies": {
-        "qcobjects-ecommerce-amp": "latest",
-        "qcobjects": "^${version.qcobjects}",
-        "qcobjects-sdk": "^${version.sdk}"
-      },
-      "devDependencies": {
-        "eslint": "^8.2.0",
-        "eslint-config-qcobjects": "latest",
-        "jasmine": "latest",
-        "qcobjects-cli": "^${version.cli}",
-        "grunt": "^1.4.1",
-        "grunt-contrib-jasmine": "^2.0.2",
-        "nyc": "^15.1.0"
-      }
-}`;
-
-          let createAppCommandPHP = `
-{
-      "name": "${appName.toLowerCase()}",
-      "version": "0.0.1",
-      "repository": {
-          "type": "git",
-          "url": "${giturl}"
-      },
-      "description": "Awesome PHP application that will help you achieve your dreams.",
-      "main": "js/init.js",
-      "license": "LGPL-3.0-or-later",
-      "scripts": {
-        "test": "(npx eslint *.js js/*.js js/packages/*.js --fix) && (npx jasmine)",
-        "sync": "git add . && git commit -am ",
-        "preversion": "npm i --upgrade && npm test",
-        "postversion": "git push && git push --tags",
-        "coverage": "nyc --reporter=lcov --reporter=text-summary npm run test",
-        "start": "node app.js",
-        "build": "exit 0"
-      },
-      "dependencies": {
-        "qcobjectsnewphp": "latest",
-        "qcobjects": "^${version.qcobjects}",
-        "qcobjects-sdk": "^${version.sdk}"
-      },
-      "devDependencies": {
-        "eslint": "^8.2.0",
-        "eslint-config-qcobjects": "latest",
-        "jasmine": "latest",
-        "qcobjects-cli": "^${version.cli}",
-        "grunt": "^1.4.1",
-        "grunt-contrib-jasmine": "^2.0.2",
-        "nyc": "^15.1.0"
-      }
-}`;
-
-          let createAppCommand;
-          let appTemplateName;
-          let _package_json_content;
-
-          if (options.createAmp){
-            appTemplateName = "qcobjects-ecommerce-amp";
-            _package_json_content = createAppCommandAMP;
-          } else if (options.createPwa){
-            appTemplateName = "qcobjectsnewapp";
-            _package_json_content = createAppCommandPWA;
-          } else if (options.createPhp){
-            appTemplateName = "qcobjectsnewphp";
-            _package_json_content = createAppCommandPHP;
-          } else if (options.createCustom){
-            appTemplateName = options.createCustom;
-            _package_json_content = createAppCommandCustom;
-          } else {
-            appTemplateName = "qcobjectsnewapp";
-            _package_json_content = createAppCommandPWA;
+        _package_json_content = `{
+          "name": "${appName}"
+          "version": "1.0.0",
+          "dependencies":{
+            "qcobjectsnewphp": "latest",
+            "qcobjects": "${version.qcobjects}",
+            "qcobjects-sdk": "^${version.sdk}"
           }
-          CONFIG.set("qcobjectsnewapp_path",CONFIG.get("node_modules_path")+"/"+appTemplateName);
+        }`;
+
+        let createAppCommand;
+        let appTemplateName;
+
+        if (options.createAmp){
+          appTemplateName = "qcobjects-ecommerce-amp";
+        } else if (options.createPwa){
+          appTemplateName = "qcobjectsnewapp";
+        } else if (options.createPhp){
+          appTemplateName = "qcobjectsnewphp";
+        } else if (options.createCustom){
+          appTemplateName = options.createCustom;
+        } else {
+          appTemplateName = "qcobjectsnewapp";
+        }
+        CONFIG.set("qcobjectsnewapp_path",CONFIG.get("node_modules_path")+"/"+appTemplateName);
+
+        let _package_json_template_fname = path.resolve(CONFIG.get("qcobjectsnewapp_path", "qcobjectsnewapp"), "./package.json");
+
 /*          if (!process.platform.toLowerCase().startsWith("win")){
-            _package_json_content = _package_json_content.replace(/(")/g, String.fromCharCode(92)+"\"");
-          }*/
-          createAppCommand = "npm init -y";
-          let _package_json_file = path.resolve(CONFIG.get("projectPath"),"./package.json");
-          logger.debug("_package_json_file: "+_package_json_file);
-          logger.debug(createAppCommand);
+          _package_json_content = _package_json_content.replace(/(")/g, String.fromCharCode(92)+"\"");
+        }*/
+        
+        createAppCommand = "npm init -y";
+        let _package_json_file = path.resolve(CONFIG.get("projectPath"),"./package.json");
+        logger.debug("_package_json_file: "+_package_json_file);
+        logger.debug(createAppCommand);
 
-          exec(createAppCommand, (err, stdout, stderr) => {
-            if (err) {
-              logger.warn(err);
-              process.exit(1);
-              return;
-            }
-            fs.writeFile(_package_json_file, _package_json_content, err => {
-              if (err) {
-                logger.warn(err);
-                process.exit(1);
-                return;
-              }
+        exec(createAppCommand, (err, stdout, stderr) => {
+          if (err) {
+            throw Error (err.message);
+            process.exit(1);
+            return;
+          }
 
-              exec("npm cache verify && npm i --save-dev --legacy-peer-deps", (err, stdout, stderr) => {
+          exec(`npm i --save-dev ${appTemplateName}`, ()=> {
+            let _package_json_template_file = require (_package_json_template_fname);
+            _package_json_template_file.name = appName;
+            _package_json_template_file.version = "1.0.0";
+            _package_json_template_file.repository = {};
+            fs.writeFileSync(_package_json_file, JSON.stringify(_package_json_template_file,null,4));
+            logger.info("Good! App Templates was installed!");
+
+            console.log(`Starting to copy files from app template ${appTemplateName} to your project...`);
+  
+            switchCommander.copyTemplate(path.resolve(findPackageNodePath(appTemplateName),appTemplateName),path.resolve(CONFIG.get("projectPath"),"./") )
+            .then(()=>{
+
+              exec("npm uninstall "+appTemplateName+" --save && npm cache verify",(err,stdout,stderr)=>{
+                switchCommander.generateServiceWorker(appName);
+                execSync("npm install --save-dev qcobjects-cli ");
+              });
+        
+              exec("npm cache verify && npm i ", (err, stdout, stderr) => {
                 if (err) {
-                  logger.warn(err);
+                  throw Error (err.message);
                   process.exit(1);
                   return;
                 }
+  
+                logger.info("Good! Your application is done. You can play with QCObjects now!");
+                  
+                logger.info("I will create the SSL certificates now. It may take some time...");
+                exec("qcobjects-createcert",(err,stdout,stderr)=>{
+                  logger.info("Test certificates generated");
 
-                Promise.resolve(switchCommander.copyTemplate())
-                .then(()=>{
-                  logger.info("Good! Your application is getting done. You can play with QCObjects now!");
-                  logger.info("In about five seconds your server will start...");
-                  exec("qcobjects-createcert",(err,stdout,stderr)=>{
-                    logger.info("Test certificates generated");
-
-                    exec("npm uninstall "+appTemplateName+" --save && npm cache verify",(err,stdout,stderr)=>{
-                      switchCommander.generateServiceWorker(appName);
-                    });
-
-                  }).stdout.on("data", function(data) {
-                      console.log(data);
+                  let githubService = New(Service);
+                  githubService.url= "https://raw.githubusercontent.com/QuickCorp/QCObjects/main/.gitignore";
+                  githubService.headers= {
+                    Accept: 'application/vnd.github+json',
+                    'X-GitHub-Api-Version': '2022-11-28',
+                    'User-Agent': 'qcobjects-cli'
+                  };
+                  githubService.done = ()=>{};
+                  serviceLoader(githubService)
+                  .then (({service})=> {
+                    fs.writeFileSync(path.resolve(CONFIG.get("projectPath"),"./.gitignore"),service.template);
+                    try {
+                      execSync("git init");
+                      logger.debug("Git initialized.");
+                    } catch (e){
+                      logger.debug("Could not initialize git.");
+                    }
                   });
+
+                }).stdout.on("data", function(data) {
+                    console.log(data);
                 });
+  
               }).stdout.on("data", function(data) {
                   console.log(data);
               });
-
+  
+            })
+            .catch((e)=>{
+              console.log(e);
             });
-
+  
+  
           }).stdout.on("data", function(data) {
-              console.log("App generation started...");
+            console.log(data);
           });
 
+        }).stdout.on("data", function(data) {
+            console.log("App generation started...");
         });
 
       },
@@ -426,63 +310,63 @@ Package("org.quickcorp.qcobjects.cli",[
       return component;
     }
 
-    copyTemplate(){
-      var map_files = function (pathname,callback){
-        var _filenames = function (pathname){
-          fs.readdir(pathname,{withFileTypes:true},function (err,files){
-            if (typeof files !== "undefined"){
-              files.filter((f)=>{return f.isFile();}).map((file)=>{
-                callback(pathname+"/"+file.name);
-                _filenames(pathname+"/"+file.name);
+    copyTemplate(source, dest){
+      return new Promise ((resolve, reject)=> {
+
+        const copyDir = (source, dest, exclude) => {
+          source = path.resolve(source);
+          dest = path.resolve(dest);
+          const dname = path.basename(source);
+          const dirExcluded = (exclude.includes(dname));
+
+          const isDir = (d) => {
+            return (fs.existsSync(d) && fs.statSync(d).isDirectory())?(true):(false);
+          };
+
+          const isFile = (d) => {
+            return (fs.existsSync(d) && fs.statSync(d).isFile())?(true):(false);
+          }
+
+          if (isDir(source) && !dirExcluded){
+            fs.mkdirSync(dest, {recursive:true});
+            const paths = fs.readdirSync(source, {withFileTypes:true})
+            const dirs = paths.filter(d=>d.isDirectory());
+            const files = paths.filter(f=>f.isFile());
+            (async function (paths, dirs, files, exclude){
+              files.map((f)=>{
+                const sourceFile = path.resolve(source, f.name);
+                const destFile = path.resolve(dest, f.name);
+                const fileExcluded = exclude.includes(f.name);
+                if (isFile(sourceFile) && !fileExcluded){
+                  logger.debug(`[publish:static] Copying files from ${sourceFile} to ${destFile} excluding ${exclude}...`);
+                  fs.copyFileSync(sourceFile, destFile);
+                  logger.debug(`[publish:static] Copying files from ${sourceFile} to ${destFile} excluding ${exclude}...DONE!`);
+                }
               });
-            }
-          });
-        };
-        return _filenames(pathname);
-      };
-      var map_dirnames = function (pathname,callback){
-        var _main_pathnames = [];
-        var _dirnames = function (pathname){
-          fs.readdir(pathname,{withFileTypes:true},function (err,files){
-            var _pathnames = [];
-            if (typeof files !== "undefined"){
-              files.filter((f)=>{return f.isDirectory();}).map((d)=>{
-                _pathnames.push(pathname+"/"+d.name);
-                callback(pathname+"/"+d.name);
-                _dirnames(pathname+"/"+d.name);
+              dirs.map((d)=>{
+                const sourceDir = path.resolve(source, d.name);
+                const destDir = path.resolve(dest, d.name);
+                copyDir(sourceDir,destDir, exclude);
               });
-            }
-            _main_pathnames = _main_pathnames.concat(_pathnames);
-          });
-          return _main_pathnames;
+            })(paths, dirs, files, exclude);
+          }
+
         };
-        return _dirnames(pathname);
-      };
-      var relativePath = function (dirname){
-        return dirname.replace(CONFIG.get("qcobjectsnewapp_path"),".");
-      };
-      var copyTemplateFile = function (sourceFileName, destFileName){
-        fs.copyFile(sourceFileName, destFileName, (err) => {
-          if (err) throw err;
-          logger.debug("File "+destFileName+" was created successfully");
-        });
-      };
-      map_dirnames(CONFIG.get("qcobjectsnewapp_path"),(dirname)=>{
-        logger.info("Creating path: "+relativePath(dirname));
-        fs.mkdir(relativePath(dirname),()=>{
-          map_files(dirname,(filename)=>{
-            logger.debug("Creating file: "+relativePath(filename));
-            copyTemplateFile(filename,relativePath(filename));
-          });
-        });
-      });
-      map_files(CONFIG.get("qcobjectsnewapp_path"),(filename)=>{
-        if (!["./package.json",
-              "./package-lock.json",
-              "./sw.js"].includes(relativePath(filename))){
-          logger.info("Creating file: "+relativePath(filename));
-          copyTemplateFile(filename,relativePath(filename));
+
+        try {
+          const exclude = [
+            "package.json",
+            "node_modules",
+            ".DS_Store"
+          ]
+          logger.info(`[create] Copying files from ${source} to ${dest} excluding ${exclude}...`);
+          copyDir(source, dest, (typeof exclude !== "undefined") ? (exclude) : ([]));
+          resolve();
+        } catch (e) {
+          logger.warn(`Something went wrong trying to publish static files: ${e.message}`);
+          reject(e);
         }
+        
       });
 
     }
