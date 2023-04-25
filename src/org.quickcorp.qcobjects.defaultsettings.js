@@ -347,4 +347,9 @@ try {
   }
 
   logger.info("Dependencies loaded");
+
+  process.once("SIGTERM", ()=> {
+    console.log("\x1b[33m%s\x1b[0m", "Bye bye!");
+    process.exit();
+  });
 })();
