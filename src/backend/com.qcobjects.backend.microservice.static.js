@@ -47,7 +47,7 @@ Package("com.qcobjects.backend.microservice.static", [
 
       const microservice = this;
       const stream = microservice.stream;
-      const fileName = `${process.cwd()}/${microservice.fileName}`;
+      const fileName = (!microservice.fileName.startsWith("/"))?(`${process.cwd()}/${microservice.fileName}`):(microservice.fileName);
 
       const sendFileHTTP2 = function(stream, fileName) {
         // read and send file content in the stream

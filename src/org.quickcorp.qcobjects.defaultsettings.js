@@ -132,6 +132,8 @@ try {
   const path = require("path");
   const projectPath = CONFIG.get("projectPath", `${process.cwd()}/`);
   const loadDefaultRoutes = async () => {
+    const sdkPath = path.resolve(findPackageNodePath("qcobjects-sdk"), "qcobjects-sdk");
+    const qcobjectsPath = path.resolve(findPackageNodePath("qcobjects"), "qcobjects");
     let backend = CONFIG.get("backend");
     if (typeof backend === "undefined") {
       backend = {};
@@ -144,7 +146,7 @@ try {
         "description": "Redirection of QCObjects.js",
         "path": "^/QCObjects.js$",
         "microservice": "com.qcobjects.backend.microservice.static",
-        "redirect_to": "./node_modules/qcobjects/QCObjects.js",
+        "redirect_to": path.resolve(qcobjectsPath,"src","QCObjects.js"),
         "responseHeaders": {},
         "cors": {
           "allow_origins": "*"
@@ -155,7 +157,7 @@ try {
         "description": "Redirection of QCObjects SDK",
         "path": "^/js/packages/QCObjects-SDK.js$",
         "microservice": "com.qcobjects.backend.microservice.static",
-        "redirect_to": "./node_modules/qcobjects-sdk/QCObjects-SDK.js",
+        "redirect_to": path.resolve(sdkPath, "src/QCObjects-SDK.js"),
         "responseHeaders": {},
         "cors": {
           "allow_origins": "*"
@@ -166,7 +168,7 @@ try {
         "description": "Redirection of QCObjects SDK",
         "path": "^/qcobjects-sdk/(.*)$",
         "microservice": "com.qcobjects.backend.microservice.static",
-        "redirect_to": "./node_modules/qcobjects-sdk/$1",
+        "redirect_to": path.resolve(sdkPath, "src/$1"),
         "responseHeaders": {},
         "cors": {
           "allow_origins": "*"
@@ -176,7 +178,6 @@ try {
     ]);
     CONFIG.set("backend", backend);
 
-    return;
   };
   await loadDefaultRoutes();
 })().then(() => logger.info("Default routes loaded"));
