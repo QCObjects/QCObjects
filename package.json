@@ -24,12 +24,13 @@
   "dependencies": {
     "commander": "^10.0.1",
     "mime": "^2.4.7",
-    "qcobjects": "^2.4.68",
+    "qcobjects": "^2.4.71",
     "yaml": "^2.2.2",
     "qcobjects-sdk": "^2.4.33"
   },
   "devDependencies": {
     "@types/qcobjects": "github:QCObjects/-types-qcobjects",
+    "@types/qcobjects-api": "github:QCObjects/-types-qcobjects-api",
     "@types/qcobjects-sdk": "github:QCObjects/-types-qcobjects-sdk",
     "@typescript-eslint/eslint-plugin": "^5.58.0",
     "@typescript-eslint/parser": "^5.58.0",
@@ -43,12 +44,12 @@
     "eslint-plugin-n": "^15.7.0",
     "eslint-plugin-promise": "^6.1.1",
     "jasmine": "^3.99.0",
-    "qcobjects": "^2.4.68",
+    "qcobjects": "^2.4.71",
     "qcobjects-sdk": "^2.4.34",
     "qcobjects-tsconfig": "^2.4.10"
   },
   "peerDependencies": {
-    "qcobjects": "^2.4.68",
+    "qcobjects": "^2.4.71",
     "qcobjects-sdk": "^2.4.33"
   },
   "repository": {
