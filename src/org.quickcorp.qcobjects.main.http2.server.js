@@ -237,8 +237,7 @@ Package("org.quickcorp.qcobjects.main.http2.server", [
               logger.debug("Session was normally finishing...");
             }
           } catch (e) {
-            logger.debug("An unhandled error occurred during timeout catching...");
-            logger.debug(e.message);
+            logger.debug(`An unhandled error occurred during timeout catching: ${e}`);
           }
 
           if (!stream.destroyed) {
