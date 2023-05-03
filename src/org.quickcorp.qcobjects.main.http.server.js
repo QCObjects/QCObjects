@@ -31,22 +31,24 @@
 "use strict";
 
 const path = require("path");
-const absolutePath = path.resolve( __dirname, "./" );
+const absolutePath = path.resolve(__dirname, "./");
 
 const fs = require("fs");
 const mime = require("mime");
-require(absolutePath+"/org.quickcorp.qcobjects.main.file.js");
-require(absolutePath+ "/org.qcobjects.common.pipelog.js");
+require(absolutePath + "/org.quickcorp.qcobjects.main.file.js");
+require(absolutePath + "/org.qcobjects.common.pipelog.js");
 
-
-let ImportMicroservice = function (microservicePackage){
-  var standardPath = findPackageNodePath(microservicePackage) || findPackageNodePath(microservicePackage+".js");
-  if (standardPath !== null){
-    Import (microservicePackage);
+let ImportMicroservice = function (microservicePackage) {
+  var _ret_;
+  var standardPath = findPackageNodePath(microservicePackage) || findPackageNodePath(microservicePackage + ".js");
+  if (standardPath !== null) {
+    _ret_ = Import(microservicePackage);
   } else {
-    Import (absolutePath+"/backend/"+microservicePackage);
+    _ret_ = Import(absolutePath + "/backend/" + microservicePackage);
   }
+  return _ret_;
 };
+
 
 Package("org.quickcorp.qcobjects.main.http.server",[
 
@@ -56,20 +58,26 @@ Package("org.quickcorp.qcobjects.main.http.server",[
       basePath=CONFIG.get("basePath"),
       body=null,
       stream=null,
-      server=null,
       request=null
     }){
       super(...arguments);
 
-      logger.debug("Executing Legacy HTTP BackendMicroservice ");
+      logger.debug("Initializing Legacy BackendMicroservice...");
       let microservice = this;
+      if (typeof this.body === "undefined") {
+        this.body = null;
+      }
+      if (typeof body !== "undefined"){
+        this.body = body;
+      }
       this.cors();
+      microservice.stream = stream;
       microservice.req.on("data", (data) => {
         // data from POST, GET
         var requestMethod = request.method.toLowerCase();
         var supportedMethods = {"post":microservice.post,
                               };
-        if (supportedMethods.hasOwnProperty.call(supportedMethods,requestMethod)) {
+        if (Object.hasOwnProperty.call(supportedMethods,requestMethod)) {
           supportedMethods[requestMethod].call(microservice,data);
         }
       });
@@ -85,51 +93,74 @@ Package("org.quickcorp.qcobjects.main.http.server",[
                               "trace":microservice.trace,
                               "patch":microservice.patch
                             };
-      if (supportedMethods.hasOwnProperty.call(supportedMethods,requestMethod)) {
+      if (Object.hasOwnProperty.call(supportedMethods,requestMethod)) {
         supportedMethods[requestMethod].call(microservice);
       }
 
 
     }
 
-    cors(){
-      if (this.route.cors){
-        let {allow_origins,allow_credentials,allow_methods,allow_headers} = this.route.cors;
+    cors() {
+      if (this.route.cors) {
+        logger.debug("Validating CORS...");
+        let {
+          allow_origins,
+          allow_credentials,
+          allow_methods,
+          allow_headers
+        } = this.route.cors;
         var microservice = this;
-        if (typeof microservice.headers !== "object"){
+        if (typeof microservice.headers !== "object") {
           microservice.headers = {};
         }
-        if (typeof allow_origins !== "undefined"){
+        if (typeof microservice.route.responseHeaders !== "object") {
+          microservice.route.responseHeaders = {};
+        }
+        if (typeof allow_origins !== "undefined") {
+          logger.debug("CORS: allow_origins available. Validating origins...");
           // an example of allow_origins is ['https://example.com','http://www.example.com']
-          if (allow_origins =="*" || (typeof microservice.request.headers.origin == "undefined") || [...allow_origins].indexOf(microservice.request.headers.origin)!== -1){
+          if (allow_origins === "*" || (typeof microservice.request.headers.origin === "undefined") || [...allow_origins].indexOf(microservice.request.headers.origin) !== -1) {
             // for compatibility with all browsers allways return a wildcard when the origin is allowed
-            microservice.headers["Access-Control-Allow-Origin"] = "*";
+            logger.debug("CORS: Adding header Access-Control-Allow-Origin=*");
+            microservice.route.responseHeaders["Access-Control-Allow-Origin"] = "*";
           } else {
-            logger.debug("Origin is not allowed: " + microservice.request.headers.origin);
-            logger.debug("Forcing to finish the response...");
+            logger.debug("CORS: Origin is not allowed: " + microservice.request.headers.origin);
+            logger.debug("CORS: Forcing to finish the response...");
             this.body = {};
             try {
               this.done();
-            } catch (e){}
+            } catch (e) {
+              logger.debug(`It was not possible to finish the call to the microservice: ${e}`);
+            }
           }
         } else {
-          microservice.headers["Access-Control-Allow-Origin"] = "*";
+          logger.debug("CORS: no allow_origins available. Allowing all origins...");
+          logger.debug("CORS: Adding header Access-Control-Allow-Origin=*");
+          microservice.route.responseHeaders["Access-Control-Allow-Origin"] = "*";
         }
-        if (typeof allow_credentials !== "undefined"){
-          microservice.headers["Access-Control-Allow-Credentials"] = allow_credentials.toString();
+        if (typeof allow_credentials !== "undefined") {
+          logger.debug(`CORS: allow_credentials present. Allowing ${allow_credentials}...`);
+          microservice.route.responseHeaders["Access-Control-Allow-Credentials"] = allow_credentials.toString();
         } else {
-          microservice.headers["Access-Control-Allow-Credentials"] = "true";
+          logger.debug("CORS: No allow_credentials present. Allowing all credentials.");
+          microservice.route.responseHeaders["Access-Control-Allow-Credentials"] = "true";
         }
-        if (typeof allow_methods !== "undefined"){
-          microservice.headers["Access-Control-Allow-Methods"] = [...allow_methods].join(",");
+        if (typeof allow_methods !== "undefined") {
+          logger.debug(`CORS: allow_methods present. Allowing ${allow_methods}...`);
+          microservice.route.responseHeaders["Access-Control-Allow-Methods"] = [...allow_methods].join(",");
         } else {
-          microservice.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS, POST";
+          logger.debug("CORS: No allow_methods present. Allowing only GET, OPTIONS and POST");
+          microservice.route.responseHeaders["Access-Control-Allow-Methods"] = "GET, OPTIONS, POST";
         }
-        if (typeof allow_headers !== "undefined"){
-          microservice.headers["Access-Control-Allow-Headers"] = [...allow_headers].join(",");
+        if (typeof allow_headers !== "undefined") {
+          logger.debug(`CORS: allow_headers present. Allowing ${allow_headers}...`);
+          microservice.route.responseHeaders["Access-Control-Allow-Headers"] = [...allow_headers].join(",");
         } else {
-          microservice.headers["Access-Control-Allow-Headers"] = "*";
+          logger.debug(`CORS: No allow_headers present. Allowing all headers...`);
+          microservice.route.responseHeaders["Access-Control-Allow-Headers"] = "*";
         }
+      } else {
+        logger.debug("No CORS validation available. You can specify cors in CONFIG.backend.routes[].cors");
       }
     }
     head(formData){this.done();}
@@ -145,7 +176,8 @@ Package("org.quickcorp.qcobjects.main.http.server",[
         stream.write(JSON.stringify(this.body));
         stream.end();
       } catch (e){
-        logger.debug("Something wrong writing the response for microservice"+e.toString());
+        logger.debug(`Something wrong writing the response for microservice: ${e}`);
+        throw Error(e);
       }
     }
     done(){
@@ -154,8 +186,8 @@ Package("org.quickcorp.qcobjects.main.http.server",[
       try {
         stream.writeHead(200, microservice.headers);
       } catch (e){
-        logger.debug("Something went wront while sending headers in http...");
-        logger.debug(e.toString());
+        logger.debug(`Something went wront while sending headers in http... ${e}`);
+        throw Error(e);
       }
       if (microservice.body != null){
         microservice.finishWithBody.call(microservice,stream);
@@ -169,17 +201,17 @@ Package("org.quickcorp.qcobjects.main.http.server",[
   class HTTPServerResponse extends InheritClass {
     constructor ({
       headers={
-        ":status": 200,
+        "status": 200,
         "content-type": "text/html"
       },
-      body="",
-      request=null,
-      fileDispatcher=null,
-      stream=null
-    }){
+      body = "",
+      request = null,
+      fileDispatcher = null,
+      stream = null
+    }) {
       super(...arguments);
       var self = this;
-      self.stream = self.stream;
+      self.stream = stream;
       self._generateResponse();
 
     }
@@ -219,18 +251,30 @@ Package("org.quickcorp.qcobjects.main.http.server",[
 
         // This catches any errors that happen while creating the readable stream (usually invalid names)
         readStream.on("error", function(err) {
+          const headers = {
+            "status": 500,
+            "content-type": mime.getType(fileName)
+          };
+          stream.setHeader("content-type", headers["content-type"]);
+          stream.setHeader("status", headers["status"]);
+          stream.write(`<h1>500 - INTERNAL SERVER ERROR</h1>
+            <p>${err}</p>
+          `);
+
           stream.end(err);
         });
 
       } catch (e){
         if (e.errno==-2){
           const headers = {
-            ":status": 404,
-            "content-type": "text/html"
+            "status": 404,
+            "content-type": mime.getType(fileName)
           };
+          stream.setHeader("content-type", headers["content-type"]);
+          stream.setHeader("status", headers["status"]);
           stream.write("<h1>404 - FILE NOT FOUND</h1>");
           stream.on("close", () => {
-            console.log("closing file", fileName);
+            logger.debug("closing file " + fileName);
           });
           stream.end();
         }
@@ -245,16 +289,14 @@ Package("org.quickcorp.qcobjects.main.http.server",[
           response.headers = headers;
           var stream = response.stream;
           if (isTemplate){
-            logger.debug("TEMPLATE");
             response.body = body;
-//            stream.respond(response.headers);
+            Object.keys(headers).map((header)=>stream.setHeader(header, headers[header]));
             stream.write(response.body);
             stream.end();
-          } else if (headers[":status"]==200){
-            response.sendFile(stream,templateURI);
+          } else if (headers["status"] == 200 || headers[":status"] == 200) {
+            response.sendFile(stream, templateURI);
           } else {
-            logger.debug("NONE ");
-//          stream.respond(response.headers);
+            Object.keys(headers).map((header)=>stream.setHeader(header, headers[header]));
             stream.end();
           }
         }
@@ -265,40 +307,39 @@ Package("org.quickcorp.qcobjects.main.http.server",[
   },
 
   class HTTPServerRequest extends InheritClass {
-    constructor ({
-      scriptname="",
-      path="",
-      method="",
-      url="",
-      headers=null,
-      flags=null,
-      protocol= null,
-      slashes= null,
-      auth= null,
-      host= null,
-      port= null,
-      hostname= null,
-      hash= null,
-      search= "",
-      query= "",
-      pathname= "",
-      href= ""
-    }){
+    constructor({
+      scriptname = "",
+      path = "",
+      method = "",
+      url = "",
+      headers = null,
+      flags = null,
+      protocol = null,
+      slashes = null,
+      auth = null,
+      host = null,
+      port = null,
+      hostname = null,
+      hash = null,
+      search = "",
+      query = "",
+      pathname = "",
+      href = ""
+    }) {
       super(...arguments);
     }
   },
 
   class HTTPServer extends InheritClass {
-    constructor ({
-      request=null,
-      response="",
-      server=null,
-      scriptname="",
-      interceptorInstances=[]
-    }){
+    constructor({
+      request = null,
+      response = "",
+      server = null,
+      scriptname = "",
+      interceptorInstances = []
+    }) {
       super(...arguments);
 
-      let oHTTPServer = this;
       const welcometo = "Welcome to \n";
       const instructions = "QCObjects Legacy HTTPServer \n";
       const logo = " .d88888b.  .d8888b.  .d88888b. 888       d8b                888            \r\nd88P\" \"Y88bd88P  Y88bd88P\" \"Y88b888       Y8P                888            \r\n888     888888    888888     888888                          888            \r\n888     888888       888     88888888b.  8888 .d88b.  .d8888b888888.d8888b  \r\n888     888888       888     888888 \"88b \"888d8P  Y8bd88P\"   888   88K      \r\n888 Y8b 888888    888888     888888  888  88888888888888     888   \"Y8888b. \r\nY88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r\n \"Y888888\"  \"Y8888P\"  \"Y88888P\" 88888P\"   888 \"Y8888  \"Y8888P \"Y888 88888P' \r\n       Y8b                                888                               \r\n                                         d88P                               \r\n                                       888P\"   ";
@@ -310,43 +351,40 @@ Package("org.quickcorp.qcobjects.main.http.server",[
       logger.info("Go to: \n"+this.showPossibleURL());
 
       const http = require("http");
-
-      oHTTPServer.server = http.createServer((req, res) => {
-
+      this.server = http.createServer((req, res) => {
+        logger.debug("Legacy Server Instantiated.");
       });
 
-      var server = oHTTPServer.server;
-
-      server.on("error", (err) => console.error(err));
+      this.server.on("error", (err) => console.error(err));
 
       if (global.get("backendAvailable")){
         logger.info("Loading backend interceptors...");
-        let interceptors = CONFIG.get("backend",{}).interceptors;
-        if (typeof interceptors !== "undefined"){
+        let interceptors = CONFIG.get("backend", {}).interceptors;
+        if (typeof interceptors !== "undefined") {
           logger.info("Backend Interceptors Available");
-          interceptors.map(interceptor=>{
-            ImportMicroservice (interceptor.microservice);
-            var interceptorClassFactory = ClassFactory(interceptor.microservice+".Interceptor");
-            var interceptorInstance = New(interceptorClassFactory,{
-              domain:CONFIG.get("domain"),
-              basePath:CONFIG.get("basePath"),
-              projectPath:CONFIG.get("projectPath"),
-              interceptor:interceptor,
-              server:server
+          interceptors.map(interceptor => {
+            ImportMicroservice(interceptor.microservice);
+            var interceptorClassFactory = ClassFactory(interceptor.microservice + ".Interceptor");
+            var interceptorInstance = New(interceptorClassFactory, {
+              domain: CONFIG.get("domain"),
+              basePath: CONFIG.get("basePath"),
+              projectPath: CONFIG.get("projectPath"),
+              interceptor: interceptor,
+              server: this.server
             });
-            oHTTPServer.interceptorInstances.push(interceptorInstance);
+            this.interceptorInstances.push(interceptorInstance);
           });
         }
       }
 
-      server.on("request", (req, res) => {
+      this.server.on("request", (req, res) => {
 
         let request = Object.assign(New(HTTPServerRequest),require("url").parse(req.url));
         request.headers = req.headers;
         this.request = request;
         this.request.method = req.method;
         this.request.path = req.url;
-        server.setMaxListeners(9999999999);
+        this.server.setMaxListeners(9999999999);
         CONFIG.set("backendTimeout",CONFIG.get("backendTimeout") || 20000);
         var timeoutHandler = ()=>{
           // end the stream on timeout
@@ -364,15 +402,14 @@ Package("org.quickcorp.qcobjects.main.http.server",[
             } else {
               logger.debug("Session was normally finishing...");
             }
-          }catch (e){
-            logger.debug("An unhandled error occurred during timeout catching...");
-            logger.debug(e.message);
+          } catch (e) {
+            logger.debug(`An unhandled error occurred during timeout catching: ${e}`);
           }
-          server.removeListener("timeout",timeoutHandler);
+          this.server.removeListener("timeout",timeoutHandler);
 
         };
         if (!res.destroyed){
-          server.setTimeout(CONFIG.get("backendTimeout"), timeoutHandler);
+          this.server.setTimeout(CONFIG.get("backendTimeout"), timeoutHandler);
         }
 
         if (this.request.pathname.indexOf(".")<0){
@@ -384,32 +421,54 @@ Package("org.quickcorp.qcobjects.main.http.server",[
 
         logger.debug((new PipeLog()).pipe(this.request));
 
-        if (global.get("backendAvailable")){
-          logger.info("Backend Legacy Microservices Available");
-          let routes = CONFIG.get("backend").routes;
-          let selectedRoute = routes.filter(route=>{let standardRoutePath = route.path.replace(/{(.*?)}/g,"(?<$1>.*)");return (new RegExp(standardRoutePath,"g")).test(request.path);});
-          if (selectedRoute.length>0){
-            selectedRoute.map(route=>{
-              let standardRoutePath = route.path.replace(/{(.*?)}/g,"(?<$1>.*)"); //allowing {param}
-              let selectedRouteParams = {...[...request.path.matchAll((new RegExp( standardRoutePath ,"g")))][0]["groups"]};
-              ImportMicroservice (route.microservice);
-              var microServiceClassFactory = ClassFactory(route.microservice+".Microservice");
-              this.response = New(microServiceClassFactory,{
-                domain:CONFIG.get("domain"),
-                basePath:CONFIG.get("basePath"),
-                projectPath:CONFIG.get("projectPath"),
-                route:route,
-                routeParams:selectedRouteParams,
-                server:server,
-                stream:res,
-                req:req,
-                request:request
+        if (global.get("backendAvailable")) {
+          logger.info("Backend Legacy Microservices Available...");
+
+          logger.info("Loading backend routes...");
+          let routes = CONFIG.get("backend", {}).routes;
+          let selectedRoute = routes.filter(route => {
+            let standardRoutePath = route.path.replace(/{(.*?)}/g, "(?<$1>.*)");
+            return (new RegExp(standardRoutePath, "g")).test(request.path);
+          });
+          if (selectedRoute.length > 0) {
+            selectedRoute.map(route => {
+              let standardRoutePath = route.path.replace(/{(.*?)}/g, "(?<$1>.*)"); //allowing {param}
+              console.log(standardRoutePath);
+              let selectedRouteParams = {
+                ...[...request.path.matchAll((new RegExp(standardRoutePath, "g")))][0]["groups"]
+              };
+              ImportMicroservice(route.microservice).then (()=>{
+                logger.debug(`Trying to execute ${route.microservice + ".Microservice"}...`);
+                var microServiceClassFactory = ClassFactory(route.microservice + ".Microservice");
+                if (typeof microServiceClassFactory !== "undefined"){
+                  const server = this.server;
+                  this.response = New(microServiceClassFactory, {
+                    domain: CONFIG.get("domain"),
+                    basePath: CONFIG.get("basePath"),
+                    projectPath: CONFIG.get("projectPath"),
+                    route: route,
+                    routeParams: selectedRouteParams,
+                    server: server,
+                    stream: res,
+                    req:req,
+                    request: request
+                  });
+    
+                } else {
+                  throw Error (`${route.microservice + ".Microservice"} not defined.`);
+                }
+              }).catch (e=> {
+                throw Error (e);
               });
             });
           } else {
             this.response = New(HTTPServerResponse,{
-              server:server,
+              domain: CONFIG.get("domain"),
+              basePath: CONFIG.get("basePath"),
+              projectPath: CONFIG.get("projectPath"),              
+              server:this.server,
               stream:res,
+              req:req,
               request:this.request
             });
           }
@@ -418,8 +477,9 @@ Package("org.quickcorp.qcobjects.main.http.server",[
           // ...
 
           this.response = New(HTTPServerResponse,{
-            server:server,
+            server:this.server,
             stream:res,
+            req:req,
             request:this.request
           });
 
@@ -434,9 +494,9 @@ Package("org.quickcorp.qcobjects.main.http.server",[
       var _ret_ = "";
       var os = require("os");
       var ifaces = os.networkInterfaces();
-      Object.keys(ifaces).forEach(function (iface){
-        ifaces[iface].map(function (ipGroup){
-          _ret_ += iface +": " + (new PipeLog()).pipe(ipGroup)+"\n";
+      Object.keys(ifaces).forEach(function (iface) {
+        ifaces[iface].map(function (ipGroup) {
+          _ret_ += iface + ": " + (new PipeLog()).pipe(ipGroup) + "\n";
         });
       });
       return _ret_;
