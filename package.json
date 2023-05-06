@@ -26,7 +26,7 @@
     "mime": "^2.4.7",
     "qcobjects": "^2.4.87",
     "yaml": "^2.2.2",
-    "qcobjects-sdk": "^2.4.53"
+    "qcobjects-sdk": "^2.4.55"
   },
   "devDependencies": {
     "@types/qcobjects": "github:QCObjects/-types-qcobjects",
@@ -45,12 +45,12 @@
     "eslint-plugin-promise": "^6.1.1",
     "jasmine": "^3.99.0",
     "qcobjects": "^2.4.87",
-    "qcobjects-sdk": "^2.4.53",
+    "qcobjects-sdk": "^2.4.55",
     "qcobjects-tsconfig": "^2.4.10"
   },
   "peerDependencies": {
     "qcobjects": "^2.4.87",
-    "qcobjects-sdk": "^2.4.53"
+    "qcobjects-sdk": "^2.4.55"
   },
   "repository": {
     "type": "file",
