@@ -168,7 +168,7 @@ try {
         "description": "Redirection of QCObjects SDK",
         "path": "^/qcobjects-sdk/(.*)$",
         "microservice": "com.qcobjects.backend.microservice.static",
-        "redirect_to": path.resolve(sdkPath, "src/$1"),
+        "redirect_to": path.resolve(sdkPath, "$1"),
         "responseHeaders": {},
         "cors": {
           "allow_origins": "*"

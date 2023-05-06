@@ -123,7 +123,7 @@ Package("com.qcobjects.backend.microservice.static", [
         } catch (e){
           if (e.errno==-2){
             headers = {
-              ":status": 404,
+              "status": 404,
               "Content-Type": "text/html"
             };
             stream.writeHead(404, headers);
