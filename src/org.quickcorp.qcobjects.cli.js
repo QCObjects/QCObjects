@@ -283,6 +283,49 @@ Package("org.quickcorp.qcobjects.cli",[
     }
 
     generateServiceWorker(appName){
+      class ServiceWorkerComponent extends Component {
+        cached = false;
+        templateURI= "sw.js";
+        basePath = templatePwaPath;
+        name ="sw";
+        cached = false;
+        tplsource= "default";
+      
+        done ({request, component}) {
+          return new Promise ((resolve, reject)=> {
+            super.done({request, component});
+              try {
+                const parsedText = this.parsedAssignmentText;
+                logger.debug("Starting to write the sw file...");
+                fs.writeFile("./sw.js", parsedText, err => {
+                  if (err){
+                    throw Error (err);
+                  }
+                  logger.info("Service Worker Generated");
+                  console.log("");
+                  console.log("Now simply put:");
+                  console.log("CONFIG.set('serviceWorkerURI','/sw.js');");
+                  console.log(" In your init.js file ");
+                  console.log("");
+                  console.log("To start your app in a local server ");
+                  console.log("Execute the command: ");
+                  console.log("> qcobjects launch <appname>");
+                  console.log("");
+                });
+                resolve({request, component});  
+  
+              } catch (e){
+                reject(`There was a problem writing file for service worker :${e}`);
+              }
+  
+          })
+          .catch(e=> {
+            throw Error (e);
+          });
+        }
+
+      }
+
       return new Promise( (resolve, reject) => {
         var filelist = ["/"].concat(this.fileListRecursive("./"));
         filelist = filelist.filter(function (fl){return fl !== "sw.js" && (!fl.startsWith("node_modules/")); });
@@ -291,36 +334,16 @@ Package("org.quickcorp.qcobjects.cli",[
         filelist = filelist.filter(fname => !(new RegExp("^package(.*).json$")).test(fname));
         filelist = filelist.filter(fname => !fname.startsWith("."));
         var fileListString = "\n\t\""+filelist.join("\",\n\t\"")+"\"";
-        var component = New(Component, {
-          templateURI: "sw.js",
-          basePath:templatePwaPath,
-          name:"sw",
-          cached:false,
-          tplsource: "default",
+        var component = new ServiceWorkerComponent( {
+          name: "sw",
           data: {
             appName: appName,
             appVersion: "1.0.0",
             filelist: fileListString
-          },
-          done ({request, component}) {
-            return new Promise ((resolve, reject)=> {
-              fs.writeFile("./sw.js", component.parsedAssignmentText, err => {
-                logger.info("Service Worker Generated");
-                console.log("");
-                console.log("Now simply put:");
-                console.log("CONFIG.set('serviceWorkerURI','/sw.js');");
-                console.log(" In your init.js file ");
-                console.log("");
-                console.log("To start your app in a local server ");
-                console.log("Execute the command: ");
-                console.log("> qcobjects launch <appname>");
-                console.log("");
-              });
-              resolve({request, component});  
-            });
           }
         });
-  
+        component.done({component});
+        resolve("Service Worker Generated!");
       } );
     }
 
