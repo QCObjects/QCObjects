@@ -62,10 +62,11 @@ Package("org.quickcorp.qcobjects.cli",[
   class SwitchCommander extends InheritClass {
 
     choiceOption = {
-      generateSw(_appName){
+      generateSw(_appName, options){
+        let dirPrefix = options.dir;
         let switchCommander = this;
         let appName = (typeof _appName ==="undefined" || _appName === true)?("MyAppName"):(_appName);
-        switchCommander.generateServiceWorker(appName);
+        switchCommander.generateServiceWorker(appName, dirPrefix);
 
       },
       create(_appName, options){
@@ -282,69 +283,70 @@ Package("org.quickcorp.qcobjects.cli",[
       });
     }
 
-    generateServiceWorker(appName){
+    generateServiceWorker(appName, dirPrefix = "./"){
+      const writeContent = (component) => {
+        const parsedText = component.parseTemplate(component.template);
+        logger.debug("Starting to write the sw file...");
+        fs.writeFile(`${dirPrefix}/sw.js`, parsedText , (err) => {
+          if (err){
+            throw Error (err);
+          }
+          logger.info("Service Worker Generated");
+          console.log("");
+          console.log("Now simply put:");
+          console.log("CONFIG.set('serviceWorkerURI','/sw.js');");
+          console.log(" In your init.js file ");
+          console.log("");
+          console.log("To start your app in a local server ");
+          console.log("Execute the command: ");
+          console.log("> qcobjects launch <appname>");
+          console.log("");
+        });
+
+      };
+
+
       class ServiceWorkerComponent extends Component {
         cached = false;
         templateURI= "sw.js";
         basePath = templatePwaPath;
         name ="sw";
-        cached = false;
         tplsource= "default";
-      
-        done ({request, component}) {
-          return new Promise ((resolve, reject)=> {
-            super.done({request, component});
-              try {
-                const parsedText = this.parsedAssignmentText;
-                logger.debug("Starting to write the sw file...");
-                fs.writeFile("./sw.js", parsedText, err => {
-                  if (err){
-                    throw Error (err);
-                  }
-                  logger.info("Service Worker Generated");
-                  console.log("");
-                  console.log("Now simply put:");
-                  console.log("CONFIG.set('serviceWorkerURI','/sw.js');");
-                  console.log(" In your init.js file ");
-                  console.log("");
-                  console.log("To start your app in a local server ");
-                  console.log("Execute the command: ");
-                  console.log("> qcobjects launch <appname>");
-                  console.log("");
-                });
-                resolve({request, component});  
-  
-              } catch (e){
-                reject(`There was a problem writing file for service worker :${e}`);
-              }
-  
-          })
-          .catch(e=> {
-            throw Error (e);
-          });
-        }
+        template = "";
 
+        done ({request, component}){
+          super.done({request, component});
+          writeContent(this);
+        }
       }
 
       return new Promise( (resolve, reject) => {
-        var filelist = ["/"].concat(this.fileListRecursive("./"));
+        var filelist = ["/"].concat(this.fileListRecursive(`${dirPrefix}`));
+        if (typeof dirPrefix !== "undefined" && dirPrefix !== "./" && dirPrefix !== "."){
+          filelist = filelist.map(f=>f.replace(new RegExp(`${dirPrefix}/`), ""));
+        }
         filelist = filelist.filter(function (fl){return fl !== "sw.js" && (!fl.startsWith("node_modules/")); });
         filelist = filelist.filter(fname => !fname.endsWith(".pem"));
         filelist = filelist.filter(fname => !fname.endsWith(".sh"));
         filelist = filelist.filter(fname => !(new RegExp("^package(.*).json$")).test(fname));
         filelist = filelist.filter(fname => !fname.startsWith("."));
         var fileListString = "\n\t\""+filelist.join("\",\n\t\"")+"\"";
-        var component = new ServiceWorkerComponent( {
-          name: "sw",
-          data: {
-            appName: appName,
-            appVersion: "1.0.0",
-            filelist: fileListString
-          }
+        let component;
+
+        new Promise ((resolve, reject)=> {
+            component = new ServiceWorkerComponent({
+              name: "sw",
+              data: {
+                appName: appName,
+                appVersion: "1.0.0",
+                filelist: fileListString
+              }
+            });
+            setTimeout(()=> {
+              component.done({request:null, component});
+            }, 1000);
         });
-        component.done({component});
-        resolve("Service Worker Generated!");
-      } );
+      });
     }
 
     copyTemplate(source, dest){
@@ -466,8 +468,9 @@ Package("org.quickcorp.qcobjects.cli",[
           .action(function(args, options){
               switchCommander.choiceOption.upgradeToEnterprise.call(switchCommander,args,options);
           });
-        switchCommander.program.command("generate-sw  <appname>")
-          .description("Generates the service worker  <appname>")
+        switchCommander.program.command("generate-sw <appname>")
+          .option("-d, --dir <dirPrefix> ", "creates the service worker in a specific dir <dirPrefix>")
+          .description("Generates the service worker <appname>")
           .action(function(args, options){
               switchCommander.choiceOption.generateSw.call(switchCommander,args,options);
           });
