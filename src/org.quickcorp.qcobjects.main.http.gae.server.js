@@ -39,13 +39,21 @@ require(absolutePath + "/org.quickcorp.qcobjects.main.file.js");
 require(absolutePath+ "/org.qcobjects.common.pipelog.js");
 
 let ImportMicroservice = function (microservicePackage) {
+  var _ret_;
   var standardPath = findPackageNodePath(microservicePackage) || findPackageNodePath(microservicePackage + ".js");
   if (standardPath !== null) {
-    Import(microservicePackage);
+    _ret_ = Import(microservicePackage);
   } else {
-    Import(absolutePath + "/backend/" + microservicePackage);
+    var nonStandardPath = findPackageNodePath(absolutePath + "/backend/" + microservicePackage) || findPackageNodePath(absolutePath + "/backend/" + microservicePackage + ".js");
+    if (nonStandardPath !== null){
+      _ret_ = Import(absolutePath + "/backend/" + microservicePackage);
+    } else {
+      _ret_ = Promise.resolve(require (microservicePackage));
+    }
   }
+  return _ret_;
 };
+
 
 Package("org.quickcorp.qcobjects.main.http.gae.server", [
 

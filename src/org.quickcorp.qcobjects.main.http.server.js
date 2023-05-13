@@ -44,11 +44,15 @@ let ImportMicroservice = function (microservicePackage) {
   if (standardPath !== null) {
     _ret_ = Import(microservicePackage);
   } else {
-    _ret_ = Import(absolutePath + "/backend/" + microservicePackage);
+    var nonStandardPath = findPackageNodePath(absolutePath + "/backend/" + microservicePackage) || findPackageNodePath(absolutePath + "/backend/" + microservicePackage + ".js");
+    if (nonStandardPath !== null){
+      _ret_ = Import(absolutePath + "/backend/" + microservicePackage);
+    } else {
+      _ret_ = Promise.resolve(require (microservicePackage));
+    }
   }
   return _ret_;
 };
-
 
 Package("org.quickcorp.qcobjects.main.http.server",[
 
