@@ -360,6 +360,14 @@ try {
     throw Error(`Something went wrong trying to load Dev commands: ${e.message}`);
   }
 
+  try {
+    const commands = CONFIG.get("backend", {commands:[]}).commands || [];
+    const devCommands = CONFIG.get("backend", {devCommands:[]}).devCommands || [];
+    setBackendValue("plugins", commands.concat(devCommands));
+  } catch (e) {
+    throw Error(`Something went wrong trying to load plugins list: ${e.message}`);
+  }
+
   logger.info("Dependencies loaded");
 
   process.once("SIGTERM", ()=> {
