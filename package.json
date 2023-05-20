@@ -47,7 +47,7 @@
     "qcobjects-tsconfig": "^2.4.10"
   },
   "peerDependencies": {
-    "qcobjects": "^2.4.92",
+    "qcobjects": "^2.4.94",
     "qcobjects-sdk": "^2.4.60"
   },
   "repository": {
