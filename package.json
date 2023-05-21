@@ -9,7 +9,8 @@
       "require": "./src/index.cjs",
       "import": "./src/index.mjs"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./*.js":"./src/*.js"
   },
   "type": "commonjs",
   "types": "./src/index.d.ts",
