@@ -1,6 +1,6 @@
 {
   "name": "qcobjects-cli",
-  "version": "2.4.59",
+  "version": "2.4.60",
   "description": "qcobjects cli command line tool",
   "main": "src/index.cjs",
   "module": "src/index.mjs",
@@ -10,7 +10,7 @@
       "import": "./src/index.mjs"
     },
     "./package.json": "./package.json",
-    "./*.js":"./src/*.js"
+    "./*.js": "./src/*.js"
   },
   "type": "commonjs",
   "types": "./src/index.d.ts",
