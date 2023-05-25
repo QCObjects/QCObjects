@@ -383,4 +383,15 @@
   global.__load_default_settings__ = __load_default_settings__;
   global.__load_default_settings__();
 
+  const cleanCache = () => {
+    Object.keys(require.cache).forEach( (key) => { delete require.cache[key]; });
+  }
+
+  const __reset_settings__ = () => {
+    cleanCache();
+    global.__load_default_settings__();
+  };
+
+  global.__reset_settings__ = __reset_settings__;
+
 })();
