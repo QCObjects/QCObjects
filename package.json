@@ -10,7 +10,15 @@
       "import": "./src/index.mjs"
     },
     "./package.json": "./package.json",
-    "./*.js": "./src/*.js"
+    "./*.js": "./src/*.js",
+    "./qcobjects-collab": "./src/qcobjects-collab.js",
+    "./qcobjects-cli": "./src/qcobjects-cli.js",
+    "./qcobjects-createcert": "./src/qcobjects-createcert.js",
+    "./qcobjects-gae-http-server": "./src/qcobjects-gae-http-server.js",
+    "./qcobjects-http-server": "./src/qcobjects-http-server.js",
+    "./qcobjects-http2-server": "./src/qcobjects-http2-server.js",
+    "./qcobjects-shell": "./src/qcobjects-shell.js",
+    "./defaultsettings": "./src/org.quickcorp.qcobjects.defaultsettings.js"
   },
   "type": "commonjs",
   "types": "./src/index.d.ts",
