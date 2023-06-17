@@ -40,10 +40,6 @@ const path = require("path");
 const absolutePath = path.resolve( __dirname, "./" );
 const { exec,execSync } = require("child_process");
 
-const package_config = require(absolutePath+"/package.json");
-const qcobjects_pkg_config = require("qcobjects/package.json");
-const qcobjects_sdk_pkg_config = require("qcobjects-sdk/package.json");
-
 console.log(welcometo);
 console.log(logo);
 

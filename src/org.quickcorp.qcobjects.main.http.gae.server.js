@@ -333,6 +333,7 @@ Package("org.quickcorp.qcobjects.main.http.gae.server", [
       logger.debug(this.showIPAddress());
       logger.info("Listening on HTTP PORT: " + CONFIG.get("serverPortHTTP").toString());
       logger.info("Go to: \n" + this.showPossibleURL());
+      this.interceptorInstances = interceptorInstances;
 
       const http = require("http");
 
