@@ -33,6 +33,14 @@
 const path = require("path");
 const absolutePath = path.resolve( __dirname, "./" );
 const templatePath = path.resolve( __dirname, "./templates/apps/" )+"/";
+const os = require("os");
+const isWindows = ()=>{
+  return os.platform().toLowerCase().startsWith("win");
+};
+const isMac = ()=>{
+  return os.platform().toLowerCase().startsWith("darwin");
+};
+
 
 require("qcobjects");
 
@@ -53,11 +61,19 @@ class Main extends InheritClass {
       case "self_signed":
         // stderr is sent to stderr of parent process
         // you can set options.stdio if you want it to go elsewhere
-        stdout = execSync("openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN="+CONFIG.get("domain")+"'  -keyout "+CONFIG.get("private-key-pem")+" -out "+CONFIG.get("private-cert-pem"));
+        if (isWindows()){
+          stdout = execSync("openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj \"/CN="+CONFIG.get("domain")+"\"  -keyout "+CONFIG.get("private-key-pem")+" -out "+CONFIG.get("private-cert-pem"));
+        } else {
+          stdout = execSync("openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN="+CONFIG.get("domain")+"'  -keyout "+CONFIG.get("private-key-pem")+" -out "+CONFIG.get("private-cert-pem"));
+        }
         break;
       case "letsencrypt":
-        var prehook_posthook = "--pre-hook \"service qcobjects stop\" --post-hook=\"service qcobjects start\"";
-        stdout = execSync(`certbot -n -d ${CONFIG.get("domain")} certonly --standalone ${prehook_posthook}`);
+        if (isWindows()){
+          throw Error("Letsencrypt certificate is not supported in Windows");
+        } else {
+          var prehook_posthook = "--pre-hook \"service qcobjects stop\" --post-hook=\"service qcobjects start\"";
+          stdout = execSync(`certbot -n -d ${CONFIG.get("domain")} certonly --standalone ${prehook_posthook}`);
+        }
         break;
       default:
         break;
