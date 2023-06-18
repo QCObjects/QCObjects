@@ -63,7 +63,6 @@ Package("com.qcobjects.backend.microservice.static", [
           };
           if (typeof microservice.route.responseHeaders !== "undefined") {
             headers = Object.assign(headers, microservice.route.responseHeaders);
-            console.log(headers);
           }
 
           stream.respondWithFD(fd, headers);
@@ -74,8 +73,7 @@ Package("com.qcobjects.backend.microservice.static", [
           stream.end();
 
         } catch (e) {
-          console.log(e);
-          logger.debug("[ERROR] Something went wrong when trying to send the response as file " + fileName);
+          logger.warn("[ERROR] Something went wrong when trying to send the response as file " + fileName);
           if (e.errno == -2) {
             const headers = {
               ":status": 404,
@@ -96,7 +94,7 @@ Package("com.qcobjects.backend.microservice.static", [
         // read and send file content in the stream
         let headers;
         try {
-          console.log("trying to read "+ fileName);
+          logger.info("trying to read "+ fileName);
           const fd = fs.openSync(fileName, "r");
           const stat = fs.fstatSync(fd);
           headers = {
@@ -107,7 +105,6 @@ Package("com.qcobjects.backend.microservice.static", [
           };
           if (typeof microservice.route.responseHeaders !== "undefined") {
             headers = Object.assign(headers, microservice.route.responseHeaders);
-            console.log(headers);
           }
 
           logger.debug("closing file " + fileName);
@@ -117,7 +114,7 @@ Package("com.qcobjects.backend.microservice.static", [
 
           stream.write(fs.readFileSync(fileName));
           stream.on("close", () => {
-            console.log("closing static file", fileName);
+            logger.info("closing static file", fileName);
           });
 
         } catch (e){
@@ -129,10 +126,10 @@ Package("com.qcobjects.backend.microservice.static", [
             stream.writeHead(404, headers);
             stream.write("<h1>404 - FILE NOT FOUND</h1>");
             stream.on("close", () => {
-              console.log("closing static file with error: ", fileName);
+              logger.info("closing static file with error: ", fileName);
             });
           }
-          console.log(e);
+          logger.warn(e);
           stream.end();
         }
         stream.end();
@@ -171,7 +168,7 @@ Package("com.qcobjects.backend.microservice.static", [
             try {
               resolve();
             } catch (e) {
-              console.log("\u{1F926} Something went wrong \u{1F926} when trying to deliver a static path: " + microservice.fileName);
+              logger.warn("\u{1F926} Something went wrong \u{1F926} when trying to deliver a static path: " + microservice.fileName);
               reject();
             }
           } else {
