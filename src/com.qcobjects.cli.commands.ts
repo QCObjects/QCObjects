@@ -29,13 +29,14 @@
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
 "use strict";
-var fs = require("fs");
-var path = require("path");
-var absolutePath = path.resolve(__dirname, "./");
-var templatePath = path.resolve(__dirname, "./templates/apps/") + "/";
-var templatePwaPath = path.resolve(__dirname, "./templates/pwa/") + "/";
-var package_config = require(absolutePath + "/../package.json");
-var _a = require("child_process"), exec = _a.exec, execSync = _a.execSync;
+const fs = require("fs");
+const path = require("path");
+const absolutePath = path.resolve( __dirname, "./" );
+const templatePath = path.resolve( __dirname, "./templates/apps/" )+"/";
+const templatePwaPath = path.resolve( __dirname, "./templates/pwa/" )+"/";
+const package_config = require(absolutePath+"/../package.json");
+const { exec,execSync } = require("child_process");
+
 // plugin commands here
-require(absolutePath + "/com.qcobjects.cli.commands.version");
-require(absolutePath + "/com.qcobjects.cli.commands.jira");
+require(absolutePath+"/com.qcobjects.cli.commands.version");
+require(absolutePath+"/com.qcobjects.cli.commands.jira");

@@ -29,13 +29,42 @@
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
 "use strict";
-var fs = require("fs");
-var path = require("path");
-var absolutePath = path.resolve(__dirname, "./");
-var templatePath = path.resolve(__dirname, "./templates/apps/") + "/";
-var templatePwaPath = path.resolve(__dirname, "./templates/pwa/") + "/";
-var package_config = require(absolutePath + "/../package.json");
-var _a = require("child_process"), exec = _a.exec, execSync = _a.execSync;
-// plugin commands here
-require(absolutePath + "/com.qcobjects.cli.commands.version");
-require(absolutePath + "/com.qcobjects.cli.commands.jira");
+Package("com.qcobjects.cli.commands.jira.client_services", [
+  class JiraCloud extends Service {
+    constructor ({
+      name= "jira_cloud",
+      external= true,
+      useHTTP2= true,
+      cached= false,
+      method= "POST",
+      headers= {
+        "accept":"application/json",
+        "content-type":"application/json"
+      },
+      basePath= "",
+      url= "",
+      withCredentials= false
+    }){
+      super(...arguments);
+      var o = this;
+      this.domain = `${o.domain}`;
+      this.basePath = `https://${this.domain}/`;
+      this.username_password = `${o.username}:${o.password}`;
+      this.headers["authorization"] = `Basic ${Buffer.from(this.username_password).toString("base64")}`;
+      this.url = this.basePath + o.apiMethod;
+      this.data = o.data;
+  
+    }
+
+    done(service,standardResponse) {
+      // service loaded
+      logger.debug(standardResponse);
+    }
+
+    fail (e){
+        logger.debug(e);
+    }
+
+  }
+
+]);

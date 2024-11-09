@@ -29,13 +29,27 @@
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
 "use strict";
-var fs = require("fs");
-var path = require("path");
-var absolutePath = path.resolve(__dirname, "./");
-var templatePath = path.resolve(__dirname, "./templates/apps/") + "/";
-var templatePwaPath = path.resolve(__dirname, "./templates/pwa/") + "/";
-var package_config = require(absolutePath + "/../package.json");
-var _a = require("child_process"), exec = _a.exec, execSync = _a.execSync;
-// plugin commands here
-require(absolutePath + "/com.qcobjects.cli.commands.version");
-require(absolutePath + "/com.qcobjects.cli.commands.jira");
+Package("org.qcobjects.common.pipelog", [
+    class PipeLog extends InheritClass {
+        constructor() {
+            super(...arguments);
+        }
+
+        pipe(o) {
+            var _o = [];
+            for (var k in o) {
+                if (typeof o[k] !== "undefined" &&
+                    o[k] !== null &&
+                    typeof o[k] !== "function") {
+                    try {
+                        _o.push("" + k + "=" + o[k].toString());
+                    } catch (e) {
+                        // error logging, do nothing
+                    }
+                }
+            }
+            return _o.join(" ");
+        }
+
+    }
+]);

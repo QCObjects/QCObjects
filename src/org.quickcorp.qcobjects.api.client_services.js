@@ -29,43 +29,44 @@
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Package("org.quickcorp.qcobjects.api.client_services", [
-
-  class QuickCorpCloud extends Service {
-    constructor ({
-      name= "quickcorp_cloud",
-      external= true,
-      useHTTP2=true,
-      cached= false,
-      method= "post",
-      headers= {
-        "origin": "localhost",
-        "content-type": "application/json"
-      },
-      basePath= "https://cloud.quickcorp.org/",
-      url= "",
-      withCredentials= false
-    }) {
-      super(...arguments);
-
-    }
-
-    _new_(o) {
-      // service instantiated
-      this.headers["authorization"] = "Basic token";
-      this.url = this.basePath + o.apiMethod;
-      this.data = o.data;
-    }
-    
-    done(service,standardResponse) {
-      // service loaded
-      logger.debug(standardResponse);
-    }
-
-    fail(e){
-        logger.debug(e);
-    }
-
-  }
-
+    /** @class */ (function (_super) {
+        __extends(QuickCorpCloud, _super);
+        function QuickCorpCloud(_a) {
+            var _b = _a.name, name = _b === void 0 ? "quickcorp_cloud" : _b, _c = _a.external, external = _c === void 0 ? true : _c, _d = _a.useHTTP2, useHTTP2 = _d === void 0 ? true : _d, _e = _a.cached, cached = _e === void 0 ? false : _e, _f = _a.method, method = _f === void 0 ? "post" : _f, _g = _a.headers, headers = _g === void 0 ? {
+                "origin": "localhost",
+                "content-type": "application/json"
+            } : _g, _h = _a.basePath, basePath = _h === void 0 ? "https://cloud.quickcorp.org/" : _h, _j = _a.url, url = _j === void 0 ? "" : _j, _k = _a.withCredentials, withCredentials = _k === void 0 ? false : _k;
+            return _super.apply(this, arguments) || this;
+        }
+        QuickCorpCloud.prototype._new_ = function (o) {
+            // service instantiated
+            this.headers["authorization"] = "Basic token";
+            this.url = this.basePath + o.apiMethod;
+            this.data = o.data;
+        };
+        QuickCorpCloud.prototype.done = function (service, standardResponse) {
+            // service loaded
+            logger.debug(standardResponse);
+        };
+        QuickCorpCloud.prototype.fail = function (e) {
+            logger.debug(e);
+        };
+        return QuickCorpCloud;
+    }(Service))
 ]);

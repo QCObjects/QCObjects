@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /**
  * QCObjects CLI 2.4.x
  * ________________
@@ -29,13 +30,30 @@
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
 "use strict";
-var fs = require("fs");
-var path = require("path");
-var absolutePath = path.resolve(__dirname, "./");
-var templatePath = path.resolve(__dirname, "./templates/apps/") + "/";
-var templatePwaPath = path.resolve(__dirname, "./templates/pwa/") + "/";
-var package_config = require(absolutePath + "/../package.json");
-var _a = require("child_process"), exec = _a.exec, execSync = _a.execSync;
-// plugin commands here
-require(absolutePath + "/com.qcobjects.cli.commands.version");
-require(absolutePath + "/com.qcobjects.cli.commands.jira");
+const path = require("path");
+const absolutePath = path.resolve( __dirname, "./" );
+
+require("qcobjects");
+
+require(absolutePath+"/org.quickcorp.qcobjects.defaultsettings.js");
+
+if (CONFIG.get("useLegacyHTTP",false)){
+  require(absolutePath+"/org.quickcorp.qcobjects.main.http.server.js");
+} else {
+  require(absolutePath+"/org.quickcorp.qcobjects.main.http2.server.js");
+}
+
+class Main extends InheritClass {
+  constructor (){
+    super(...arguments);
+    const _ServerClass_ = (CONFIG.get("useLegacyHTTP",false))? (HTTPServer): (HTTP2Server);
+    const app = New(_ServerClass_);
+    app.start();
+
+    logger.debug("initialized");
+    
+  }
+
+}
+
+let __main__ = new Main();

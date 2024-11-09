@@ -30,30 +30,41 @@
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
 "use strict";
-const path = require("path");
-const absolutePath = path.resolve( __dirname, "./" );
-
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var path = require("path");
+var absolutePath = path.resolve(__dirname, "./");
 require("qcobjects");
-
-require(absolutePath+"/org.quickcorp.qcobjects.defaultsettings.js");
-
-if (CONFIG.get("useLegacyHTTP",false)){
-  require(absolutePath+"/org.quickcorp.qcobjects.main.http.server.js");
-} else {
-  require(absolutePath+"/org.quickcorp.qcobjects.main.http2.server.js");
+require(absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
+if (CONFIG.get("useLegacyHTTP", false)) {
+    require(absolutePath + "/org.quickcorp.qcobjects.main.http.server.js");
 }
-
-class Main extends InheritClass {
-  constructor (){
-    super(...arguments);
-    const _ServerClass_ = (CONFIG.get("useLegacyHTTP",false))? (HTTPServer): (HTTP2Server);
-    const app = New(_ServerClass_);
-    app.start();
-
-    logger.debug("initialized");
-    
-  }
-
+else {
+    require(absolutePath + "/org.quickcorp.qcobjects.main.http2.server.js");
 }
-
-let __main__ = new Main();
+var Main = /** @class */ (function (_super) {
+    __extends(Main, _super);
+    function Main() {
+        var _this = _super.apply(this, arguments) || this;
+        var _ServerClass_ = (CONFIG.get("useLegacyHTTP", false)) ? (HTTPServer) : (HTTP2Server);
+        var app = New(_ServerClass_);
+        app.start();
+        logger.debug("initialized");
+        return _this;
+    }
+    return Main;
+}(InheritClass));
+var __main__ = new Main();

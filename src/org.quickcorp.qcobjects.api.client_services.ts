@@ -29,13 +29,43 @@
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
 "use strict";
-var fs = require("fs");
-var path = require("path");
-var absolutePath = path.resolve(__dirname, "./");
-var templatePath = path.resolve(__dirname, "./templates/apps/") + "/";
-var templatePwaPath = path.resolve(__dirname, "./templates/pwa/") + "/";
-var package_config = require(absolutePath + "/../package.json");
-var _a = require("child_process"), exec = _a.exec, execSync = _a.execSync;
-// plugin commands here
-require(absolutePath + "/com.qcobjects.cli.commands.version");
-require(absolutePath + "/com.qcobjects.cli.commands.jira");
+Package("org.quickcorp.qcobjects.api.client_services", [
+
+  class QuickCorpCloud extends Service {
+    constructor ({
+      name= "quickcorp_cloud",
+      external= true,
+      useHTTP2=true,
+      cached= false,
+      method= "post",
+      headers= {
+        "origin": "localhost",
+        "content-type": "application/json"
+      },
+      basePath= "https://cloud.quickcorp.org/",
+      url= "",
+      withCredentials= false
+    }) {
+      super(...arguments);
+
+    }
+
+    _new_(o) {
+      // service instantiated
+      this.headers["authorization"] = "Basic token";
+      this.url = this.basePath + o.apiMethod;
+      this.data = o.data;
+    }
+    
+    done(service,standardResponse) {
+      // service loaded
+      logger.debug(standardResponse);
+    }
+
+    fail(e){
+        logger.debug(e);
+    }
+
+  }
+
+]);

@@ -29,13 +29,28 @@
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Package("org.qcobjects.common.pipelog", [
-    class PipeLog extends InheritClass {
-        constructor() {
-            super(...arguments);
+    /** @class */ (function (_super) {
+        __extends(PipeLog, _super);
+        function PipeLog() {
+            return _super.apply(this, arguments) || this;
         }
-
-        pipe(o) {
+        PipeLog.prototype.pipe = function (o) {
             var _o = [];
             for (var k in o) {
                 if (typeof o[k] !== "undefined" &&
@@ -43,13 +58,14 @@ Package("org.qcobjects.common.pipelog", [
                     typeof o[k] !== "function") {
                     try {
                         _o.push("" + k + "=" + o[k].toString());
-                    } catch (e) {
+                    }
+                    catch (e) {
                         // error logging, do nothing
                     }
                 }
             }
             return _o.join(" ");
-        }
-
-    }
+        };
+        return PipeLog;
+    }(InheritClass))
 ]);
