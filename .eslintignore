@@ -1,5 +1,0 @@
-build
-dist
-public
-src/**/*.d.ts
-src/**/*.js
