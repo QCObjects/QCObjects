@@ -1,14 +1,18 @@
 {
   "name": "qcobjects-cli",
-  "version": "2.4.66",
+  "version": "2.5.100-beta",
   "description": "qcobjects cli command line tool",
-  "main": "src/index.cjs",
-  "module": "src/index.mjs",
+  "main": "public/cjs/index.cjs",
+  "module": "public/esm/index.mjs",
+  "browser": "public/browser/index.js",
+  "type": "commonjs",
+  "types": "build/index.d.ts",
   "exports": {
     ".": {
-      "require": "./src/index.cjs",
-      "import": "./src/index.mjs"
+      "require": "./public/cjs/index.cjs",
+      "import": "./public/esm/index.mjs"
     },
+    "./types/*": "./types/*",
     "./package.json": "./package.json",
     "./*.js": "./src/*.js",
     "./qcobjects-collab": "./src/qcobjects-collab.js",
@@ -19,9 +23,8 @@
     "./qcobjects-http2-server": "./src/qcobjects-http2-server.js",
     "./qcobjects-shell": "./src/qcobjects-shell.js",
     "./defaultsettings": "./src/org.quickcorp.qcobjects.defaultsettings.js"
+
   },
-  "type": "commonjs",
-  "types": "./src/index.d.ts",
   "license": "LGPL-3.0",
   "scripts": {
     "sync": "git add . && git commit -am ",
@@ -32,32 +35,12 @@
   },
   "dependencies": {
     "commander": "^10.0.1",
-    "mime": "^2.4.7",
-    "yaml": "^2.2.2"
-  },
-  "devDependencies": {
-    "@types/qcobjects": "github:QCObjects/-types-qcobjects",
-    "@types/qcobjects-api": "github:QCObjects/-types-qcobjects-api",
-    "@types/qcobjects-sdk": "github:QCObjects/-types-qcobjects-sdk",
-    "@typescript-eslint/eslint-plugin": "^5.58.0",
-    "@typescript-eslint/parser": "^5.58.0",
-    "eslint": "^8.38.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-config-qcobjects": "^0.0.27",
-    "eslint-config-qcobjects-typescript": "^2.4.5",
-    "eslint-config-semistandard": "^17.0.0",
-    "eslint-config-standard": "^17.0.0",
-    "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-n": "^15.7.0",
-    "eslint-plugin-promise": "^6.1.1",
-    "jasmine": "^3.99.0",
-    "qcobjects": "^2.4.94",
-    "qcobjects-sdk": "^2.4.60",
-    "qcobjects-tsconfig": "^2.4.10"
+    "mime": "^2.6.0",
+    "yaml": "^2.6.0"
   },
   "peerDependencies": {
-    "qcobjects": "^2.4.94",
-    "qcobjects-sdk": "^2.4.60"
+    "qcobjects": ">=2.5.105-beta",
+    "qcobjects-sdk": ">=2.4.66"
   },
   "repository": {
     "type": "file",
@@ -97,8 +80,32 @@
     "qcobjects-http-server": "./src/qcobjects-http-server.js",
     "qcobjects-collab": "./src/qcobjects-collab.js"
   },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.1.0",
+    "@eslint/js": "^9.13.0",
+    "@types/jasmine": "^5.1.4",
+    "@types/node": "^22.8.1",
+    "@typescript-eslint/eslint-plugin": "^5.58.0",
+    "@typescript-eslint/parser": "^5.58.0",
+    "esbuild": "^0.24.0",
+    "esbuild-plugin-alias": "^0.2.1",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^8.10.0",
+    "eslint-config-semistandard": "^17.0.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.7.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "globals": "^15.11.0",
+    "hint": "^2.0.0",
+    "install": "^0.13.0",
+    "jasmine": "^3.7.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.11.0"
+  },
   "engines": {
-    "node": ">=18",
-    "npm": ">=9"
+    "npm": ">=10",
+    "node": ">=22"
   }
 }
