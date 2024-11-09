@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "noEmit": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "target": "ESNext",
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
+    "module": "NodeNext",
+    "rootDir": "./",
+    "allowJs": true,
+    "outDir": "build/spec",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+    "paths": {
+      "types": [
+        "src/types/global"
+      ],
+      "qcobjects-sdk": ["spec/mocks/qcobjects-sdk.mock.ts"]
+    }
+  },
+  "include": [
+    "spec/**/*"
+  ],
+  "exclude": ["src/**/*"]
+
+}
