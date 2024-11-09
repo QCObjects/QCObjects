@@ -1,5 +1,5 @@
 {
-  "extends": "qcobjects-tsconfig/tsconfig.d.json",
+  "extends": "qcobjects/tsconfig.d.json",
   "include": ["src/**/*.ts"],
   "exclude": ["src/**/*.spec.js", "src/*.js"]
 }
