@@ -40,105 +40,108 @@ const {
   execSync
 } = require("child_process");
 
-require(absolutePath + "/com.qcobjects.cli.commands.jira.client_services");
+const {Package, InheritClass, _DataStringify, New, CONFIG, logger, serviceLoader} = require("qcobjects");
 
-Package("com.qcobjects.cli.commands.jira", [
+const {JiraCloud} = require(absolutePath + "/com.qcobjects.cli.commands.jira.client_services");
 
-  class CommandHandler extends InheritClass {
-    constructor({
-      switchCommander
-    }) {
-      super(...arguments);
-      this.choiceOption = {
-        issues: function (options) {
+class CommandHandler extends InheritClass {
+  constructor({
+    switchCommander
+  }:{switchCommander:any}) {
+    super({switchCommander});
+    this.choiceOption = {
+      issues: function (options:any) {
 
-          this.getIssueList().then(function (response) {
-            console.log(_DataStringify(response));
-          }).catch(e => {
-            console.log(e);
-            process.exit(1);
-          });
-
-        }
-      };
-
-      let commandHandler = this;
-
-      switchCommander.program.command("jira <subcommand>")
-        .option("-u, --from-user [username]", "User name")
-        .option("-fp,--from-project <projectName>", "Project name")
-        .option("-p, --pwd <password>", "Password")
-        .option("-f, --format <format>", "Format (json, table)")
-        .description(`Jira Integration:
-                              Sub-Commands can be:
-                                  issues: To get the issues list from JIRA
-          `)
-        .action(function (subcommand, options) {
-          if (commandHandler.choiceOption.hasOwnProperty.call(commandHandler.choiceOption, subcommand)) {
-            commandHandler.choiceOption[subcommand].call(commandHandler, subcommand, options);
-          } else {
-            console.error(`Sub-Command (jira ${subcommand}... ) is not available`);
-            process.exit(1);
-          }
+        this.getIssueList().then(function (response:any) {
+          console.log(_DataStringify(response));
+        }).catch((e:any) => {
+          console.log(e);
+          process.exit(1);
         });
 
+      }
+    };
 
+    const commandHandler = this;
 
-
-
-    }
-
-    getIssueList(username, password, project) {
-      return new Promise(function (resolve, reject) {
-        logger.info("I'm going to get the issue list from the jira cloud...");
-        let jira_config = CONFIG.get("jira", null);
-        if (jira_config !== null) {
-          let jira_username = jira_config.username;
-          let jira_password = jira_config.auth_token;
-          let jira_project = jira_config.project;
-          let jira_domain = jira_config.domain;
-          let jira_issue_fields = ["id", "key", "summary", "timetracking"];
-          let cloudClient = New(JiraCloud, {
-            domain: `${jira_domain}`,
-            username: `${jira_username}`,
-            password: `${jira_password}`,
-            apiMethod: "rest/api/latest/search",
-            data: {
-              "jql": `project = ${jira_project}`,
-              "startAt": 0,
-              "maxResults": 5000,
-              "fields": jira_issue_fields
-            }
-          });
-          try {
-            let service = serviceLoader(cloudClient).then(successResponse => {
-              let template = successResponse.service.template;
-              let responseHeaders = successResponse.responseHeaders;
-              if (responseHeaders[":status"] === 200 || !cloudClient.useHTTP2) {
-                let response = JSON.parse(template);
-                resolve(response);
-              } else {
-                console.error("\u{1F926} Something went wrong \u{1F926} when trying to get jira issues from the cloud. The status was: " + responseHeaders[":status"]);
-                reject(template);
-              }
-            }).catch((e) => {
-              console.error("\u{1F926} Something went wrong \u{1F926} when trying to get jira issues from the cloud");
-              reject(e);
-            });
-          } catch (e) {
-            console.error("\u{1F926} Something went wrong \u{1F926} when trying to get jira issues from the cloud");
-            reject(e);
-          }
-
+    switchCommander.program.command("jira <subcommand>")
+      .option("-u, --from-user [username]", "User name")
+      .option("-fp,--from-project <projectName>", "Project name")
+      .option("-p, --pwd <password>", "Password")
+      .option("-f, --format <format>", "Format (json, table)")
+      .description(`Jira Integration:
+                            Sub-Commands can be:
+                                issues: To get the issues list from JIRA
+        `)
+      .action(function (subcommand: string | number, options: any) {
+        if (commandHandler.choiceOption.hasOwnProperty.call(commandHandler.choiceOption, subcommand)) {
+          commandHandler.choiceOption[subcommand].call(commandHandler, subcommand, options);
         } else {
-          console.error("\u{1F926} Something went wrong \u{1F926} You need to set the jira config settings");
-          reject();
+          console.error(`Sub-Command (jira ${subcommand}... ) is not available`);
+          process.exit(1);
         }
-
       });
-    }
+
+
+
 
 
   }
 
+  getIssueList(username: any, password: any, project: any) {
+    return new Promise<void>(function (resolve, reject) {
+      logger.info("I'm going to get the issue list from the jira cloud...");
+      const jira_config = CONFIG.get("jira", null);
+      if (jira_config !== null) {
+        const jira_username = jira_config.username;
+        const jira_password = jira_config.auth_token;
+        const jira_project = jira_config.project;
+        const jira_domain = jira_config.domain;
+        const jira_issue_fields = ["id", "key", "summary", "timetracking"];
+        const cloudClient = New(JiraCloud, {
+          domain: `${jira_domain}`,
+          username: `${jira_username}`,
+          password: `${jira_password}`,
+          apiMethod: "rest/api/latest/search",
+          data: {
+            "jql": `project = ${jira_project}`,
+            "startAt": 0,
+            "maxResults": 5000,
+            "fields": jira_issue_fields
+          }
+        });
+        try {
+          const service = serviceLoader(cloudClient).then((successResponse: { service: { template: any; }; responseHeaders: any; }) => {
+            const template = successResponse.service.template;
+            const responseHeaders = successResponse.responseHeaders;
+            if (responseHeaders[":status"] === 200 || !cloudClient.useHTTP2) {
+              const response = JSON.parse(template);
+              resolve(response);
+            } else {
+              console.error("\u{1F926} Something went wrong \u{1F926} when trying to get jira issues from the cloud. The status was: " + responseHeaders[":status"]);
+              reject(template as Error);
+            }
+          }).catch((e: any) => {
+            console.error("\u{1F926} Something went wrong \u{1F926} when trying to get jira issues from the cloud");
+            reject(e as Error);
+          });
+        } catch (e) {
+          console.error("\u{1F926} Something went wrong \u{1F926} when trying to get jira issues from the cloud");
+          reject(e as Error);
+        }
+
+      } else {
+        console.error("\u{1F926} Something went wrong \u{1F926} You need to set the jira config settings");
+        reject(new Error ("\u{1F926} Something went wrong \u{1F926} You need to set the jira config settings"));
+      }
+
+    });
+  }
+
+
+}
+
+Package("com.qcobjects.cli.commands.jira", [
+
+CommandHandler
 ]);

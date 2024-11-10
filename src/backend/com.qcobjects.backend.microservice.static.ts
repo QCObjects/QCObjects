@@ -35,11 +35,10 @@ const path = require("path");
 const absolutePath = path.resolve(__dirname, "./");
 const mime = require("mime");
 
+const {Package, BackendMicroservice, CONFIG, logger} = require("qcobjects");
+
 Package("com.qcobjects.backend.microservice.static", [
   class Microservice extends BackendMicroservice {
-    constructor (){
-      super(...arguments);
-    }
 
     finishWithBody (){}
     done() {
@@ -49,7 +48,7 @@ Package("com.qcobjects.backend.microservice.static", [
       const stream = microservice.stream;
       const fileName = (!microservice.fileName.startsWith("/"))?(`${process.cwd()}/${microservice.fileName}`):(microservice.fileName);
 
-      const sendFileHTTP2 = function(stream, fileName) {
+      const sendFileHTTP2 = function(stream: { respondWithFD: (arg0: any, arg1: { "content-length": any; "last-modified": any; "content-type": any; "cache-control": any; }) => void; on: (arg0: string, arg1: { (): void; (): void; }) => void; end: () => void; respond: (arg0: { ":status": number; "content-type": any; }) => void; write: (arg0: string) => void; }, fileName: string) {
         // read and send file content in the stream
 
         try {
@@ -72,7 +71,7 @@ Package("com.qcobjects.backend.microservice.static", [
           });
           stream.end();
 
-        } catch (e) {
+        } catch (e:any) {
           logger.warn("[ERROR] Something went wrong when trying to send the response as file " + fileName);
           if (e.errno == -2) {
             const headers = {
@@ -90,7 +89,7 @@ Package("com.qcobjects.backend.microservice.static", [
 
       };
 
-      const sendFileLegacyHTTP = function(stream, fileName) {
+      const sendFileLegacyHTTP = function(stream: { writeHead: (arg0: number, arg1: { status: number; "Content-Type": string; }) => void; write: (arg0: string) => void; on: (arg0: string, arg1: { (): void; (): void; }) => void; end: () => void; }, fileName: string) {
         // read and send file content in the stream
         let headers;
         try {
@@ -117,7 +116,7 @@ Package("com.qcobjects.backend.microservice.static", [
             logger.info("closing static file", fileName);
           });
 
-        } catch (e){
+        } catch (e:any){
           if (e.errno==-2){
             headers = {
               "status": 404,
@@ -144,10 +143,10 @@ Package("com.qcobjects.backend.microservice.static", [
 
     }
 
-    static(method, data) {
+    static(method: string, data: any) {
       const microservice = this;
       const redirect_to = microservice.route.redirect_to;
-      return new Promise(function(resolve, reject) {
+      return new Promise<void>(function(resolve, reject) {
         const supported_methods = microservice.route.supported_methods;
         let _method_allowed_ = false;
         if (typeof supported_methods !== "undefined") {
@@ -169,11 +168,11 @@ Package("com.qcobjects.backend.microservice.static", [
               resolve();
             } catch (e) {
               logger.warn("\u{1F926} Something went wrong \u{1F926} when trying to deliver a static path: " + microservice.fileName);
-              reject();
+              reject(e as Error);
             }
           } else {
             logger.info("There is no redirect_to setting declared in route properties. \n Skipping static delivery...");
-            reject();
+            reject(new Error ("There is no redirect_to setting declared in route properties. \n Skipping static delivery..."));
           }
         } else {
           logger.debug("Method: " + method + " will be skipped");
@@ -183,15 +182,16 @@ Package("com.qcobjects.backend.microservice.static", [
       });
     }
 
-    head(formData) {
+    head(formData: any) {
       const microservice = this;
       microservice.static("head", formData).then(response => {
         microservice.body = response;
         microservice.done();
-      });
+      })
+      .catch((e:any) => {logger.warn(`An error ocurred: ${e}`);});
     }
 
-    get(formData) {
+    get(formData: any) {
       const microservice = this;
       microservice.static("get", formData).then(response => {
         microservice.body = response;
@@ -201,60 +201,74 @@ Package("com.qcobjects.backend.microservice.static", [
       });
     }
 
-    post(formData) {
+    post(formData: any) {
       const microservice = this;
       microservice.static("post", formData).then(response => {
         microservice.body = response;
         microservice.done();
-      });
+      })
+      .catch((e:any) => {logger.warn(`An error ocurred: ${e}`);});
+
     }
 
-    put(formData) {
+    put(formData: any) {
       const microservice = this;
       microservice.static("put", formData).then(response => {
         microservice.body = response;
         microservice.done();
-      });
+      })
+      .catch((e:any) => {logger.warn(`An error ocurred: ${e}`);});
+
     }
     
-    delete(formData) {
+    delete(formData: any) {
       const microservice = this;
       microservice.static("delete", formData).then(response => {
         microservice.body = response;
         microservice.done();
-      });
+      })
+      .catch((e:any) => {logger.warn(`An error ocurred: ${e}`);});
+
     }
 
-    connect(formData) {
+    connect(formData: any) {
       const microservice = this;
       microservice.static("connect", formData).then(response => {
         microservice.body = response;
         microservice.done();
-      });
+      })
+      .catch((e:any) => {logger.warn(`An error ocurred: ${e}`);});
+
     }
 
-    options(formData) {
+    options(formData: any) {
       const microservice = this;
       microservice.static("options", formData).then(response => {
         microservice.body = response;
         microservice.done();
-      });
+      })
+      .catch((e:any) => {logger.warn(`An error ocurred: ${e}`);});
+
     }
 
-    trace(formData) {
+    trace(formData: any) {
       const microservice = this;
       microservice.static("trace", formData).then(response => {
         microservice.body = response;
         microservice.done();
-      });
+      })
+      .catch((e:any) => {logger.warn(`An error ocurred: ${e}`);});
+
     }
 
-    patch(formData) {
+    patch(formData: any) {
       const microservice = this;
       microservice.static("patch", formData).then(response => {
         microservice.body = response;
         microservice.done();
-      });
+      })
+      .catch((e:any) => {logger.warn(`An error ocurred: ${e}`);});
+
     }
 
   }

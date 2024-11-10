@@ -29,43 +29,60 @@
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
 "use strict";
-Package("org.quickcorp.qcobjects.api.client_services", [
 
-  class QuickCorpCloud extends Service {
-    constructor ({
-      name= "quickcorp_cloud",
-      external= true,
-      useHTTP2=true,
-      cached= false,
-      method= "post",
-      headers= {
-        "origin": "localhost",
-        "content-type": "application/json"
-      },
-      basePath= "https://cloud.quickcorp.org/",
-      url= "",
-      withCredentials= false
-    }) {
-      super(...arguments);
+const {Package, Service, logger} = require("qcobjects");
 
-    }
-
-    _new_(o) {
-      // service instantiated
-      this.headers["authorization"] = "Basic token";
-      this.url = this.basePath + o.apiMethod;
-      this.data = o.data;
-    }
-    
-    done(service,standardResponse) {
-      // service loaded
-      logger.debug(standardResponse);
-    }
-
-    fail(e){
-        logger.debug(e);
-    }
+class QuickCorpCloud extends Service {
+  constructor ({
+    name= "quickcorp_cloud",
+    external= true,
+    useHTTP2=true,
+    cached= false,
+    method= "post",
+    headers= {
+      "origin": "localhost",
+      "content-type": "application/json"
+    },
+    basePath= "https://cloud.quickcorp.org/",
+    url= "",
+    withCredentials= false
+  }) {
+    super({
+      name,
+      external,
+      useHTTP2,
+      cached,
+      method,
+      headers,
+      basePath,
+      url,
+      withCredentials
+    });
 
   }
 
+  _new_(o:any) {
+    // service instantiated
+    this.headers["authorization"] = "Basic token";
+    this.url = this.basePath + o.apiMethod;
+    this.data = o.data;
+  }
+  
+  done(service:any,standardResponse:any) {
+    // service loaded
+    logger.debug(standardResponse);
+  }
+
+  fail(e:any){
+      logger.debug(e);
+  }
+
+}
+
+Package("org.quickcorp.qcobjects.api.client_services", [
+QuickCorpCloud
 ]);
+
+exports = {
+  QuickCorpCloud
+};

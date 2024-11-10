@@ -35,14 +35,16 @@ const absolutePath = path.resolve( __dirname, "./" );
 const templatePath = path.resolve( __dirname, "./templates/apps/" )+"/";
 const os = require("os");
 const isWindows = ()=>{
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return os.platform().toLowerCase().startsWith("win");
 };
 const isMac = ()=>{
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return os.platform().toLowerCase().startsWith("darwin");
 };
 
 
-require("qcobjects");
+const {InheritClass, CONFIG} = require("qcobjects");
 
 require(absolutePath+"/org.quickcorp.qcobjects.defaultsettings.js");
 
@@ -50,7 +52,7 @@ const { execSync } = require("child_process");
 
 class Main extends InheritClass {
   constructor (){
-    super(...arguments);
+    super();
     this.start();
   }
 
@@ -82,4 +84,4 @@ class Main extends InheritClass {
   }
 }
 
-let __main__ = new Main();
+const __main__ = new Main();

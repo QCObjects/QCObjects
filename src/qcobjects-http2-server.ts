@@ -34,18 +34,16 @@ const path = require("path");
 const absolutePath = path.resolve( __dirname, "./" );
 
 require("qcobjects");
+const {CONFIG, InheritClass, New, logger} = require ("qcobjects");
 
 require(absolutePath+"/org.quickcorp.qcobjects.defaultsettings.js");
-
-if (CONFIG.get("useLegacyHTTP",false)){
-  require(absolutePath+"/org.quickcorp.qcobjects.main.http.server.js");
-} else {
-  require(absolutePath+"/org.quickcorp.qcobjects.main.http2.server.js");
-}
+const HTTPServer:any = require(absolutePath+"/org.quickcorp.qcobjects.main.http.server.js");
+const HTTP2Server = require(absolutePath+"/org.quickcorp.qcobjects.main.http2.server.js");
 
 class Main extends InheritClass {
   constructor (){
-    super(...arguments);
+    super();
+    
     const _ServerClass_ = (CONFIG.get("useLegacyHTTP",false))? (HTTPServer): (HTTP2Server);
     const app = New(_ServerClass_);
     app.start();
@@ -56,4 +54,4 @@ class Main extends InheritClass {
 
 }
 
-let __main__ = new Main();
+const __main__ = new Main();

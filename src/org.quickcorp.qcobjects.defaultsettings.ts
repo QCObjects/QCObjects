@@ -30,6 +30,8 @@
 /*eslint no-undef: "off"*/
 "use strict";
 
+const {CONFIG, global, logger, _Crypt, findPackageNodePath} = require ("qcobjects");
+
 (function (){
 
   const __load_default_settings__ = () => {
@@ -65,7 +67,7 @@
     };
   
   
-    let setDevMode = function (devmode) {
+    const setDevMode = function (devmode:string) {
       if (typeof devmode !== "undefined") {
         switch (true) {
           case devmode == "debug":
@@ -102,7 +104,7 @@
       var _config = require(CONFIG.get("projectPath") + "config.json");
       logger.debug("Loading settings from your config.json");
   
-      let _secretKey = (_config.hasOwnProperty.call(_config, "domain")) ? (_config["domain"]) : ("_secret_");
+      const _secretKey = (_config.hasOwnProperty.call(_config, "domain")) ? (_config["domain"]) : ("_secret_");
   
       if (_config.hasOwnProperty.call(_config, "__encoded__")) {
         _config = JSON.parse(_Crypt.decrypt(_config.__encoded__, _secretKey));
@@ -121,7 +123,7 @@
           try {
             process.chdir(CONFIG.get("basePath"));
             logger.debug(`New directory: ${process.cwd()}`);
-          } catch (err) {
+          } catch (err:any) {
             logger.warn(`It was impossible to change the current chdir: ${err}`);
           }
         }
@@ -135,55 +137,59 @@
       const path = require("path");
       const projectPath = CONFIG.get("projectPath", `${process.cwd()}/`);
       const loadDefaultRoutes = async () => {
-        const sdkPath = path.resolve(findPackageNodePath("qcobjects-sdk"), "qcobjects-sdk");
-        const qcobjectsPath = path.resolve(findPackageNodePath("qcobjects"), "qcobjects");
-        let backend = CONFIG.get("backend");
-        if (typeof backend === "undefined") {
-          backend = {};
-        }
-        if (typeof backend.routes === "undefined") {
-          backend.routes = [];
-        }
-        backend.routes = backend.routes.concat([{
-            "name": "QCObjects.js",
-            "description": "Redirection of QCObjects.js",
-            "path": "^/QCObjects.js$",
-            "microservice": "com.qcobjects.backend.microservice.static",
-            "redirect_to": path.resolve(qcobjectsPath,"src","QCObjects.js"),
-            "responseHeaders": {},
-            "cors": {
-              "allow_origins": "*"
-            }
-          },
-          {
-            "name": "QCObjects-SDK.js",
-            "description": "Redirection of QCObjects SDK",
-            "path": "^/js/packages/QCObjects-SDK.js$",
-            "microservice": "com.qcobjects.backend.microservice.static",
-            "redirect_to": path.resolve(sdkPath, "src/QCObjects-SDK.js"),
-            "responseHeaders": {},
-            "cors": {
-              "allow_origins": "*"
-            }
-          },
-          {
-            "name": "QCObjects-SDK Components",
-            "description": "Redirection of QCObjects SDK",
-            "path": "^/qcobjects-sdk/(.*)$",
-            "microservice": "com.qcobjects.backend.microservice.static",
-            "redirect_to": path.resolve(sdkPath, "$1"),
-            "responseHeaders": {},
-            "cors": {
-              "allow_origins": "*"
-            }
+        return await new Promise<void> ((resolve, reject) => {
+          const sdkPath = path.resolve(findPackageNodePath("qcobjects-sdk"), "qcobjects-sdk");
+          const qcobjectsPath = path.resolve(findPackageNodePath("qcobjects"), "qcobjects");
+          let backend = CONFIG.get("backend");
+          if (typeof backend === "undefined") {
+            backend = {};
           }
-  
-        ]);
-        CONFIG.set("backend", backend);
-  
+          if (typeof backend.routes === "undefined") {
+            backend.routes = [];
+          }
+          backend.routes = backend.routes.concat([{
+              "name": "QCObjects.js",
+              "description": "Redirection of QCObjects.js",
+              "path": "^/QCObjects.js$",
+              "microservice": "com.qcobjects.backend.microservice.static",
+              "redirect_to": path.resolve(qcobjectsPath,"src","QCObjects.js"),
+              "responseHeaders": {},
+              "cors": {
+                "allow_origins": "*"
+              }
+            },
+            {
+              "name": "QCObjects-SDK.js",
+              "description": "Redirection of QCObjects SDK",
+              "path": "^/js/packages/QCObjects-SDK.js$",
+              "microservice": "com.qcobjects.backend.microservice.static",
+              "redirect_to": path.resolve(sdkPath, "src/QCObjects-SDK.js"),
+              "responseHeaders": {},
+              "cors": {
+                "allow_origins": "*"
+              }
+            },
+            {
+              "name": "QCObjects-SDK Components",
+              "description": "Redirection of QCObjects SDK",
+              "path": "^/qcobjects-sdk/(.*)$",
+              "microservice": "com.qcobjects.backend.microservice.static",
+              "redirect_to": path.resolve(sdkPath, "$1"),
+              "responseHeaders": {},
+              "cors": {
+                "allow_origins": "*"
+              }
+            }
+    
+          ]);
+          CONFIG.set("backend", backend);
+          resolve();
+        });
       };
       await loadDefaultRoutes();
-    })().then(() => logger.info("Default routes loaded"));
+    })()
+    .then(() => logger.info("Default routes loaded"))
+    .catch((e:any) => {logger.warn(`An error ocurred loading default settings: ${e}`);});
   
     (function () {
       /* Auto Discover dependencies (lib, handlers, commands) */
@@ -191,15 +197,15 @@
       const fs = require ("fs");
       const projectPath = CONFIG.get("projectPath", `${process.cwd()}/`);
       logger.debug(`CONFIG.projectPath is set to ${projectPath}`);
-      const findPath = (p) => {
+      const findPath = (p:string) => {
         const packagePath = path.resolve(findPackageNodePath(p), p);
         return packagePath;
       };
   
-      const getPackageJSON = (p) => {
+      const getPackageJSON = (p:string) => {
         let _json;
         try {
-          let packagePath = findPath(p);
+          const packagePath = findPath(p);
           if (typeof packagePath !== "undefined"){
             _json = JSON.parse(fs.readFileSync(path.resolve(`${packagePath}`,"./package.json")).toString());
           } else {
@@ -207,26 +213,29 @@
           }
         } catch (e){
           logger.debug(`It was impossible to get the package.json from ${p}: ${e}`);
-          _json = {}
+          _json = {};
         }
         return _json;
       };
   
-      const hasKeyword = (p, keyword) => {
-        if (typeof hasKeyword.keywords === "undefined"){
-          hasKeyword.keywords = {};
-        }
-        try {
-          if (typeof hasKeyword.keywords[p] === "undefined"){
-            hasKeyword.keywords[p] = getPackageJSON(p).keywords;
-          }  
-        } catch (e){
-          throw Error (`Something went wrong when trying to get the keywords of ${p}`);
-        }
-        return typeof hasKeyword.keywords[p] !== "undefined" && hasKeyword.keywords[p].includes(keyword);
-      };
+      const hasKeyword = (() => {
+        let keywords: { [key: string]: string[] } = {};
+        return (p:string, keyword:string) => {
+          if (typeof keywords === "undefined"){
+            keywords = {};
+          }
+          try {
+            if (typeof keywords[p] === "undefined"){
+              keywords[p] = getPackageJSON(p).keywords;
+            }  
+          } catch (e){
+            throw Error (`Something went wrong when trying to get the keywords of ${p}`);
+          }
+          return typeof keywords[p] !== "undefined" && keywords[p].includes(keyword);
+        };
+      })();
   
-      const setBackendValue = (name, value) => {
+      const setBackendValue = (name:string, value:any) => {
         const backend = CONFIG.get("backend", {});
         if (typeof value !== "undefined"){
           backend[name] = value;
@@ -234,21 +243,27 @@
         CONFIG.set("backend",backend);
       };
   
-      const dependencies = () => {
-        if (typeof dependencies.deps === "undefined"){
-          dependencies.deps = Object.keys(JSON.parse(fs.readFileSync(path.resolve(`${projectPath}`,"./package.json")).toString()).dependencies);
-          setBackendValue("dependencies", dependencies.deps);
-        }
-        return dependencies.deps;
-      };
+      const dependencies = (() => {
+        let deps: string[] = [];
+        return () => {
+          if (typeof deps === "undefined"){
+            deps = Object.keys(JSON.parse(fs.readFileSync(path.resolve(`${projectPath}`,"./package.json")).toString()).dependencies);
+            setBackendValue("dependencies", deps);
+          }
+          return deps;  
+        };        
+      })();
   
-      const devDependencies = () => {
-        if (typeof devDependencies.deps === "undefined"){
-          devDependencies.deps = Object.keys(JSON.parse(fs.readFileSync(path.resolve(`${projectPath}`,"./package.json")).toString()).devDependencies);
-          setBackendValue("devDependencies", devDependencies.deps);
-        }
-        return devDependencies.deps;
-      };
+      const devDependencies = (()=> {
+        let deps: string[] = [];
+        return () => {
+          if (typeof deps === "undefined"){
+            deps = Object.keys(JSON.parse(fs.readFileSync(path.resolve(`${projectPath}`,"./package.json")).toString()).devDependencies);
+            setBackendValue("devDependencies", deps);
+          }
+          return deps;
+        };
+      })();
   
       const loadLibs = () => {
         let _ret_;
@@ -256,7 +271,7 @@
           const libs = dependencies().filter((p) => hasKeyword(p, "qcobjects-lib"));
           setBackendValue("libs", libs);
           if (libs.length>0){
-            logger.debug(`Plugin Libs found: ${libs}`);
+            logger.debug(`Plugin Libs found: ${libs.join(",")}`);
             _ret_ = Promise.all(libs.map((p) => {return require(findPath(p));})).then(() => logger.info("Libs loaded"));
           } else {
             logger.debug("No Plugin Libs found.");
@@ -274,7 +289,7 @@
           const handlers = dependencies().filter((p) => hasKeyword(p, "qcobjects-handler"));
           setBackendValue("handlers", handlers);
           if (handlers.length>0){
-            logger.debug(`Plugin Handlers found: ${handlers}`);
+            logger.debug(`Plugin Handlers found: ${handlers.join(",")}`);
             _ret_ = Promise.all(handlers.map((p) => {return require(findPath(p));})).then(() => logger.info("Handlers loaded"));
           } else {
             logger.debug("No Plugin Handlers found.");
@@ -293,7 +308,7 @@
           const commands = dependencies().filter((p) => hasKeyword(p, "qcobjects-command"));
           setBackendValue("commands", commands);
           if (commands.length>0){
-            logger.debug(`Plugin Commands found: ${commands}`);
+            logger.debug(`Plugin Commands found: ${commands.join(",")}`);
             _ret_ = Promise.all(commands.map((p) => {return require(findPath(p));})).then(() => logger.info("Commands loaded"));  
           } else {
             logger.debug("No Plugin Commands found.");
@@ -312,7 +327,7 @@
           const commands = devDependencies().filter((p) => hasKeyword(p, "qcobjects-command"));
           setBackendValue("devCommands", commands);
           if (commands.length>0){
-            logger.debug(`Dev Plugin Commands found: ${commands}`);
+            logger.debug(`Dev Plugin Commands found: ${commands.join(",")}`);
             _ret_ = Promise.all(commands.map((p) => {return require(findPath(p));})).then(() => logger.info("Commands loaded"));  
           } else {
             logger.debug("No Plugin Commands found in dev dependencies.");
@@ -340,26 +355,34 @@
   
       try {
         logger.debug("Loading Libs...");
-        loadLibs();
-      } catch (e) {
+        loadLibs().catch ((e:any) => {
+          logger.warn(`An error ocurred loading libs: ${e}`);
+        });
+      } catch (e:any) {
         throw Error(`Something went wrong trying to load libs: ${e.message}`);
       }
       try {
         logger.debug("Loading Handlers...");
-        loadHandlers();
-      } catch (e) {
+        loadHandlers().catch ((e:any) => {
+          logger.warn(`An error ocurred loading handlers: ${e}`);
+        });
+      } catch (e:any) {
         throw Error(`Something went wrong trying to load handler: ${e.message}`);
       }
       try {
         logger.debug("Loading Commands...");
-        loadCommands();
-      } catch (e) {
+        loadCommands().catch((e:any)=>{
+          logger.warn(`An error ocurred loading commands: ${e}`);
+        });
+      } catch (e:any) {
         throw Error(`Something went wrong trying to load commands: ${e.message}`);
       }
       try {
         logger.debug("Loading Dev Commands...");
-        loadDevCommands();
-      } catch (e) {
+        loadDevCommands().catch((e:any)=>{
+          logger.warn(`An error ocurred loading dev commands: ${e}`);
+        });
+      } catch (e:any) {
         throw Error(`Something went wrong trying to load Dev commands: ${e.message}`);
       }
   
@@ -367,7 +390,7 @@
         const commands = CONFIG.get("backend", {commands:[]}).commands || [];
         const devCommands = CONFIG.get("backend", {devCommands:[]}).devCommands || [];
         setBackendValue("plugins", commands.concat(devCommands));
-      } catch (e) {
+      } catch (e:any) {
         throw Error(`Something went wrong trying to load plugins list: ${e.message}`);
       }
   
@@ -385,7 +408,7 @@
 
   const cleanCache = () => {
     Object.keys(require.cache).forEach( (key) => { delete require.cache[key]; });
-  }
+  };
 
   const __reset_settings__ = () => {
     cleanCache();

@@ -33,15 +33,15 @@
 const path = require("path");
 const absolutePath = path.resolve( __dirname, "./" );
 
-require("qcobjects");
+const {InheritClass, logger} = require("qcobjects");
 
 require(absolutePath+"/org.quickcorp.qcobjects.defaultsettings.js");
 
-require(absolutePath+"/org.quickcorp.qcobjects.collab.server.js");
+const {CollabServer} = require(absolutePath+"/org.quickcorp.qcobjects.collab.server.js");
 
 class Main extends InheritClass {
   constructor (){
-    super (...arguments);
+    super ();
     const app = new CollabServer();
     app.start();
 
@@ -50,4 +50,4 @@ class Main extends InheritClass {
   }
 }
 
-let __main__ = new Main();
+const __main__ = new Main();

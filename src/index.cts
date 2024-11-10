@@ -1,2 +1,2 @@
 import cli from "./qcobjects-cli";
-export default cli;
+module.exports = cli;

@@ -30,33 +30,30 @@
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
 "use strict";
+
 const welcometo = "Welcome to \n";
 const instructions = "Type:\n .exit to quit\n .help for see a quick guide\n And any other command to execute like pure javascript \n All the QCObjects stuff is already loaded for you";
 //const logo = ' .88888.    a88888b.  .88888.  dP       oo                     dP            \r\nd8\'   `8b  d8\'   `88 d8\'   `8b 88                              88            \r\n88     88  88        88     88 88d888b. dP .d8888b. .d8888b. d8888P .d8888b. \r\n88  db 88  88        88     88 88\'  `88 88 88ooood8 88\'  `\"\"   88   Y8ooooo. \r\nY8.  Y88P  Y8.   .88 Y8.   .8P 88.  .88 88 88.  ... 88.  ...   88         88 \r\n `8888PY8b  Y88888P\'  `8888P\'  88Y8888\' 88 `88888P\' `88888P\'   dP   `88888P\' \r\noooooooooooooooooooooooooooooooooooooooo88~oooooooooooooooooooooooooooooooooo\r\n                                        dP    ';
 const logo = " .d88888b.  .d8888b.  .d88888b. 888       d8b                888            \r\nd88P\" \"Y88bd88P  Y88bd88P\" \"Y88b888       Y8P                888            \r\n888     888888    888888     888888                          888            \r\n888     888888       888     88888888b.  8888 .d88b.  .d8888b888888.d8888b  \r\n888     888888       888     888888 \"88b \"888d8P  Y8bd88P\"   888   88K      \r\n888 Y8b 888888    888888     888888  888  88888888888888     888   \"Y8888b. \r\nY88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r\n \"Y888888\"  \"Y8888P\"  \"Y88888P\" 88888P\"   888 \"Y8888  \"Y8888P \"Y888 88888P' \r\n       Y8b                                888                               \r\n                                         d88P                               \r\n                                       888P\"   ";
-const util = require("util");
-const path = require("path");
+import path from "path";
 const absolutePath = path.resolve( __dirname, "./" );
 
+import vm from "vm";
 
-const vm = require("vm");
-require("qcobjects");
-
+const {InheritClass, global} = require("qcobjects");
 require(absolutePath+"/org.quickcorp.qcobjects.defaultsettings.js");
-const readline = require("readline");
+import readline from "readline";
 
 const package_config = require(absolutePath+"/package.json");
-const qcobjects_pkg_config = require("qcobjects/package.json");
-const qcobjects_sdk_pkg_config = require("qcobjects-sdk/package.json");
 
 class Main extends InheritClass {
   constructor(){
-    super(...arguments);
+    super();
     this.start();
   }
 
   start (){
-    let sandbox = {
+    const sandbox = {
       require:require,
       module:module,
       __dirname:"./",
@@ -64,10 +61,10 @@ class Main extends InheritClass {
     };
     global.context = vm.createContext(sandbox);
     
-    const runScript = (code,logOutput=false)=>{
+    const runScript = (code: string,logOutput=false)=>{
       const options = {filename:sandbox.__filename};
     
-      const backgroundRunScript = (code)=>{
+      const backgroundRunScript = (code: string):any=>{
         var output = vm.runInContext(code,global.context,options);
         return output;
       };
@@ -88,7 +85,7 @@ class Main extends InheritClass {
     if (process.stdin.isTTY)
       process.stdin.setRawMode(true);
     
-    let qcobjects_version = global.__get_version_string__();
+    const qcobjects_version = global.__get_version_string__();
     
     const rl = readline.createInterface({
       input: process.stdin,
@@ -148,7 +145,7 @@ class Main extends InheritClass {
         default:
           try{
             runScript(codeline,true);
-            syncGlobal(sandbox);
+            syncGlobal.bind(sandbox)();
           }catch (e){
             console.log("An exeption ocurred while trying to run your awesome code! ");
             console.log(e);

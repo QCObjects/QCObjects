@@ -29,13 +29,13 @@
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
 "use strict";
+
+const {Package, InheritClass} = require("qcobjects");
+
 Package("org.qcobjects.common.pipelog", [
     class PipeLog extends InheritClass {
-        constructor() {
-            super(...arguments);
-        }
 
-        pipe(o) {
+        pipe(o:any) {
             var _o = [];
             for (var k in o) {
                 if (typeof o[k] !== "undefined" &&

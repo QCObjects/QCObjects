@@ -4,7 +4,7 @@ const alias = require("esbuild-plugin-alias");
 const path = require("path");
 
 const baseSettings = {
-    entryPoints: ["src/QCObjects.ts"], // Your entry file
+    entryPoints: ["src/**/*.ts"], // Your entry file
     bundle: true,
     outdir: "public/cjs", // Output dir
     format: "cjs", // or "esm" depending on your module system    
@@ -20,11 +20,17 @@ const baseSettings = {
         alias({
             "types": path.join(__dirname, "src/types/global/index.d.ts")
         })
-    ]    
+    ],
+    external: ["os", "path", "http", "url", 
+        "child_process", "events", "fs", "process",
+        "node:fs", "node:os", "node:child_process", 
+        "node:path", "readline", "node:net", "node:repl",
+        "node:vm", "http2", "vm", "qcobjects", "qcobjects-sdk"
+    ]
 };
 
 const cjsSettings = {...baseSettings,
-    entryPoints: ["src/QCObjects.ts"], // Your entry file
+    entryPoints: ["src/**/*.ts"], // Your entry file
     outdir: "public/cjs", // Output dir
     format: "cjs", // or "esm" depending on your module system    
     platform: "node", // or "browser" depending on your target environment
@@ -35,7 +41,7 @@ const cjsSettings = {...baseSettings,
 };
 
 const esmSettings = {...baseSettings,
-    entryPoints: ["src/QCObjects.ts"], // Your entry file
+    entryPoints: ["src/**/*.ts"], // Your entry file
     outdir: "public/esm", // Output dir
     format: "esm", // or "esm" depending on your module system    
     platform: "browser", // or "browser" depending on your target environment
@@ -46,7 +52,7 @@ const esmSettings = {...baseSettings,
 };
 
 const browserSettings = {...baseSettings,
-    entryPoints: ["src/QCObjects.ts"], // Your entry file
+    entryPoints: ["src/**/*.ts"], // Your entry file
     bundle: true,
     outdir: "public/browser", // Output dir
     format: "iife", // or "esm" depending on your module system    
