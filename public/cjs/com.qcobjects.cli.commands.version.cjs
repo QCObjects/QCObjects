@@ -1,14 +1,31 @@
 "use strict";
 var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // src/com.qcobjects.cli.commands.version.ts
+var com_qcobjects_cli_commands_version_exports = {};
+__export(com_qcobjects_cli_commands_version_exports, {
+  CommandHandler: () => CommandHandler
+});
+module.exports = __toCommonJS(com_qcobjects_cli_commands_version_exports);
 var fs = require("fs");
 var path = require("path");
-var absolutePath = path.resolve(__dirname, "./");
-var templatePath = path.resolve(__dirname, "./templates/apps/") + "/";
-var templatePwaPath = path.resolve(__dirname, "./templates/pwa/") + "/";
-var package_config = require(absolutePath + "/../package.json");
 var { exec, execSync } = require("child_process");
 var { Package, InheritClass, logger } = require("qcobjects");
 var CommandHandler = class extends InheritClass {
@@ -112,7 +129,6 @@ var CommandHandler = class extends InheritClass {
             }
           );
           var minorVersionTags = versionTags.filter((tag) => tag.version !== "").map((tag) => tag.version.split(".")[0] + "." + tag.version.split(".")[1]).unique();
-          var majorVersionTags = versionTags.filter((tag) => tag.version !== "").map((tag) => tag.version.split(".")[0]).unique();
           var history = minorVersionTags.map((minor) => {
             return {
               "major": minor.split(".")[0],
@@ -220,5 +236,8 @@ var CommandHandler = class extends InheritClass {
 Package("com.qcobjects.cli.commands.version", [
   CommandHandler
 ]);
-exports = { CommandHandler };
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  CommandHandler
+});
 //# sourceMappingURL=com.qcobjects.cli.commands.version.cjs.map

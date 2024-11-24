@@ -30,23 +30,23 @@
 /*eslint no-undef: "off"*/
 "use strict";
 
-const {Package, Service, logger} = require ("qcobjects");
+const { Package, Service, logger } = require("qcobjects");
 
-class JiraCloud extends Service {
-  constructor ({
-    name= "jira_cloud",
-    external= true,
-    useHTTP2= true,
-    cached= false,
-    method= "POST",
-    headers= {
-      "accept":"application/json",
-      "content-type":"application/json"
+export class JiraCloud extends Service {
+  constructor({
+    name = "jira_cloud",
+    external = true,
+    useHTTP2 = true,
+    cached = false,
+    method = "POST",
+    headers = {
+      "accept": "application/json",
+      "content-type": "application/json"
     },
-    basePath= "",
-    url= "",
-    withCredentials= false
-  }){
+    basePath = "",
+    url = "",
+    withCredentials = false
+  }) {
     super({
       name,
       external,
@@ -68,19 +68,17 @@ class JiraCloud extends Service {
 
   }
 
-  done(service: any,standardResponse: any) {
+  done(service: any, standardResponse: any) {
     // service loaded
     logger.debug(standardResponse);
   }
 
-  fail (e: any){
-      logger.debug(e);
+  fail(e: any) {
+    logger.debug(e);
   }
 
 }
 
 Package("com.qcobjects.cli.commands.jira.client_services", [
-JiraCloud
+  JiraCloud
 ]);
-
-exports = {JiraCloud};

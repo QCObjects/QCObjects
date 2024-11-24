@@ -31,35 +31,31 @@
 "use strict";
 const fs = require("fs");
 const path = require("path");
-const absolutePath = path.resolve(__dirname, "./");
-const templatePath = path.resolve(__dirname, "./templates/apps/") + "/";
 const templatePwaPath = path.resolve(__dirname, "./templates/pwa/") + "/";
-const package_config = require(absolutePath + "/../package.json");
 const { exec, execSync } = require("child_process");
 
-const { CONFIG, findPackageNodePath, Import, logger, Package, InheritClass, New, serviceLoader, global, Service, Component } = require("qcobjects");
+require ("qcobjects");
+
+const { CONFIG, findPackageNodePath, logger, Package, InheritClass, New, serviceLoader, global, Service, Component } = require("qcobjects");
 
 CONFIG.set("node_modules_path", "./node_modules/");
 CONFIG.set("qcobjectsnewapp_path", CONFIG.get("node_modules_path") + "/qcobjectsnewapp");
 
-const {QCObjectsEnterprise} = require(absolutePath + "/org.qcobjects.enterprise.commands");
-const {QuickCorpCloud} = require(absolutePath + "/org.quickcorp.qcobjects.api.client_services");
-require(absolutePath + "/com.qcobjects.cli.commands");
+export * as EnterpriseCommands from "./org.qcobjects.enterprise.commands";
+import { QCObjectsEnterprise } from "./org.qcobjects.enterprise.commands";
+export * as QuickCorpServices from "./org.quickcorp.qcobjects.api.client_services";
+import {QuickCorpCloud} from "./org.quickcorp.qcobjects.api.client_services";
+export * as customCommands from "./com.qcobjects.cli.commands";
+import { __get_version__, __get_version_string__ } from "./org.quickcorp.qcobjects.defaultsettings";
 
-const ImportCustomCommand = function (commandName: any, commandPackage: string) {
-  let _ret_;
-  var standardPath = findPackageNodePath(commandPackage) || findPackageNodePath(commandPackage + ".js");
-  if (standardPath !== null) {
-    _ret_ = Import(commandPackage);
-  } else {
-    logger.debug(`${commandPackage} is not a valid package for ${commandName}!`);
-    _ret_ = Promise.reject(new Error(`${commandName} does not exist!`));
-  }
-  return _ret_;
+export const getPluginCommandsList = () => {
+  return global.ClassesList
+  .filter((c: { packageName: string; }) => c.packageName.startsWith("com.qcobjects.cli.commands."))
+  .filter((p: { classFactory: { name: string; }; }) => p.classFactory.name.endsWith("CommandHandler"));
 };
 
 
-class SwitchCommander extends InheritClass {
+export class SwitchCommander extends InheritClass {
 
   choiceOption = {
     generateSw: (_appName: boolean, options: { dir: any; }) => {
@@ -71,19 +67,10 @@ class SwitchCommander extends InheritClass {
 
     },
     create: (_appName: boolean, options: { createAmp: any; createPwa: any; createPhp: any; createCustom: any; }) => {
-      const version = global.__get_version__();
+      const version = __get_version__();
       const switchCommander = this;
       const appName = (typeof _appName === "undefined" || _appName === true) ? ("MyAppName") : (_appName);
 
-      const _package_json_content = `{
-        "name": "${appName}"
-        "version": "1.0.0",
-        "dependencies":{
-          "qcobjectsnewphp": "latest",
-          "qcobjects": "${version.qcobjects}",
-          "qcobjects-sdk": "^${version.sdk}"
-        }
-      }`;
 
       let appTemplateName;
 
@@ -111,7 +98,7 @@ class SwitchCommander extends InheritClass {
       logger.debug("_package_json_file: " + _package_json_file);
       logger.debug(createAppCommand);
 
-      exec(createAppCommand, (err: { message: string | undefined; }, stdout: any, stderr: any) => {
+      exec(createAppCommand, (err: { message: string | undefined; }) => {
         if (err) {
           throw Error(err.message);
           // eslint-disable-next-line no-unreachable
@@ -132,7 +119,7 @@ class SwitchCommander extends InheritClass {
           switchCommander.copyTemplate(path.resolve(findPackageNodePath(appTemplateName), appTemplateName), path.resolve(CONFIG.get("projectPath"), "./"))
             .then(() => {
 
-              exec("npm uninstall " + appTemplateName + " --save && npm cache verify", (err: { message: string | undefined; }, stdout: any, stderr: any) => {
+              exec("npm uninstall " + appTemplateName + " --save && npm cache verify", (err: { message: string | undefined; }) => {
                 if (err) {
                   throw Error(err.message);
                   // eslint-disable-next-line no-unreachable
@@ -149,7 +136,7 @@ class SwitchCommander extends InheritClass {
                 execSync("npm install --save-dev qcobjects-cli ");
               });
 
-              exec("npm cache verify && npm i ", (err: { message: string | undefined; }, stdout: any, stderr: any) => {
+              exec("npm cache verify && npm i ", (err: { message: string | undefined; }) => {
                 if (err) {
                   throw Error(err.message);
                   // eslint-disable-next-line no-unreachable
@@ -160,7 +147,7 @@ class SwitchCommander extends InheritClass {
                 logger.info("Good! Your application is done. You can play with QCObjects now!");
 
                 logger.info("I will create the SSL certificates now. It may take some time...");
-                exec("qcobjects-createcert", (err: any, stdout: any, stderr: any) => {
+                exec("qcobjects-createcert", () => {
                   logger.info("Test certificates generated");
 
                   const githubService = New(Service);
@@ -200,7 +187,7 @@ class SwitchCommander extends InheritClass {
           console.log(data);
         });
 
-      }).stdout.on("data", function (data: any) {
+      }).stdout.on("data", function () {
         console.log("App generation started...");
       });
 
@@ -240,11 +227,6 @@ class SwitchCommander extends InheritClass {
             })).catch(e => reject_all(e as Error));
         }
       );
-      var _promise_all = Promise.all(_promises_set).then(function (response) {
-        resolve_all(response);
-      }).catch(function (e) {
-        reject_all(e as Error);
-      });
     }).catch(e => console.log(e));
   }
 
@@ -269,14 +251,6 @@ class SwitchCommander extends InheritClass {
       });
       //        logger.debugEnabled = true;
       try {
-        const service = serviceLoader(cloudClient).then((successResonse: { service: { template: any; }; }) => {
-          const template = successResonse.service.template;
-          const response = JSON.parse(template);
-          resolve(response);
-        }).catch((e: any) => {
-          console.log("\u{1F926} Something went wrong \u{1F926} when trying to register you in the cloud");
-          reject(e as Error);
-        });
       } catch (e) {
         console.log("\u{1F926} Something went wrong \u{1F926} when trying to register you in the cloud");
         reject(e as Error);
@@ -326,7 +300,7 @@ class SwitchCommander extends InheritClass {
       }
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise(() => {
       var filelist = ["/"].concat(this.fileListRecursive(`${dirPrefix}`));
       if (typeof dirPrefix !== "undefined" && dirPrefix !== "./" && dirPrefix !== ".") {
         filelist = filelist.map(f => f.replace(new RegExp(`${dirPrefix}/`), ""));
@@ -421,7 +395,7 @@ class SwitchCommander extends InheritClass {
       logger.debug("Installing Commands...");
 
       switchCommander.program
-        .version(global.__get_version_string__());
+        .version(__get_version_string__());
       switchCommander.program
         .command("create <appname>")
         .description("Creates an app with <appname>")
@@ -438,14 +412,11 @@ class SwitchCommander extends InheritClass {
       try {
         logger.debug("Loading Plugin Commands...");
         const importPluginCommands = function (switchCommander: any) {
-          return global.ClassesList
-            .filter((c: { packageName: string; }) => c.packageName.startsWith("com.qcobjects.cli.commands."))
-            .filter((p: { classFactory: { name: string; }; }) => p.classFactory.name.endsWith("CommandHandler"))
-            .map((pluginCommand: { packageName: any; classFactory: any; plugin: any; }) => {
+          return getPluginCommandsList().map((pluginCommand: { packageName: any; classFactory: any; plugin: any; }) => {
               try {
                 logger.debug(`Loading plugin ${pluginCommand.packageName}`);
                 const classFactory = pluginCommand.classFactory;
-                pluginCommand.plugin = New(classFactory, { switchCommander: switchCommander });
+                pluginCommand.plugin = new classFactory ({ switchCommander: switchCommander });
               } catch (e) {
                 throw Error(`Something went wrong loading ${pluginCommand.packageName}`);
               }
@@ -481,12 +452,12 @@ class SwitchCommander extends InheritClass {
         });
       switchCommander.program.command("launch <appname>")
         .description("Launches the application")
-        .action(function (args: any, options: any) {
+        .action(function () {
           logger.info("Launching...");
           setTimeout(() => {
             logger.info("Go to the browser and open https://localhost ");
             logger.info("Press Ctrl-C to stop serving ");
-            exec("qcobjects-server", (err: any, stdout: any, stderr: any) => {
+            exec("qcobjects-server", () => {
             }).stdout.on("data", function (data: any) {
               console.log(data);
             });
@@ -530,4 +501,4 @@ Package("org.quickcorp.qcobjects.cli", [
 
   SwitchCommander
 ]);
-exports = {SwitchCommander};
+global.SwitchCommander = SwitchCommander;

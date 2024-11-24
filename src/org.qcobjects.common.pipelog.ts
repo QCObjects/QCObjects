@@ -32,24 +32,27 @@
 
 const {Package, InheritClass} = require("qcobjects");
 
-Package("org.qcobjects.common.pipelog", [
-    class PipeLog extends InheritClass {
+export class PipeLog extends InheritClass {
 
-        pipe(o:any) {
-            var _o = [];
-            for (var k in o) {
-                if (typeof o[k] !== "undefined" &&
-                    o[k] !== null &&
-                    typeof o[k] !== "function") {
-                    try {
-                        _o.push("" + k + "=" + o[k].toString());
-                    } catch (e) {
-                        // error logging, do nothing
-                    }
+    pipe(o:any) {
+        var _o = [];
+        for (var k in o) {
+            if (typeof o[k] !== "undefined" &&
+                o[k] !== null &&
+                typeof o[k] !== "function") {
+                try {
+                    _o.push("" + k + "=" + o[k].toString());
+                } catch (e) {
+                    // error logging, do nothing
                 }
             }
-            return _o.join(" ");
         }
-
+        return _o.join(" ");
     }
+
+}
+
+
+Package("org.qcobjects.common.pipelog", [
+    PipeLog
 ]);

@@ -29,32 +29,28 @@
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
 "use strict";
-const fs = require("fs");
 const path = require("path");
 const absolutePath = path.resolve(__dirname, "./");
-const templatePath = path.resolve(__dirname, "./templates/apps/") + "/";
-const templatePwaPath = path.resolve(__dirname, "./templates/pwa/") + "/";
-const package_config = require(absolutePath + "/../package.json");
 const {
   exec,
   execSync
 } = require("child_process");
 
-const {Package, InheritClass, _DataStringify, New, CONFIG, logger, serviceLoader} = require("qcobjects");
+const { Package, InheritClass, _DataStringify, New, CONFIG, logger, serviceLoader } = require("qcobjects");
 
-const {JiraCloud} = require(absolutePath + "/com.qcobjects.cli.commands.jira.client_services");
+import { JiraCloud } from "./com.qcobjects.cli.commands.jira.client_services";
 
-class CommandHandler extends InheritClass {
+export class CommandHandler extends InheritClass {
   constructor({
     switchCommander
-  }:{switchCommander:any}) {
-    super({switchCommander});
+  }: { switchCommander: any }) {
+    super({ switchCommander });
     this.choiceOption = {
-      issues: function (options:any) {
+      issues: function () {
 
-        this.getIssueList().then(function (response:any) {
+        this.getIssueList().then(function (response: any) {
           console.log(_DataStringify(response));
-        }).catch((e:any) => {
+        }).catch((e: any) => {
           console.log(e);
           process.exit(1);
         });
@@ -82,13 +78,9 @@ class CommandHandler extends InheritClass {
         }
       });
 
-
-
-
-
   }
 
-  getIssueList(username: any, password: any, project: any) {
+  getIssueList() {
     return new Promise<void>(function (resolve, reject) {
       logger.info("I'm going to get the issue list from the jira cloud...");
       const jira_config = CONFIG.get("jira", null);
@@ -111,20 +103,6 @@ class CommandHandler extends InheritClass {
           }
         });
         try {
-          const service = serviceLoader(cloudClient).then((successResponse: { service: { template: any; }; responseHeaders: any; }) => {
-            const template = successResponse.service.template;
-            const responseHeaders = successResponse.responseHeaders;
-            if (responseHeaders[":status"] === 200 || !cloudClient.useHTTP2) {
-              const response = JSON.parse(template);
-              resolve(response);
-            } else {
-              console.error("\u{1F926} Something went wrong \u{1F926} when trying to get jira issues from the cloud. The status was: " + responseHeaders[":status"]);
-              reject(template as Error);
-            }
-          }).catch((e: any) => {
-            console.error("\u{1F926} Something went wrong \u{1F926} when trying to get jira issues from the cloud");
-            reject(e as Error);
-          });
         } catch (e) {
           console.error("\u{1F926} Something went wrong \u{1F926} when trying to get jira issues from the cloud");
           reject(e as Error);
@@ -132,7 +110,7 @@ class CommandHandler extends InheritClass {
 
       } else {
         console.error("\u{1F926} Something went wrong \u{1F926} You need to set the jira config settings");
-        reject(new Error ("\u{1F926} Something went wrong \u{1F926} You need to set the jira config settings"));
+        reject(new Error("\u{1F926} Something went wrong \u{1F926} You need to set the jira config settings"));
       }
 
     });
@@ -142,6 +120,5 @@ class CommandHandler extends InheritClass {
 }
 
 Package("com.qcobjects.cli.commands.jira", [
-
-CommandHandler
+  CommandHandler
 ]);

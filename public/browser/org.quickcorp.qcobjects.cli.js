@@ -1,7 +1,9 @@
 "use strict";
 var global = (() => {
   var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
   var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
   var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
     get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
@@ -12,6 +14,19 @@ var global = (() => {
   var __commonJS = (cb, mod) => function __require2() {
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
+  var __export = (target, all) => {
+    for (var name in all)
+      __defProp(target, name, { get: all[name], enumerable: true });
+  };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+    }
+    return to;
+  };
+  var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
   // node_modules/commander/lib/error.js
   var require_error = __commonJS({
@@ -939,8 +954,8 @@ var global = (() => {
       "use strict";
       var EventEmitter = __require("events").EventEmitter;
       var childProcess = __require("child_process");
-      var path = __require("path");
-      var fs = __require("fs");
+      var path4 = __require("path");
+      var fs3 = __require("fs");
       var process2 = __require("process");
       var { Argument, humanReadableArgName } = require_argument();
       var { CommanderError } = require_error();
@@ -1770,10 +1785,10 @@ Expecting one of '${allowedValues.join("', '")}'`);
           let launchWithNode = false;
           const sourceExt = [".js", ".ts", ".tsx", ".mjs", ".cjs"];
           function findFile(baseDir, baseName) {
-            const localBin = path.resolve(baseDir, baseName);
-            if (fs.existsSync(localBin)) return localBin;
-            if (sourceExt.includes(path.extname(baseName))) return void 0;
-            const foundExt = sourceExt.find((ext) => fs.existsSync(`${localBin}${ext}`));
+            const localBin = path4.resolve(baseDir, baseName);
+            if (fs3.existsSync(localBin)) return localBin;
+            if (sourceExt.includes(path4.extname(baseName))) return void 0;
+            const foundExt = sourceExt.find((ext) => fs3.existsSync(`${localBin}${ext}`));
             if (foundExt) return `${localBin}${foundExt}`;
             return void 0;
           }
@@ -1785,23 +1800,23 @@ Expecting one of '${allowedValues.join("', '")}'`);
           if (this._scriptPath) {
             let resolvedScriptPath;
             try {
-              resolvedScriptPath = fs.realpathSync(this._scriptPath);
+              resolvedScriptPath = fs3.realpathSync(this._scriptPath);
             } catch (err) {
               resolvedScriptPath = this._scriptPath;
             }
-            executableDir = path.resolve(path.dirname(resolvedScriptPath), executableDir);
+            executableDir = path4.resolve(path4.dirname(resolvedScriptPath), executableDir);
           }
           if (executableDir) {
             let localFile = findFile(executableDir, executableFile);
             if (!localFile && !subcommand._executableFile && this._scriptPath) {
-              const legacyName = path.basename(this._scriptPath, path.extname(this._scriptPath));
+              const legacyName = path4.basename(this._scriptPath, path4.extname(this._scriptPath));
               if (legacyName !== this._name) {
                 localFile = findFile(executableDir, `${legacyName}-${subcommand._name}`);
               }
             }
             executableFile = localFile || executableFile;
           }
-          launchWithNode = sourceExt.includes(path.extname(executableFile));
+          launchWithNode = sourceExt.includes(path4.extname(executableFile));
           let proc;
           if (process2.platform !== "win32") {
             if (launchWithNode) {
@@ -2578,7 +2593,7 @@ Expecting one of '${allowedValues.join("', '")}'`);
          * @return {Command}
          */
         nameFromFilename(filename) {
-          this._name = path.basename(filename, path.extname(filename));
+          this._name = path4.basename(filename, path4.extname(filename));
           return this;
         }
         /**
@@ -2592,9 +2607,9 @@ Expecting one of '${allowedValues.join("', '")}'`);
          * @param {string} [path]
          * @return {string|Command}
          */
-        executableDir(path2) {
-          if (path2 === void 0) return this._executableDir;
-          this._executableDir = path2;
+        executableDir(path5) {
+          if (path5 === void 0) return this._executableDir;
+          this._executableDir = path5;
           return this;
         }
         /**
@@ -2794,392 +2809,1278 @@ Expecting one of '${allowedValues.join("', '")}'`);
   });
 
   // src/org.quickcorp.qcobjects.cli.ts
-  var require_org_quickcorp_qcobjects_cli = __commonJS({
-    "src/org.quickcorp.qcobjects.cli.ts"(exports) {
-      var fs = __require("fs");
-      var path = __require("path");
-      var absolutePath = path.resolve(__dirname, "./");
-      var templatePath = path.resolve(__dirname, "./templates/apps/") + "/";
-      var templatePwaPath = path.resolve(__dirname, "./templates/pwa/") + "/";
-      var package_config = __require(absolutePath + "/../package.json");
-      var { exec, execSync } = __require("child_process");
-      var { CONFIG, findPackageNodePath, Import, logger, Package, InheritClass, New, serviceLoader, global, Service, Component } = __require("qcobjects");
-      CONFIG.set("node_modules_path", "./node_modules/");
-      CONFIG.set("qcobjectsnewapp_path", CONFIG.get("node_modules_path") + "/qcobjectsnewapp");
-      var { QCObjectsEnterprise } = __require(absolutePath + "/org.qcobjects.enterprise.commands");
-      var { QuickCorpCloud } = __require(absolutePath + "/org.quickcorp.qcobjects.api.client_services");
-      __require(absolutePath + "/com.qcobjects.cli.commands");
-      var SwitchCommander = class extends InheritClass {
-        static {
-          __name(this, "SwitchCommander");
-        }
-        choiceOption = {
-          generateSw: /* @__PURE__ */ __name((_appName, options) => {
-            const dirPrefix = options.dir;
-            const switchCommander = this;
-            const appName = typeof _appName === "undefined" || _appName === true ? "MyAppName" : _appName;
-            switchCommander.generateServiceWorker(appName, dirPrefix).catch((e) => {
-              logger.warn(`An error ocurred while creating service worker: ${e}`);
+  var org_quickcorp_qcobjects_cli_exports = {};
+  __export(org_quickcorp_qcobjects_cli_exports, {
+    EnterpriseCommands: () => org_qcobjects_enterprise_commands_exports,
+    QuickCorpServices: () => org_quickcorp_qcobjects_api_client_services_exports,
+    SwitchCommander: () => SwitchCommander,
+    customCommands: () => com_qcobjects_cli_commands_exports,
+    getPluginCommandsList: () => getPluginCommandsList
+  });
+
+  // src/org.qcobjects.enterprise.commands.ts
+  var org_qcobjects_enterprise_commands_exports = {};
+  __export(org_qcobjects_enterprise_commands_exports, {
+    QCObjectsEnterprise: () => QCObjectsEnterprise
+  });
+  var import_node_child_process = __require("node:child_process");
+  var { Package, InheritClass, CONFIG, logger } = __require("qcobjects");
+  var license = CONFIG.get("enterprise-license", "1234");
+  var email = CONFIG.get("enterprise-email", "a@b.com");
+  var QCObjectsEnterprise = class extends InheritClass {
+    static {
+      __name(this, "QCObjectsEnterprise");
+    }
+    install() {
+      const instance = this;
+      return instance.installEnterprise(license, email);
+    }
+    upgrade(switchCommander) {
+      const instance = this;
+      const readline = __require("readline");
+      const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+      });
+      var emailQuestion = /* @__PURE__ */ __name(function() {
+        rl.question(`
+  [NOTE: No information will be sent to a server until I got your consent]
+
+  Please tell me your e-Mail (\u{1F48C}):
+  `, (email2) => {
+          if (email2 !== "") {
+            var phoneNumberQuestion = /* @__PURE__ */ __name(function() {
+              rl.question("Please tell me your phone number (\u{1F919}): \n", (phonenumber) => {
+                if (phonenumber !== "") {
+                  rl.question(`
+  Please select one of the following options (type a number):
+
+  1.- \u{1F640} This is your first interaction \u{1F60D} with QCObjects Enterprise Edition \u{1F3E2},
+  you want to send your email and phone number to one of our executives to process your
+  inquiry, pay the license (when aplies) and receive a new fresh license number
+  that will free up to you the most advanced features for large companies
+
+  2.- \u2714 Your assigned executive \u{1F9D1} has given to you a new fresh QCObjects Enterprise Edition License Number
+  and you want to enter it to follow up with the next steps.
+
+  3.- \u{1F3C3} You want to quit this form, as you got here accidentally
+  (You should think about it. It's not a coincidence, It's destiny \u{1F600}).
+
+  Please enter the number of the option and press [enter]: `, (interaction_option) => {
+                    logger.infoEnabled = true;
+                    switch (interaction_option) {
+                      case "1":
+                        switchCommander.register(email2, phonenumber).then(function() {
+                          logger.info(`\u{1F44F} Congrats! You have been successfully registered to the cloud! \u{1F44F}
+  One of our executives will be in touch with you as soon as possible to give you the next steps
+  to get a new License Number and start using QCObjects Entrprise Edition!
+
+  (In the meantime, you can continue using all the features of the QCObjects Community Edition)
+  `);
+                          rl.close();
+                        }).catch(() => {
+                          rl.close();
+                        });
+                        break;
+                      case "2":
+                        rl.stdoutMuted = true;
+                        rl._writeToOutput = /* @__PURE__ */ __name(function _writeToOutput(stringToWrite) {
+                          if (rl.stdoutMuted)
+                            rl.output.write("*");
+                          else
+                            rl.output.write(stringToWrite);
+                        }, "_writeToOutput");
+                        rl.question("Please tell me the number of license that your executive has given to you: \n", (license2) => {
+                          rl.stdoutMuted = false;
+                          instance.installEnterprise(license2, email2);
+                          rl.close();
+                        });
+                        break;
+                      default:
+                        logger.info("\u{1F937} You can continue to use QCObjects Community Edition, see you! \u{1F64B} ");
+                        rl.close();
+                        break;
+                    }
+                  });
+                } else {
+                  console.log(`You need to enter a Phone Number if you want to be contacted.
+  If you want to quit, press Ctrl-C.
+  `);
+                  phoneNumberQuestion();
+                }
+              });
+            }, "phoneNumberQuestion");
+            phoneNumberQuestion();
+          } else {
+            console.log(`You need to enter a real e-Mail adress if you want to be contacted.
+  If you want to quit, press Ctrl-C.
+  `);
+            emailQuestion();
+          }
+        });
+      }, "emailQuestion");
+      emailQuestion();
+    }
+    installEnterprise(license2, email2) {
+      const asterisk = "*";
+      logger.info(`Your entered license number is ${asterisk.repeat(license2.length)} and the email that you have entered is ${email2}`);
+      logger.info("Now, I'm installing QCObjects Enterprise Edition in your computer...");
+      const cmdDownloadGit = `npm i --force -g git+https://license:${license2}@software.qcobjects.io/qcobjects-enterprise/qcobjects-enterprise.git`;
+      (0, import_node_child_process.execSync)(cmdDownloadGit);
+      const stdout = (0, import_node_child_process.execSync)("qcobjects --version");
+      if (stdout.lastIndexOf("Enterprise Edition") !== -1) {
+        logger.info("\u{1F44F} Congrats! Now you have installed QCObjects Entrprise Edition! \u{1F44F}");
+        logger.info(`You can test it using:
+> qcobjects --version
+
+To find more help, type the command:
+
+> qcobjects --help
+
+Enjoy!
+`);
+      } else {
+        console.log("\u{1F926} Something went wrong \u{1F926} when trying to update your license to QCObjects Enterprise Edition");
+        console.log("Ask your executive to help");
+      }
+    }
+  };
+  Package("org.qcobjects.enterprise.commands", [
+    QCObjectsEnterprise
+  ]);
+
+  // src/org.quickcorp.qcobjects.api.client_services.ts
+  var org_quickcorp_qcobjects_api_client_services_exports = {};
+  __export(org_quickcorp_qcobjects_api_client_services_exports, {
+    QuickCorpCloud: () => QuickCorpCloud
+  });
+  var { Package: Package2, Service, logger: logger2 } = __require("qcobjects");
+  var QuickCorpCloud = class extends Service {
+    static {
+      __name(this, "QuickCorpCloud");
+    }
+    constructor({
+      name = "quickcorp_cloud",
+      external = true,
+      useHTTP2 = true,
+      cached = false,
+      method = "post",
+      headers = {
+        "origin": "localhost",
+        "content-type": "application/json"
+      },
+      basePath = "https://cloud.quickcorp.org/",
+      url = "",
+      withCredentials = false
+    }) {
+      super({
+        name,
+        external,
+        useHTTP2,
+        cached,
+        method,
+        headers,
+        basePath,
+        url,
+        withCredentials
+      });
+    }
+    _new_(o) {
+      this.headers["authorization"] = "Basic token";
+      this.url = this.basePath + o.apiMethod;
+      this.data = o.data;
+    }
+    done(service, standardResponse) {
+      logger2.debug(standardResponse);
+    }
+    fail(e) {
+      logger2.debug(e);
+    }
+  };
+  Package2("org.quickcorp.qcobjects.api.client_services", [
+    QuickCorpCloud
+  ]);
+
+  // src/com.qcobjects.cli.commands.ts
+  var com_qcobjects_cli_commands_exports = {};
+  __export(com_qcobjects_cli_commands_exports, {
+    jiraCommand: () => com_qcobjects_cli_commands_jira_exports,
+    versionCommand: () => com_qcobjects_cli_commands_version_exports
+  });
+
+  // src/com.qcobjects.cli.commands.version.ts
+  var com_qcobjects_cli_commands_version_exports = {};
+  __export(com_qcobjects_cli_commands_version_exports, {
+    CommandHandler: () => CommandHandler
+  });
+  var fs = __require("fs");
+  var path = __require("path");
+  var { exec, execSync: execSync2 } = __require("child_process");
+  var { Package: Package3, InheritClass: InheritClass2, logger: logger3 } = __require("qcobjects");
+  var CommandHandler = class extends InheritClass2 {
+    static {
+      __name(this, "CommandHandler");
+    }
+    constructor({ switchCommander }) {
+      super({ switchCommander });
+      const commandHandler = this;
+      this.choiceOption = {
+        v_major(filename, options) {
+          filename = typeof filename === "undefined" ? "VERSION" : filename;
+          const versionString = this.getVersionStringFromFile(filename);
+          const versionSuffix = this.parseVersionSuffix(versionString);
+          const versionObject = this.parseVersionString(versionString);
+          const major = parseInt(versionObject.major);
+          const minor = parseInt(versionObject.minor);
+          const patch = parseInt(versionObject.patch);
+          const newVersion = this.buildNewVersionString({ major: major + 1, minor, patch }, versionSuffix);
+          this.saveNewVersionFile(filename, newVersion);
+          if (options.syncGit) {
+            var commitMsg = options.commitMsg || `New Version v${newVersion}`;
+            this.syncGit(newVersion, commitMsg, options.syncNpm);
+          }
+        },
+        v_minor(filename, options) {
+          filename = typeof filename === "undefined" ? "VERSION" : filename;
+          const versionString = this.getVersionStringFromFile(filename);
+          const versionSuffix = this.parseVersionSuffix(versionString);
+          const versionObject = this.parseVersionString(versionString);
+          const major = parseInt(versionObject.major);
+          const minor = parseInt(versionObject.minor);
+          const patch = parseInt(versionObject.patch);
+          const newVersion = this.buildNewVersionString({ major, minor: minor + 1, patch }, versionSuffix);
+          this.saveNewVersionFile(filename, newVersion);
+          if (options.syncGit) {
+            var commitMsg = options.commitMsg || `New Version v${newVersion}`;
+            this.syncGit(newVersion, commitMsg, options.syncNpm);
+          }
+        },
+        v_patch(filename, options) {
+          filename = typeof filename === "undefined" ? "VERSION" : filename;
+          const versionString = this.getVersionStringFromFile(filename);
+          const versionSuffix = this.parseVersionSuffix(versionString);
+          const versionObject = this.parseVersionString(versionString);
+          const major = parseInt(versionObject.major);
+          const minor = parseInt(versionObject.minor);
+          const patch = parseInt(versionObject.patch);
+          const newVersion = this.buildNewVersionString({ major, minor, patch: patch + 1 }, versionSuffix);
+          this.saveNewVersionFile(filename, newVersion);
+          if (options.syncGit) {
+            var commitMsg = options.commitMsg || `New Version v${newVersion}`;
+            this.syncGit(newVersion, commitMsg, options.syncNpm);
+          }
+        },
+        v_sync(filename, options) {
+          filename = typeof filename === "undefined" ? "VERSION" : filename;
+          var commandHandler2 = this;
+          commandHandler2.switchCommander.shellCommands([
+            "echo $(git describe)"
+          ]).then(function(response) {
+            const versionString = response[0].split("-")[0].slice(1).replace("\n", "");
+            console.log(versionString);
+            const versionSuffix = commandHandler2.parseVersionSuffix(versionString);
+            const versionObject = commandHandler2.parseVersionString(versionString);
+            const major = parseInt(versionObject.major);
+            const minor = parseInt(versionObject.minor);
+            const patch = parseInt(versionObject.patch);
+            const newVersion = commandHandler2.buildNewVersionString({ major, minor, patch }, versionSuffix);
+            commandHandler2.saveNewVersionFile(filename, newVersion);
+            var commitMsg = options.commitMsg || `Synced Version v${newVersion}`;
+            commandHandler2.switchCommander.shellCommands(
+              [
+                "git fetch --tags -f",
+                `git add . && git commit -am "${commitMsg}"`,
+                "git fetch origin --tags",
+                "git tag -ln",
+                `npm version "${newVersion}" --allow-same-version -m "${commitMsg}"`,
+                "git push && git push --tags"
+              ]
+            ).then(function(response2) {
+              console.log(response2);
             });
-          }, "generateSw"),
-          create: /* @__PURE__ */ __name((_appName, options) => {
-            const version = global.__get_version__();
-            const switchCommander = this;
-            const appName = typeof _appName === "undefined" || _appName === true ? "MyAppName" : _appName;
-            const _package_json_content = `{
-        "name": "${appName}"
-        "version": "1.0.0",
-        "dependencies":{
-          "qcobjectsnewphp": "latest",
-          "qcobjects": "${version.qcobjects}",
-          "qcobjects-sdk": "^${version.sdk}"
-        }
-      }`;
-            let appTemplateName;
-            if (options.createAmp) {
-              appTemplateName = "qcobjects-ecommerce-amp";
-            } else if (options.createPwa) {
-              appTemplateName = "qcobjectsnewapp";
-            } else if (options.createPhp) {
-              appTemplateName = "qcobjectsnewphp";
-            } else if (options.createCustom) {
-              appTemplateName = options.createCustom;
-            } else {
-              appTemplateName = "qcobjectsnewapp";
-            }
-            CONFIG.set("qcobjectsnewapp_path", CONFIG.get("node_modules_path") + "/" + appTemplateName);
-            const _package_json_template_fname = path.resolve(CONFIG.get("qcobjectsnewapp_path", "qcobjectsnewapp"), "./package.json");
-            const createAppCommand = "npm init -y";
-            const _package_json_file = path.resolve(CONFIG.get("projectPath"), "./package.json");
-            logger.debug("_package_json_file: " + _package_json_file);
-            logger.debug(createAppCommand);
-            exec(createAppCommand, (err, stdout, stderr) => {
-              if (err) {
-                throw Error(err.message);
-                process.exit(1);
-                return;
+          });
+        },
+        v_changelog() {
+          const commandHandler2 = this;
+          commandHandler2.switchCommander.shellCommands(
+            [
+              "git tag -ln"
+            ]
+          ).then(function(response) {
+            var versionTags = response[0].split("\n").map((tag) => tag.split(" ").unique()).unique().map(
+              (tag) => {
+                return {
+                  "version": tag[0],
+                  "major": tag[0].split(".")[0],
+                  "minor": tag[0].split(".")[0] + "." + tag[0].split(".")[1],
+                  "description": tag.slice(1).join(" ").trim()
+                };
               }
-              exec(`npm i --save-dev ${appTemplateName}`, () => {
-                const _package_json_template_file = __require(_package_json_template_fname);
-                _package_json_template_file.name = appName;
-                _package_json_template_file.version = "1.0.0";
-                _package_json_template_file.repository = {};
-                fs.writeFileSync(_package_json_file, JSON.stringify(_package_json_template_file, null, 4));
-                logger.info("Good! App Templates was installed!");
-                console.log(`Starting to copy files from app template ${appTemplateName} to your project...`);
-                switchCommander.copyTemplate(path.resolve(findPackageNodePath(appTemplateName), appTemplateName), path.resolve(CONFIG.get("projectPath"), "./")).then(() => {
-                  exec("npm uninstall " + appTemplateName + " --save && npm cache verify", (err2, stdout2, stderr2) => {
-                    if (err2) {
-                      throw Error(err2.message);
-                      process.exit(1);
-                      return;
+            );
+            var minorVersionTags = versionTags.filter((tag) => tag.version !== "").map((tag) => tag.version.split(".")[0] + "." + tag.version.split(".")[1]).unique();
+            var history = minorVersionTags.map((minor) => {
+              return {
+                "major": minor.split(".")[0],
+                "minor": minor,
+                "history": "\n	- " + versionTags.filter((tag) => tag.minor === minor).map(
+                  function(tag) {
+                    return tag.description;
+                  }
+                ).filter((desc) => !desc.startsWith(minor.slice(1))).sort().unique().join("\n	- ")
+              };
+            }).map((hist) => {
+              return `## ${hist.major} -> ${hist.minor}
+` + hist.history;
+            }).join("\n");
+            const subtitle = "This is an automatic Changelog history of versions generated using the command: **qcobjects v-changelog > CHANGELOG.md**";
+            console.log("# Changelog \n\n" + subtitle + "\n\n" + history);
+          });
+        }
+      };
+      switchCommander.program.command("v-major [filename]").option("--git, --sync-git", "Sync with Git").option("--npm, --sync-npm", "Sync with NPM").option("-m, --commit-msg [message]", "Commit Message").description("Semantic Versioning: Upgrade to a new major version").action(function(args, options) {
+        commandHandler.choiceOption.v_major.call(commandHandler, args, options);
+      });
+      switchCommander.program.command("v-minor [filename]").option("--git, --sync-git", "Sync with Git").option("--npm, --sync-npm", "Sync with NPM").option("-m, --commit-msg [message]", "Commit Message").description("Semantic Versioning: Upgrade to a new minor version").action(function(args, options) {
+        commandHandler.choiceOption.v_minor.call(commandHandler, args, options);
+      });
+      switchCommander.program.command("v-patch [filename]").option("--git, --sync-git", "Sync with Git").option("--npm, --sync-npm", "Sync with NPM").option("-m, --commit-msg [message]", "Commit Message").description("Semantic Versioning: Upgrade to a new patch version").action(function(args, options) {
+        commandHandler.choiceOption.v_patch.call(commandHandler, args, options);
+      });
+      switchCommander.program.command("v-sync [filename]").option("-m, --commit-msg [message]", "Commit Message").description("Semantic Versioning: Sync the version of NPM with version of GIT").action(function(args, options) {
+        commandHandler.choiceOption.v_sync.call(commandHandler, args, options);
+      });
+      switchCommander.program.command("v-changelog").description("Semantic Versioning: Shows a changelog using Semantic Versioning").action(function(args, options) {
+        commandHandler.choiceOption.v_changelog.call(commandHandler, args, options);
+      });
+    }
+    syncGit(versionString, commitMsg, syncNpm = false) {
+      let _commands_ = [];
+      if (syncNpm) {
+        _commands_ = _commands_.concat(
+          [
+            "git fetch --tags -f",
+            `npm version "${versionString}" -m "${commitMsg}"`
+          ]
+        );
+      }
+      _commands_ = _commands_.concat(
+        [
+          `git add . && git commit -am "${commitMsg}"`,
+          "git fetch origin --tags",
+          "git tag -ln"
+        ]
+      );
+      if (!syncNpm) {
+        _commands_ = _commands_.concat(
+          [
+            `git tag -a "v${versionString}" -m "${commitMsg}"`
+          ]
+        );
+      }
+      _commands_ = _commands_.concat(
+        [
+          "git push && git push --tags"
+        ]
+      );
+      this.switchCommander.shellCommands(_commands_).then(function(response) {
+        logger3.info("Synced to Git");
+        logger3.debug(response);
+      }).catch(function(e) {
+        logger3.info("Something went wrong trying to sync to git");
+        logger3.debug(e);
+      });
+    }
+    parseVersionString(versionString) {
+      versionString = versionString.replace("\n", "");
+      const regexpVer = /^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
+      const versionObject = { ...versionString.match(regexpVer)?.groups };
+      return versionObject;
+    }
+    getVersionStringFromFile(filename) {
+      let versionString;
+      try {
+        versionString = fs.readFileSync(filename).toString().replace("\n", "");
+      } catch (e) {
+        versionString = "0.0.1";
+      }
+      return versionString;
+    }
+    buildNewSemVersionString({ major, minor, patch }) {
+      return `${major}.${minor}.${patch}`;
+    }
+    parseVersionSuffix(versionString) {
+      versionString = versionString.replace("\n", "");
+      const versionObject = this.parseVersionString(versionString);
+      const semVersionString = this.buildNewSemVersionString(versionObject);
+      return versionString.replace(semVersionString, "");
+    }
+    buildNewVersionString({ major, minor, patch }, suffix) {
+      const semVersionString = this.buildNewSemVersionString({ major, minor, patch });
+      return `${semVersionString}${suffix}`;
+    }
+    saveNewVersionFile(filename, versionString) {
+      fs.writeFileSync(filename, versionString);
+    }
+  };
+  Package3("com.qcobjects.cli.commands.version", [
+    CommandHandler
+  ]);
+
+  // src/com.qcobjects.cli.commands.jira.ts
+  var com_qcobjects_cli_commands_jira_exports = {};
+  __export(com_qcobjects_cli_commands_jira_exports, {
+    CommandHandler: () => CommandHandler2
+  });
+
+  // src/com.qcobjects.cli.commands.jira.client_services.ts
+  var { Package: Package4, Service: Service2, logger: logger4 } = __require("qcobjects");
+  var JiraCloud = class extends Service2 {
+    static {
+      __name(this, "JiraCloud");
+    }
+    constructor({
+      name = "jira_cloud",
+      external = true,
+      useHTTP2 = true,
+      cached = false,
+      method = "POST",
+      headers = {
+        "accept": "application/json",
+        "content-type": "application/json"
+      },
+      basePath = "",
+      url = "",
+      withCredentials = false
+    }) {
+      super({
+        name,
+        external,
+        useHTTP2,
+        cached,
+        method,
+        headers,
+        basePath,
+        url,
+        withCredentials
+      });
+      var o = this;
+      this.domain = `${o.domain}`;
+      this.basePath = `https://${this.domain}/`;
+      this.username_password = `${o.username}:${o.password}`;
+      this.headers["authorization"] = `Basic ${Buffer.from(this.username_password).toString("base64")}`;
+      this.url = this.basePath + o.apiMethod;
+      this.data = o.data;
+    }
+    done(service, standardResponse) {
+      logger4.debug(standardResponse);
+    }
+    fail(e) {
+      logger4.debug(e);
+    }
+  };
+  Package4("com.qcobjects.cli.commands.jira.client_services", [
+    JiraCloud
+  ]);
+
+  // src/com.qcobjects.cli.commands.jira.ts
+  var path2 = __require("path");
+  var absolutePath = path2.resolve(__dirname, "./");
+  var {
+    exec: exec2,
+    execSync: execSync3
+  } = __require("child_process");
+  var { Package: Package5, InheritClass: InheritClass3, _DataStringify, New, CONFIG: CONFIG2, logger: logger5, serviceLoader } = __require("qcobjects");
+  var CommandHandler2 = class extends InheritClass3 {
+    static {
+      __name(this, "CommandHandler");
+    }
+    constructor({
+      switchCommander
+    }) {
+      super({ switchCommander });
+      this.choiceOption = {
+        issues: /* @__PURE__ */ __name(function() {
+          this.getIssueList().then(function(response) {
+            console.log(_DataStringify(response));
+          }).catch((e) => {
+            console.log(e);
+            process.exit(1);
+          });
+        }, "issues")
+      };
+      const commandHandler = this;
+      switchCommander.program.command("jira <subcommand>").option("-u, --from-user [username]", "User name").option("-fp,--from-project <projectName>", "Project name").option("-p, --pwd <password>", "Password").option("-f, --format <format>", "Format (json, table)").description(`Jira Integration:
+                            Sub-Commands can be:
+                                issues: To get the issues list from JIRA
+        `).action(function(subcommand, options) {
+        if (commandHandler.choiceOption.hasOwnProperty.call(commandHandler.choiceOption, subcommand)) {
+          commandHandler.choiceOption[subcommand].call(commandHandler, subcommand, options);
+        } else {
+          console.error(`Sub-Command (jira ${subcommand}... ) is not available`);
+          process.exit(1);
+        }
+      });
+    }
+    getIssueList() {
+      return new Promise(function(resolve, reject) {
+        logger5.info("I'm going to get the issue list from the jira cloud...");
+        const jira_config = CONFIG2.get("jira", null);
+        if (jira_config !== null) {
+          const jira_username = jira_config.username;
+          const jira_password = jira_config.auth_token;
+          const jira_project = jira_config.project;
+          const jira_domain = jira_config.domain;
+          const jira_issue_fields = ["id", "key", "summary", "timetracking"];
+          const cloudClient = New(JiraCloud, {
+            domain: `${jira_domain}`,
+            username: `${jira_username}`,
+            password: `${jira_password}`,
+            apiMethod: "rest/api/latest/search",
+            data: {
+              "jql": `project = ${jira_project}`,
+              "startAt": 0,
+              "maxResults": 5e3,
+              "fields": jira_issue_fields
+            }
+          });
+          try {
+          } catch (e) {
+            console.error("\u{1F926} Something went wrong \u{1F926} when trying to get jira issues from the cloud");
+            reject(e);
+          }
+        } else {
+          console.error("\u{1F926} Something went wrong \u{1F926} You need to set the jira config settings");
+          reject(new Error("\u{1F926} Something went wrong \u{1F926} You need to set the jira config settings"));
+        }
+      });
+    }
+  };
+  Package5("com.qcobjects.cli.commands.jira", [
+    CommandHandler2
+  ]);
+
+  // src/org.quickcorp.qcobjects.defaultsettings.ts
+  __require("qcobjects");
+  var { CONFIG: CONFIG3, global, logger: logger6, _Crypt, findPackageNodePath, Export } = __require("qcobjects");
+  var __get_version__ = /* @__PURE__ */ __name(() => {
+    const path4 = __require("path");
+    const absolutePath2 = path4.resolve(__dirname, "./");
+    const package_config = __require(path4.resolve(process.cwd(), "package.json"));
+    const qcobjects_pkg_config = __require("qcobjects/package.json");
+    const qcobjects_sdk_pkg_config = __require("qcobjects-sdk/package.json");
+    return {
+      "qcobjects": qcobjects_pkg_config.version,
+      "sdk": qcobjects_sdk_pkg_config.version,
+      "cli": package_config.version
+    };
+  }, "__get_version__");
+  var __get_version_string__ = /* @__PURE__ */ __name(() => {
+    const version = __get_version__();
+    return "QCObjects: v" + version.qcobjects + ", SDK: v" + version.sdk + ", CLI: v" + version.cli;
+  }, "__get_version_string__");
+  Export(__get_version__);
+  Export(__get_version_string__);
+  var __load_default_settings__ = /* @__PURE__ */ __name(() => {
+    CONFIG3.set("documentRootFileIndex", "index.html");
+    CONFIG3.set("projectPath", `${process.cwd()}/`);
+    CONFIG3.set("useConfigService", false);
+    CONFIG3.set("documentRoot", "./");
+    CONFIG3.set("serverPortHTTP", 80);
+    CONFIG3.set("serverPortHTTPS", 443);
+    CONFIG3.set("private-key-pem", "localhost-privkey.pem");
+    CONFIG3.set("private-cert-pem", "localhost-cert.pem");
+    CONFIG3.set("allowHTTP1", true);
+    CONFIG3.set("useTemplate", false);
+    CONFIG3.set("domain", "localhost");
+    const setDevMode = /* @__PURE__ */ __name((devmode) => {
+      if (typeof devmode !== "undefined") {
+        switch (true) {
+          case devmode == "debug":
+            logger6.debugEnabled = true;
+            logger6.warnEnabled = true;
+            logger6.infoEnabled = true;
+            break;
+          case devmode == "warn":
+            logger6.debugEnabled = false;
+            logger6.warnEnabled = true;
+            logger6.infoEnabled = true;
+            break;
+          case devmode == "info":
+            logger6.debugEnabled = false;
+            logger6.warnEnabled = false;
+            logger6.infoEnabled = true;
+            break;
+          default:
+            logger6.debugEnabled = false;
+            logger6.warnEnabled = false;
+            logger6.infoEnabled = false;
+            break;
+        }
+      } else {
+        logger6.debugEnabled = false;
+        logger6.warnEnabled = false;
+        logger6.infoEnabled = false;
+      }
+    }, "setDevMode");
+    try {
+      var _config = __require(CONFIG3.get("projectPath") + "config.json");
+      logger6.debug("Loading settings from your config.json");
+      const _secretKey = Object.hasOwn(_config, "domain") ? _config["domain"] : "_secret_";
+      if (Object.hasOwn(_config, "__encoded__")) {
+        _config = JSON.parse(_Crypt.decrypt(_config.__encoded__, _secretKey));
+      }
+      for (var k in _config) {
+        CONFIG3.set(k, _config[k]);
+      }
+      setDevMode(CONFIG3.get("devmode", ""));
+      if (typeof CONFIG3.get("backend") !== "undefined") {
+        global.set("backendAvailable", true);
+        if (typeof CONFIG3.get("basePath") !== "undefined") {
+          logger6.debug(`Changing the current directory: ${process.cwd()}`);
+          try {
+            process.chdir(CONFIG3.get("basePath"));
+            logger6.debug(`New directory: ${process.cwd()}`);
+          } catch (err) {
+            logger6.warn(`It was impossible to change the current chdir: ${err}`);
+          }
+        }
+      }
+    } catch (e) {
+      logger6.debug(e);
+      logger6.debug("Something went wrong trying to load config.json file in your project");
+    }
+    (async function() {
+      const path4 = __require("path");
+      const projectPath = CONFIG3.get("projectPath", `${process.cwd()}/`);
+      const loadDefaultRoutes = /* @__PURE__ */ __name(async () => {
+        return await new Promise((resolve, reject) => {
+          const sdkPath = path4.resolve(findPackageNodePath("qcobjects-sdk"), "qcobjects-sdk");
+          const qcobjectsPath = path4.resolve(findPackageNodePath("qcobjects"), "qcobjects");
+          let backend = CONFIG3.get("backend");
+          if (typeof backend === "undefined") {
+            backend = {};
+          }
+          if (typeof backend.routes === "undefined") {
+            backend.routes = [];
+          }
+          backend.routes = backend.routes.concat([
+            {
+              "name": "QCObjects.js",
+              "description": "Redirection of QCObjects.js",
+              "path": "^/QCObjects.js$",
+              "microservice": "com.qcobjects.backend.microservice.static",
+              "redirect_to": path4.resolve(qcobjectsPath, "src", "QCObjects.js"),
+              "responseHeaders": {},
+              "cors": {
+                "allow_origins": "*"
+              }
+            },
+            {
+              "name": "QCObjects-SDK.js",
+              "description": "Redirection of QCObjects SDK",
+              "path": "^/js/packages/QCObjects-SDK.js$",
+              "microservice": "com.qcobjects.backend.microservice.static",
+              "redirect_to": path4.resolve(sdkPath, "src/QCObjects-SDK.js"),
+              "responseHeaders": {},
+              "cors": {
+                "allow_origins": "*"
+              }
+            },
+            {
+              "name": "QCObjects-SDK Components",
+              "description": "Redirection of QCObjects SDK",
+              "path": "^/qcobjects-sdk/(.*)$",
+              "microservice": "com.qcobjects.backend.microservice.static",
+              "redirect_to": path4.resolve(sdkPath, "$1"),
+              "responseHeaders": {},
+              "cors": {
+                "allow_origins": "*"
+              }
+            }
+          ]);
+          CONFIG3.set("backend", backend);
+          resolve();
+        });
+      }, "loadDefaultRoutes");
+      await loadDefaultRoutes();
+    })().then(() => logger6.info("Default routes loaded")).catch((e) => {
+      logger6.warn(`An error ocurred loading default settings: ${e}`);
+    });
+    (function() {
+      const path4 = __require("path");
+      const fs3 = __require("fs");
+      const projectPath = CONFIG3.get("projectPath", `${process.cwd()}/`);
+      logger6.debug(`CONFIG.projectPath is set to ${projectPath}`);
+      const findPath = /* @__PURE__ */ __name((p) => {
+        const packagePath = path4.resolve(findPackageNodePath(p), p);
+        return packagePath;
+      }, "findPath");
+      const getPackageJSON = /* @__PURE__ */ __name((p) => {
+        let _json;
+        try {
+          const packagePath = findPath(p);
+          if (typeof packagePath !== "undefined") {
+            _json = JSON.parse(fs3.readFileSync(path4.resolve(`${packagePath}`, "./package.json")).toString());
+          } else {
+            _json = {};
+          }
+        } catch (e) {
+          logger6.debug(`It was impossible to get the package.json from ${p}: ${e}`);
+          _json = {};
+        }
+        return _json;
+      }, "getPackageJSON");
+      const hasKeyword = /* @__PURE__ */ (() => {
+        let keywords = {};
+        return (p, keyword) => {
+          if (typeof keywords === "undefined") {
+            keywords = {};
+          }
+          try {
+            if (typeof keywords[p] === "undefined") {
+              keywords[p] = getPackageJSON(p).keywords;
+            }
+          } catch (e) {
+            throw Error(`Something went wrong when trying to get the keywords of ${p}`);
+          }
+          return typeof keywords[p] !== "undefined" && keywords[p].includes(keyword);
+        };
+      })();
+      const setBackendValue = /* @__PURE__ */ __name((name, value) => {
+        const backend = CONFIG3.get("backend", {});
+        if (typeof value !== "undefined") {
+          backend[name] = value;
+        }
+        CONFIG3.set("backend", backend);
+      }, "setBackendValue");
+      const dependencies = /* @__PURE__ */ (() => {
+        let deps = [];
+        return () => {
+          if (typeof deps === "undefined") {
+            deps = Object.keys(JSON.parse(fs3.readFileSync(path4.resolve(`${projectPath}`, "./package.json")).toString()).dependencies);
+            setBackendValue("dependencies", deps);
+          }
+          return deps;
+        };
+      })();
+      const devDependencies = /* @__PURE__ */ (() => {
+        let deps = [];
+        return () => {
+          if (typeof deps === "undefined") {
+            deps = Object.keys(JSON.parse(fs3.readFileSync(path4.resolve(`${projectPath}`, "./package.json")).toString()).devDependencies);
+            setBackendValue("devDependencies", deps);
+          }
+          return deps;
+        };
+      })();
+      const loadLibs = /* @__PURE__ */ __name(() => {
+        let _ret_;
+        if (CONFIG3.get("autodiscover", false) || CONFIG3.get("autodiscover_libs", false)) {
+          const libs = dependencies().filter((p) => hasKeyword(p, "qcobjects-lib"));
+          setBackendValue("libs", libs);
+          if (libs.length > 0) {
+            logger6.debug(`Plugin Libs found: ${libs.join(",")}`);
+            _ret_ = Promise.all(libs.map((p) => {
+              return __require(findPath(p));
+            })).then(() => logger6.info("Libs loaded"));
+          } else {
+            logger6.debug("No Plugin Libs found.");
+            _ret_ = Promise.resolve();
+          }
+        } else {
+          logger6.debug("To load libs, set autodiscover_libs to true in your config.json");
+          _ret_ = Promise.resolve();
+        }
+        return _ret_;
+      }, "loadLibs");
+      const loadHandlers = /* @__PURE__ */ __name(() => {
+        let _ret_;
+        if (CONFIG3.get("autodiscover", false) || CONFIG3.get("autodiscover_handlers", false)) {
+          const handlers = dependencies().filter((p) => hasKeyword(p, "qcobjects-handler"));
+          setBackendValue("handlers", handlers);
+          if (handlers.length > 0) {
+            logger6.debug(`Plugin Handlers found: ${handlers.join(",")}`);
+            _ret_ = Promise.all(handlers.map((p) => {
+              return __require(findPath(p));
+            })).then(() => logger6.info("Handlers loaded"));
+          } else {
+            logger6.debug("No Plugin Handlers found.");
+            _ret_ = Promise.resolve();
+          }
+        } else {
+          logger6.debug("To load handlers, set autodiscover_handlers to true in your config.json");
+          _ret_ = Promise.resolve();
+        }
+        return _ret_;
+      }, "loadHandlers");
+      const loadCommands = /* @__PURE__ */ __name(() => {
+        let _ret_;
+        logger6.debug(`Looking for custom commands as dependencies in: ${projectPath}/package.json`);
+        if (CONFIG3.get("autodiscover", false) || CONFIG3.get("autodiscover_commands", false)) {
+          const commands = dependencies().filter((p) => hasKeyword(p, "qcobjects-command"));
+          setBackendValue("commands", commands);
+          if (commands.length > 0) {
+            logger6.debug(`Plugin Commands found: ${commands.join(",")}`);
+            _ret_ = Promise.all(commands.map((p) => {
+              return __require(findPath(p));
+            })).then(() => logger6.info("Commands loaded"));
+          } else {
+            logger6.debug("No Plugin Commands found.");
+            _ret_ = Promise.resolve();
+          }
+        } else {
+          logger6.debug("To load commands, set autodiscover_commands to true in your config.json");
+          _ret_ = Promise.resolve();
+        }
+        return _ret_;
+      }, "loadCommands");
+      const loadDevCommands = /* @__PURE__ */ __name(() => {
+        let _ret_;
+        logger6.debug(`Looking for custom commands as dev dependencies in: ${projectPath}/package.json`);
+        if (CONFIG3.get("autodiscover", false) || CONFIG3.get("autodiscover_commands", false)) {
+          const commands = devDependencies().filter((p) => hasKeyword(p, "qcobjects-command"));
+          setBackendValue("devCommands", commands);
+          if (commands.length > 0) {
+            logger6.debug(`Dev Plugin Commands found: ${commands.join(",")}`);
+            _ret_ = Promise.all(commands.map((p) => {
+              return __require(findPath(p));
+            })).then(() => logger6.info("Commands loaded"));
+          } else {
+            logger6.debug("No Plugin Commands found in dev dependencies.");
+            _ret_ = Promise.resolve();
+          }
+        } else {
+          logger6.debug("To load commands, set autodiscover_commands to true in your config.json");
+          _ret_ = Promise.resolve();
+        }
+        return _ret_;
+      }, "loadDevCommands");
+      if (CONFIG3.get("autodiscover", false) || CONFIG3.get("autodiscover_libs", false) || CONFIG3.get("autodiscover_handlers", false) || CONFIG3.get("autodiscover_commands", false)) {
+        logger6.info("Auto discover is enabled");
+      } else if (!CONFIG3.get("autodiscover", false)) {
+        logger6.info("Auto discover is disabled");
+        logger6.debug("To load all dependencies, set autodiscover to true in your config.json");
+      } else {
+        logger6.info("Auto discover is disabled");
+      }
+      try {
+        logger6.debug("Loading Libs...");
+        loadLibs().catch((e) => {
+          logger6.warn(`An error ocurred loading libs: ${e}`);
+        });
+      } catch (e) {
+        throw Error(`Something went wrong trying to load libs: ${e.message}`);
+      }
+      try {
+        logger6.debug("Loading Handlers...");
+        loadHandlers().catch((e) => {
+          logger6.warn(`An error ocurred loading handlers: ${e}`);
+        });
+      } catch (e) {
+        throw Error(`Something went wrong trying to load handler: ${e.message}`);
+      }
+      try {
+        logger6.debug("Loading Commands...");
+        loadCommands().catch((e) => {
+          logger6.warn(`An error ocurred loading commands: ${e}`);
+        });
+      } catch (e) {
+        throw Error(`Something went wrong trying to load commands: ${e.message}`);
+      }
+      try {
+        logger6.debug("Loading Dev Commands...");
+        loadDevCommands().catch((e) => {
+          logger6.warn(`An error ocurred loading dev commands: ${e}`);
+        });
+      } catch (e) {
+        throw Error(`Something went wrong trying to load Dev commands: ${e.message}`);
+      }
+      try {
+        const commands = CONFIG3.get("backend", { commands: [] }).commands || [];
+        const devCommands = CONFIG3.get("backend", { devCommands: [] }).devCommands || [];
+        setBackendValue("plugins", commands.concat(devCommands));
+      } catch (e) {
+        throw Error(`Something went wrong trying to load plugins list: ${e.message}`);
+      }
+      logger6.info("Dependencies loaded");
+      process.once("SIGTERM", () => {
+        console.log("\x1B[33m%s\x1B[0m", "Bye bye!");
+        process.exit();
+      });
+    })();
+  }, "__load_default_settings__");
+  global.__load_default_settings__ = __load_default_settings__;
+  global.__load_default_settings__();
+  var cleanCache = /* @__PURE__ */ __name(() => {
+    Object.keys(__require.cache).forEach((key) => {
+      delete __require.cache[key];
+    });
+  }, "cleanCache");
+  var __reset_settings__ = /* @__PURE__ */ __name(() => {
+    cleanCache();
+    global.__load_default_settings__();
+  }, "__reset_settings__");
+  global.__reset_settings__ = __reset_settings__;
+
+  // src/org.quickcorp.qcobjects.cli.ts
+  var fs2 = __require("fs");
+  var path3 = __require("path");
+  var templatePwaPath = path3.resolve(__dirname, "./templates/pwa/") + "/";
+  var { exec: exec3, execSync: execSync4 } = __require("child_process");
+  __require("qcobjects");
+  var { CONFIG: CONFIG4, findPackageNodePath: findPackageNodePath2, logger: logger7, Package: Package6, InheritClass: InheritClass4, New: New2, serviceLoader: serviceLoader2, global: global2, Service: Service3, Component } = __require("qcobjects");
+  CONFIG4.set("node_modules_path", "./node_modules/");
+  CONFIG4.set("qcobjectsnewapp_path", CONFIG4.get("node_modules_path") + "/qcobjectsnewapp");
+  var getPluginCommandsList = /* @__PURE__ */ __name(() => {
+    return global2.ClassesList.filter((c) => c.packageName.startsWith("com.qcobjects.cli.commands.")).filter((p) => p.classFactory.name.endsWith("CommandHandler"));
+  }, "getPluginCommandsList");
+  var SwitchCommander = class extends InheritClass4 {
+    static {
+      __name(this, "SwitchCommander");
+    }
+    choiceOption = {
+      generateSw: /* @__PURE__ */ __name((_appName, options) => {
+        const dirPrefix = options.dir;
+        const switchCommander = this;
+        const appName = typeof _appName === "undefined" || _appName === true ? "MyAppName" : _appName;
+        switchCommander.generateServiceWorker(appName, dirPrefix).catch((e) => {
+          logger7.warn(`An error ocurred while creating service worker: ${e}`);
+        });
+      }, "generateSw"),
+      create: /* @__PURE__ */ __name((_appName, options) => {
+        const version = __get_version__();
+        const switchCommander = this;
+        const appName = typeof _appName === "undefined" || _appName === true ? "MyAppName" : _appName;
+        let appTemplateName;
+        if (options.createAmp) {
+          appTemplateName = "qcobjects-ecommerce-amp";
+        } else if (options.createPwa) {
+          appTemplateName = "qcobjectsnewapp";
+        } else if (options.createPhp) {
+          appTemplateName = "qcobjectsnewphp";
+        } else if (options.createCustom) {
+          appTemplateName = options.createCustom;
+        } else {
+          appTemplateName = "qcobjectsnewapp";
+        }
+        CONFIG4.set("qcobjectsnewapp_path", CONFIG4.get("node_modules_path") + "/" + appTemplateName);
+        const _package_json_template_fname = path3.resolve(CONFIG4.get("qcobjectsnewapp_path", "qcobjectsnewapp"), "./package.json");
+        const createAppCommand = "npm init -y";
+        const _package_json_file = path3.resolve(CONFIG4.get("projectPath"), "./package.json");
+        logger7.debug("_package_json_file: " + _package_json_file);
+        logger7.debug(createAppCommand);
+        exec3(createAppCommand, (err) => {
+          if (err) {
+            throw Error(err.message);
+            process.exit(1);
+            return;
+          }
+          exec3(`npm i --save-dev ${appTemplateName}`, () => {
+            const _package_json_template_file = __require(_package_json_template_fname);
+            _package_json_template_file.name = appName;
+            _package_json_template_file.version = "1.0.0";
+            _package_json_template_file.repository = {};
+            fs2.writeFileSync(_package_json_file, JSON.stringify(_package_json_template_file, null, 4));
+            logger7.info("Good! App Templates was installed!");
+            console.log(`Starting to copy files from app template ${appTemplateName} to your project...`);
+            switchCommander.copyTemplate(path3.resolve(findPackageNodePath2(appTemplateName), appTemplateName), path3.resolve(CONFIG4.get("projectPath"), "./")).then(() => {
+              exec3("npm uninstall " + appTemplateName + " --save && npm cache verify", (err2) => {
+                if (err2) {
+                  throw Error(err2.message);
+                  process.exit(1);
+                  return;
+                }
+                execSync4("npm install --save-dev qcobjects-cli ");
+              });
+              exec3("npm cache verify && npm i ", (err2) => {
+                if (err2) {
+                  throw Error(err2.message);
+                  process.exit(1);
+                  return;
+                }
+                logger7.info("Good! Your application is done. You can play with QCObjects now!");
+                logger7.info("I will create the SSL certificates now. It may take some time...");
+                exec3("qcobjects-createcert", () => {
+                  logger7.info("Test certificates generated");
+                  const githubService = New2(Service3);
+                  githubService.url = "https://raw.githubusercontent.com/QuickCorp/QCObjects/main/.gitignore";
+                  githubService.headers = {
+                    Accept: "application/vnd.github+json",
+                    "X-GitHub-Api-Version": "2022-11-28",
+                    "User-Agent": "qcobjects-cli"
+                  };
+                  githubService.done = () => {
+                  };
+                  serviceLoader2(githubService).then(({ service }) => {
+                    fs2.writeFileSync(path3.resolve(CONFIG4.get("projectPath"), "./.gitignore"), service.template);
+                    try {
+                      execSync4("git init");
+                      logger7.debug("Git initialized.");
+                    } catch (e) {
+                      logger7.debug("Could not initialize git.");
                     }
-                    execSync("npm install --save-dev qcobjects-cli ");
                   });
-                  exec("npm cache verify && npm i ", (err2, stdout2, stderr2) => {
-                    if (err2) {
-                      throw Error(err2.message);
-                      process.exit(1);
-                      return;
-                    }
-                    logger.info("Good! Your application is done. You can play with QCObjects now!");
-                    logger.info("I will create the SSL certificates now. It may take some time...");
-                    exec("qcobjects-createcert", (err3, stdout3, stderr3) => {
-                      logger.info("Test certificates generated");
-                      const githubService = New(Service);
-                      githubService.url = "https://raw.githubusercontent.com/QuickCorp/QCObjects/main/.gitignore";
-                      githubService.headers = {
-                        Accept: "application/vnd.github+json",
-                        "X-GitHub-Api-Version": "2022-11-28",
-                        "User-Agent": "qcobjects-cli"
-                      };
-                      githubService.done = () => {
-                      };
-                      serviceLoader(githubService).then(({ service }) => {
-                        fs.writeFileSync(path.resolve(CONFIG.get("projectPath"), "./.gitignore"), service.template);
-                        try {
-                          execSync("git init");
-                          logger.debug("Git initialized.");
-                        } catch (e) {
-                          logger.debug("Could not initialize git.");
-                        }
-                      });
-                    }).stdout.on("data", function(data) {
-                      console.log(data);
-                    });
-                  }).stdout.on("data", function(data) {
-                    console.log(data);
-                  });
-                }).catch((e) => {
-                  console.log(e);
+                }).stdout.on("data", function(data) {
+                  console.log(data);
                 });
               }).stdout.on("data", function(data) {
                 console.log(data);
               });
-            }).stdout.on("data", function(data) {
-              console.log("App generation started...");
+            }).catch((e) => {
+              console.log(e);
             });
-          }, "create"),
-          publish(_appName, _options) {
-            logger.debug("publish is not yet implemented");
-          },
-          upgradeToEnterprise(_appName, _options) {
-            const switchCommander = this;
-            QCObjectsEnterprise.upgrade(switchCommander);
-          }
-        };
-        constructor() {
-          super();
-          this.program = require_commander();
-        }
-        shellCommands(_shell_commands) {
-          return new Promise(function(resolve_all, reject_all) {
-            var _promises_set = _shell_commands.map(
-              function(shell_command) {
-                return new Promise(
-                  function(resolve, reject) {
-                    logger.debug(shell_command);
-                    exec(shell_command, (err, stdout, stderr) => {
-                      if (!err) {
-                        resolve(stdout);
-                      } else {
-                        logger.debug(`[FAILED]: ${shell_command}`);
-                        logger.debug(`${stderr}`);
-                        reject(stderr);
-                      }
-                    }).stdout.on("data", function(data) {
-                      logger.info(data);
-                    });
-                  }
-                ).catch((e) => reject_all(e));
-              }
-            );
-            var _promise_all = Promise.all(_promises_set).then(function(response) {
-              resolve_all(response);
-            }).catch(function(e) {
-              reject_all(e);
-            });
-          }).catch((e) => console.log(e));
-        }
-        fileListRecursive(dir) {
-          var instance = this;
-          return fs.statSync(dir).isDirectory() ? Array.prototype.concat(...fs.readdirSync(dir).map((f) => instance.fileListRecursive(path.join(dir, f)))).filter((f) => {
-            return !f.startsWith(".git") && f.lastIndexOf(".DS_Store") == -1;
-          }) : dir;
-        }
-        register(email, phonenumber) {
-          return new Promise(function(resolve, reject) {
-            logger.info("I'm going to register your profile on the cloud...");
-            const cloudClient = New(QuickCorpCloud, {
-              apiMethod: "register",
-              data: { email, phonenumber }
-            });
-            try {
-              const service = serviceLoader(cloudClient).then((successResonse) => {
-                const template = successResonse.service.template;
-                const response = JSON.parse(template);
-                resolve(response);
-              }).catch((e) => {
-                console.log("\u{1F926} Something went wrong \u{1F926} when trying to register you in the cloud");
-                reject(e);
-              });
-            } catch (e) {
-              console.log("\u{1F926} Something went wrong \u{1F926} when trying to register you in the cloud");
-              reject(e);
-            }
+          }).stdout.on("data", function(data) {
+            console.log(data);
           });
-        }
-        generateServiceWorker(appName, dirPrefix = "./") {
-          const writeContent = /* @__PURE__ */ __name((component) => {
-            const parsedText = component.parseTemplate(component.template);
-            logger.debug("Starting to write the sw file...");
-            fs.writeFile(`${dirPrefix}/sw.js`, parsedText, (err) => {
-              if (err) {
-                throw Error(err);
-              }
-              logger.info("Service Worker Generated");
-              console.log("");
-              console.log("Now simply put:");
-              console.log("CONFIG.set('serviceWorkerURI','/sw.js');");
-              console.log(" In your init.js file ");
-              console.log("");
-              console.log("To start your app in a local server ");
-              console.log("Execute the command: ");
-              console.log("> qcobjects launch <appname>");
-              console.log("");
-            });
-          }, "writeContent");
-          class ServiceWorkerComponent extends Component {
-            static {
-              __name(this, "ServiceWorkerComponent");
-            }
-            cached = false;
-            templateURI = "sw.js";
-            basePath = templatePwaPath;
-            name = "sw";
-            tplsource = "default";
-            template = "";
-            constructor({ name, data }) {
-              super({ name, data });
-            }
-            done({ request, component }) {
-              super.done({ request, component });
-              writeContent(component);
-            }
-          }
-          return new Promise((resolve, reject) => {
-            var filelist = ["/"].concat(this.fileListRecursive(`${dirPrefix}`));
-            if (typeof dirPrefix !== "undefined" && dirPrefix !== "./" && dirPrefix !== ".") {
-              filelist = filelist.map((f) => f.replace(new RegExp(`${dirPrefix}/`), ""));
-            }
-            filelist = filelist.filter(function(fl) {
-              return fl !== "sw.js" && !fl.startsWith("node_modules/");
-            });
-            filelist = filelist.filter((fname) => !fname.endsWith(".pem"));
-            filelist = filelist.filter((fname) => !fname.endsWith(".sh"));
-            filelist = filelist.filter((fname) => !new RegExp("^package(.*).json$").test(fname));
-            filelist = filelist.filter((fname) => !fname.startsWith("."));
-            var fileListString = '\n	"' + filelist.join('",\n	"') + '"';
-            const component = new ServiceWorkerComponent({
-              name: "sw",
-              data: {
-                appName,
-                appVersion: "1.0.0",
-                filelist: fileListString
-              }
-            });
-            setTimeout(() => {
-              component.done({ request: null, component });
-            }, 1e3);
-          });
-        }
-        copyTemplate(source, dest) {
-          return new Promise((resolve, reject) => {
-            const copyDir = /* @__PURE__ */ __name((source2, dest2, exclude) => {
-              source2 = path.resolve(source2);
-              dest2 = path.resolve(dest2);
-              const dname = path.basename(source2);
-              const dirExcluded = exclude.includes(dname);
-              const isDir = /* @__PURE__ */ __name((d) => {
-                return fs.existsSync(d) && fs.statSync(d).isDirectory() ? true : false;
-              }, "isDir");
-              const isFile = /* @__PURE__ */ __name((d) => {
-                return fs.existsSync(d) && fs.statSync(d).isFile() ? true : false;
-              }, "isFile");
-              if (isDir(source2) && !dirExcluded) {
-                fs.mkdirSync(dest2, { recursive: true });
-                const paths = fs.readdirSync(source2, { withFileTypes: true });
-                const dirs = paths.filter((d) => d.isDirectory());
-                const files = paths.filter((f) => f.isFile());
-                ((paths2, dirs2, files2, exclude2) => {
-                  files2.map((f) => {
-                    const sourceFile = path.resolve(source2, f.name);
-                    const destFile = path.resolve(dest2, f.name);
-                    const fileExcluded = exclude2.includes(f.name);
-                    if (isFile(sourceFile) && !fileExcluded) {
-                      logger.debug(`[publish:static] Copying files from ${sourceFile} to ${destFile} excluding ${exclude2.join(",")}...`);
-                      fs.copyFileSync(sourceFile, destFile);
-                      logger.debug(`[publish:static] Copying files from ${sourceFile} to ${destFile} excluding ${exclude2.join(",")}...DONE!`);
-                    }
-                  });
-                  dirs2.map((d) => {
-                    const sourceDir = path.resolve(source2, d.name);
-                    const destDir = path.resolve(dest2, d.name);
-                    copyDir(sourceDir, destDir, exclude2);
-                  });
-                })(paths, dirs, files, exclude);
-              }
-            }, "copyDir");
-            try {
-              const exclude = [
-                "package.json",
-                "node_modules",
-                ".DS_Store"
-              ];
-              logger.info(`[create] Copying files from ${source} to ${dest} excluding ${exclude.join(",")}...`);
-              copyDir(source, dest, typeof exclude !== "undefined" ? exclude : []);
-              resolve();
-            } catch (e) {
-              logger.warn(`Something went wrong trying to publish static files: ${e.message}`);
-              reject(e);
-            }
-          });
-        }
-        initCommand() {
-          const switchCommander = this;
-          if (process.argv.length > 1) {
-            logger.debug("Installing Commands...");
-            switchCommander.program.version(global.__get_version_string__());
-            switchCommander.program.command("create <appname>").description("Creates an app with <appname>").option("--pwa, --create-pwa", "Creates the progressive web app assets").option("--amp, --create-amp", "Creates the accelerated mobile pages assets").option("--php, --create-php", "Creates the PWA PHP assets").option("--custom, --create-custom <templateappname>", "Creates an App from any NPM package template").option("--tests, --create-tests", "Creates the test suite").action(function(args, options) {
-              switchCommander.choiceOption.create.call(switchCommander, args, options);
-            });
-            try {
-              logger.debug("Loading Plugin Commands...");
-              const importPluginCommands = /* @__PURE__ */ __name(function(switchCommander2) {
-                return global.ClassesList.filter((c) => c.packageName.startsWith("com.qcobjects.cli.commands.")).filter((p) => p.classFactory.name.endsWith("CommandHandler")).map((pluginCommand) => {
-                  try {
-                    logger.debug(`Loading plugin ${pluginCommand.packageName}`);
-                    const classFactory = pluginCommand.classFactory;
-                    pluginCommand.plugin = New(classFactory, { switchCommander: switchCommander2 });
-                  } catch (e) {
-                    throw Error(`Something went wrong loading ${pluginCommand.packageName}`);
-                  }
-                  return pluginCommand;
-                });
-              }, "importPluginCommands");
-              importPluginCommands(switchCommander);
-            } catch (e) {
-              throw Error(`Something went wrong loading plugins: ${e.message}`);
-            }
-            switchCommander.program.command("publish <appname>").description("Publishes an app with <appname>").option("--pwa, --create-pwa", "Publishes the progressive web app assets").option("--amp, --create-amp", "Publishes the accelerated mobile pages assets").option("--php, --create-php", "Creates the PWA PHP assets").option("--custom, --create-custom", "Creates an App from any NPM package template").option("--tests, --create-tests", "Publishes the test suite").action((args, options) => {
-              switchCommander.choiceOption.publish.bind(switchCommander)(args, options);
-            });
-            switchCommander.program.command("upgrade-to-enterprise").description("Upgrades to QCObjects Enterprise Edition").action(function(args, options) {
-              switchCommander.choiceOption.upgradeToEnterprise.call(switchCommander, args, options);
-            });
-            switchCommander.program.command("generate-sw <appname>").option("-d, --dir <dirPrefix> ", "creates the service worker in a specific dir <dirPrefix>").description("Generates the service worker <appname>").action(function(args, options) {
-              switchCommander.choiceOption.generateSw.call(switchCommander, args, options);
-            });
-            switchCommander.program.command("launch <appname>").description("Launches the application").action(function(args, options) {
-              logger.info("Launching...");
-              setTimeout(() => {
-                logger.info("Go to the browser and open https://localhost ");
-                logger.info("Press Ctrl-C to stop serving ");
-                exec("qcobjects-server", (err, stdout, stderr) => {
-                }).stdout.on("data", function(data) {
-                  console.log(data);
-                });
-              }, 5e3);
-            });
-            switchCommander.program.on("--help", function() {
-              console.log("");
-              console.log("Use:");
-              console.log("  $ qcobjects-cli [command] --help");
-              console.log("  For detailed information of a command ");
-              console.log("");
-              process.exit(0);
-            });
-            switchCommander.program.on("command:*", function() {
-              console.error("Invalid command: %s\nSee --help for a list of available commands.", switchCommander.program.args.join(" "));
-              process.exit(1);
-            });
-            switchCommander.program.parse(process.argv);
-          } else {
-            console.log("");
-            console.log("Use:");
-            console.log("  $ qcobjects-cli [command] --help");
-            console.log("  For detailed information of a command ");
-            console.log("");
-            process.exit(0);
-          }
-        }
-      };
-      Package("org.quickcorp.qcobjects.cli", [
-        SwitchCommander
-      ]);
-      exports = { SwitchCommander };
+        }).stdout.on("data", function() {
+          console.log("App generation started...");
+        });
+      }, "create"),
+      publish(_appName, _options) {
+        logger7.debug("publish is not yet implemented");
+      },
+      upgradeToEnterprise(_appName, _options) {
+        const switchCommander = this;
+        QCObjectsEnterprise.upgrade(switchCommander);
+      }
+    };
+    constructor() {
+      super();
+      this.program = require_commander();
     }
-  });
-  return require_org_quickcorp_qcobjects_cli();
+    shellCommands(_shell_commands) {
+      return new Promise(function(resolve_all, reject_all) {
+        var _promises_set = _shell_commands.map(
+          function(shell_command) {
+            return new Promise(
+              function(resolve, reject) {
+                logger7.debug(shell_command);
+                exec3(shell_command, (err, stdout, stderr) => {
+                  if (!err) {
+                    resolve(stdout);
+                  } else {
+                    logger7.debug(`[FAILED]: ${shell_command}`);
+                    logger7.debug(`${stderr}`);
+                    reject(stderr);
+                  }
+                }).stdout.on("data", function(data) {
+                  logger7.info(data);
+                });
+              }
+            ).catch((e) => reject_all(e));
+          }
+        );
+      }).catch((e) => console.log(e));
+    }
+    fileListRecursive(dir) {
+      var instance = this;
+      return fs2.statSync(dir).isDirectory() ? Array.prototype.concat(...fs2.readdirSync(dir).map((f) => instance.fileListRecursive(path3.join(dir, f)))).filter((f) => {
+        return !f.startsWith(".git") && f.lastIndexOf(".DS_Store") == -1;
+      }) : dir;
+    }
+    register(email2, phonenumber) {
+      return new Promise(function(resolve, reject) {
+        logger7.info("I'm going to register your profile on the cloud...");
+        const cloudClient = New2(QuickCorpCloud, {
+          apiMethod: "register",
+          data: { email: email2, phonenumber }
+        });
+        try {
+        } catch (e) {
+          console.log("\u{1F926} Something went wrong \u{1F926} when trying to register you in the cloud");
+          reject(e);
+        }
+      });
+    }
+    generateServiceWorker(appName, dirPrefix = "./") {
+      const writeContent = /* @__PURE__ */ __name((component) => {
+        const parsedText = component.parseTemplate(component.template);
+        logger7.debug("Starting to write the sw file...");
+        fs2.writeFile(`${dirPrefix}/sw.js`, parsedText, (err) => {
+          if (err) {
+            throw Error(err);
+          }
+          logger7.info("Service Worker Generated");
+          console.log("");
+          console.log("Now simply put:");
+          console.log("CONFIG.set('serviceWorkerURI','/sw.js');");
+          console.log(" In your init.js file ");
+          console.log("");
+          console.log("To start your app in a local server ");
+          console.log("Execute the command: ");
+          console.log("> qcobjects launch <appname>");
+          console.log("");
+        });
+      }, "writeContent");
+      class ServiceWorkerComponent extends Component {
+        static {
+          __name(this, "ServiceWorkerComponent");
+        }
+        cached = false;
+        templateURI = "sw.js";
+        basePath = templatePwaPath;
+        name = "sw";
+        tplsource = "default";
+        template = "";
+        constructor({ name, data }) {
+          super({ name, data });
+        }
+        done({ request, component }) {
+          super.done({ request, component });
+          writeContent(component);
+        }
+      }
+      return new Promise(() => {
+        var filelist = ["/"].concat(this.fileListRecursive(`${dirPrefix}`));
+        if (typeof dirPrefix !== "undefined" && dirPrefix !== "./" && dirPrefix !== ".") {
+          filelist = filelist.map((f) => f.replace(new RegExp(`${dirPrefix}/`), ""));
+        }
+        filelist = filelist.filter(function(fl) {
+          return fl !== "sw.js" && !fl.startsWith("node_modules/");
+        });
+        filelist = filelist.filter((fname) => !fname.endsWith(".pem"));
+        filelist = filelist.filter((fname) => !fname.endsWith(".sh"));
+        filelist = filelist.filter((fname) => !new RegExp("^package(.*).json$").test(fname));
+        filelist = filelist.filter((fname) => !fname.startsWith("."));
+        var fileListString = '\n	"' + filelist.join('",\n	"') + '"';
+        const component = new ServiceWorkerComponent({
+          name: "sw",
+          data: {
+            appName,
+            appVersion: "1.0.0",
+            filelist: fileListString
+          }
+        });
+        setTimeout(() => {
+          component.done({ request: null, component });
+        }, 1e3);
+      });
+    }
+    copyTemplate(source, dest) {
+      return new Promise((resolve, reject) => {
+        const copyDir = /* @__PURE__ */ __name((source2, dest2, exclude) => {
+          source2 = path3.resolve(source2);
+          dest2 = path3.resolve(dest2);
+          const dname = path3.basename(source2);
+          const dirExcluded = exclude.includes(dname);
+          const isDir = /* @__PURE__ */ __name((d) => {
+            return fs2.existsSync(d) && fs2.statSync(d).isDirectory() ? true : false;
+          }, "isDir");
+          const isFile = /* @__PURE__ */ __name((d) => {
+            return fs2.existsSync(d) && fs2.statSync(d).isFile() ? true : false;
+          }, "isFile");
+          if (isDir(source2) && !dirExcluded) {
+            fs2.mkdirSync(dest2, { recursive: true });
+            const paths = fs2.readdirSync(source2, { withFileTypes: true });
+            const dirs = paths.filter((d) => d.isDirectory());
+            const files = paths.filter((f) => f.isFile());
+            ((paths2, dirs2, files2, exclude2) => {
+              files2.map((f) => {
+                const sourceFile = path3.resolve(source2, f.name);
+                const destFile = path3.resolve(dest2, f.name);
+                const fileExcluded = exclude2.includes(f.name);
+                if (isFile(sourceFile) && !fileExcluded) {
+                  logger7.debug(`[publish:static] Copying files from ${sourceFile} to ${destFile} excluding ${exclude2.join(",")}...`);
+                  fs2.copyFileSync(sourceFile, destFile);
+                  logger7.debug(`[publish:static] Copying files from ${sourceFile} to ${destFile} excluding ${exclude2.join(",")}...DONE!`);
+                }
+              });
+              dirs2.map((d) => {
+                const sourceDir = path3.resolve(source2, d.name);
+                const destDir = path3.resolve(dest2, d.name);
+                copyDir(sourceDir, destDir, exclude2);
+              });
+            })(paths, dirs, files, exclude);
+          }
+        }, "copyDir");
+        try {
+          const exclude = [
+            "package.json",
+            "node_modules",
+            ".DS_Store"
+          ];
+          logger7.info(`[create] Copying files from ${source} to ${dest} excluding ${exclude.join(",")}...`);
+          copyDir(source, dest, typeof exclude !== "undefined" ? exclude : []);
+          resolve();
+        } catch (e) {
+          logger7.warn(`Something went wrong trying to publish static files: ${e.message}`);
+          reject(e);
+        }
+      });
+    }
+    initCommand() {
+      const switchCommander = this;
+      if (process.argv.length > 1) {
+        logger7.debug("Installing Commands...");
+        switchCommander.program.version(__get_version_string__());
+        switchCommander.program.command("create <appname>").description("Creates an app with <appname>").option("--pwa, --create-pwa", "Creates the progressive web app assets").option("--amp, --create-amp", "Creates the accelerated mobile pages assets").option("--php, --create-php", "Creates the PWA PHP assets").option("--custom, --create-custom <templateappname>", "Creates an App from any NPM package template").option("--tests, --create-tests", "Creates the test suite").action(function(args, options) {
+          switchCommander.choiceOption.create.call(switchCommander, args, options);
+        });
+        try {
+          logger7.debug("Loading Plugin Commands...");
+          const importPluginCommands = /* @__PURE__ */ __name(function(switchCommander2) {
+            return getPluginCommandsList().map((pluginCommand) => {
+              try {
+                logger7.debug(`Loading plugin ${pluginCommand.packageName}`);
+                const classFactory = pluginCommand.classFactory;
+                pluginCommand.plugin = new classFactory({ switchCommander: switchCommander2 });
+              } catch (e) {
+                throw Error(`Something went wrong loading ${pluginCommand.packageName}`);
+              }
+              return pluginCommand;
+            });
+          }, "importPluginCommands");
+          importPluginCommands(switchCommander);
+        } catch (e) {
+          throw Error(`Something went wrong loading plugins: ${e.message}`);
+        }
+        switchCommander.program.command("publish <appname>").description("Publishes an app with <appname>").option("--pwa, --create-pwa", "Publishes the progressive web app assets").option("--amp, --create-amp", "Publishes the accelerated mobile pages assets").option("--php, --create-php", "Creates the PWA PHP assets").option("--custom, --create-custom", "Creates an App from any NPM package template").option("--tests, --create-tests", "Publishes the test suite").action((args, options) => {
+          switchCommander.choiceOption.publish.bind(switchCommander)(args, options);
+        });
+        switchCommander.program.command("upgrade-to-enterprise").description("Upgrades to QCObjects Enterprise Edition").action(function(args, options) {
+          switchCommander.choiceOption.upgradeToEnterprise.call(switchCommander, args, options);
+        });
+        switchCommander.program.command("generate-sw <appname>").option("-d, --dir <dirPrefix> ", "creates the service worker in a specific dir <dirPrefix>").description("Generates the service worker <appname>").action(function(args, options) {
+          switchCommander.choiceOption.generateSw.call(switchCommander, args, options);
+        });
+        switchCommander.program.command("launch <appname>").description("Launches the application").action(function() {
+          logger7.info("Launching...");
+          setTimeout(() => {
+            logger7.info("Go to the browser and open https://localhost ");
+            logger7.info("Press Ctrl-C to stop serving ");
+            exec3("qcobjects-server", () => {
+            }).stdout.on("data", function(data) {
+              console.log(data);
+            });
+          }, 5e3);
+        });
+        switchCommander.program.on("--help", function() {
+          console.log("");
+          console.log("Use:");
+          console.log("  $ qcobjects-cli [command] --help");
+          console.log("  For detailed information of a command ");
+          console.log("");
+          process.exit(0);
+        });
+        switchCommander.program.on("command:*", function() {
+          console.error("Invalid command: %s\nSee --help for a list of available commands.", switchCommander.program.args.join(" "));
+          process.exit(1);
+        });
+        switchCommander.program.parse(process.argv);
+      } else {
+        console.log("");
+        console.log("Use:");
+        console.log("  $ qcobjects-cli [command] --help");
+        console.log("  For detailed information of a command ");
+        console.log("");
+        process.exit(0);
+      }
+    }
+  };
+  Package6("org.quickcorp.qcobjects.cli", [
+    SwitchCommander
+  ]);
+  global2.SwitchCommander = SwitchCommander;
+  return __toCommonJS(org_quickcorp_qcobjects_cli_exports);
 })();
 //# sourceMappingURL=org.quickcorp.qcobjects.cli.js.map

@@ -33,7 +33,7 @@
 const path = require("path");
 const absolutePath = path.resolve( __dirname, "./" );
 const templatePath = path.resolve( __dirname, "./templates/apps/" )+"/";
-const package_config = require(absolutePath+"/../package.json");
+const package_config = require(path.resolve(process.cwd(), "package.json"));
 
 
 const {logger, InheritClass } = require("qcobjects");
@@ -61,11 +61,10 @@ logger.debugEnabled = false;
 logger.warnEnabled = false;
 logger.infoEnabled = false;
 
-require(absolutePath+"/org.quickcorp.qcobjects.defaultsettings.js");
+export * as defaultSettings from "./org.quickcorp.qcobjects.defaultsettings";
+import {SwitchCommander} from "./org.quickcorp.qcobjects.cli";
 
-const {SwitchCommander} = require(absolutePath+"/org.quickcorp.qcobjects.cli");
-
-class Main extends InheritClass {
+export class Main extends InheritClass {
   constructor (){
     super();
     const main = this;

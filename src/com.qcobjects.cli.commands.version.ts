@@ -31,15 +31,11 @@
 "use strict";
 const fs = require("fs");
 const path = require("path");
-const absolutePath = path.resolve(__dirname, "./");
-const templatePath = path.resolve(__dirname, "./templates/apps/") + "/";
-const templatePwaPath = path.resolve(__dirname, "./templates/pwa/") + "/";
-const package_config = require(absolutePath + "/../package.json");
 const { exec, execSync } = require("child_process");
 
 const { Package, InheritClass, logger } = require("qcobjects");
 
-class CommandHandler extends InheritClass {
+export class CommandHandler extends InheritClass {
 
   constructor({ switchCommander }: { switchCommander: any }) {
     super({ switchCommander });
@@ -140,7 +136,6 @@ class CommandHandler extends InheritClass {
             }
           );
           var minorVersionTags = versionTags.filter((tag: { version: string; }) => tag.version !== "").map((tag: { version: string; }) => tag.version.split(".")[0] + "." + tag.version.split(".")[1]).unique();
-          var majorVersionTags = versionTags.filter((tag: { version: string; }) => tag.version !== "").map((tag: { version: string; }) => tag.version.split(".")[0]).unique();
           var history = minorVersionTags.map((minor: string) => {
             return {
               "major": minor.split(".")[0],
@@ -286,8 +281,5 @@ class CommandHandler extends InheritClass {
 
 
 Package("com.qcobjects.cli.commands.version", [
-
   CommandHandler
 ]);
-
-exports = {CommandHandler};

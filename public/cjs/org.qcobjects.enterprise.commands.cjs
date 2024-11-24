@@ -1,15 +1,30 @@
 "use strict";
 var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // src/org.qcobjects.enterprise.commands.ts
-var fs = require("fs");
-var path = require("path");
-var absolutePath = path.resolve(__dirname, "./");
-var templatePath = path.resolve(__dirname, "./templates/apps/") + "/";
-var templatePwaPath = path.resolve(__dirname, "./templates/pwa/") + "/";
-var package_config = require(absolutePath + "/../package.json");
-var { exec, execSync } = require("child_process");
+var org_qcobjects_enterprise_commands_exports = {};
+__export(org_qcobjects_enterprise_commands_exports, {
+  QCObjectsEnterprise: () => QCObjectsEnterprise
+});
+module.exports = __toCommonJS(org_qcobjects_enterprise_commands_exports);
+var import_node_child_process = require("node:child_process");
 var { Package, InheritClass, CONFIG, logger } = require("qcobjects");
 var license = CONFIG.get("enterprise-license", "1234");
 var email = CONFIG.get("enterprise-email", "a@b.com");
@@ -17,7 +32,7 @@ var QCObjectsEnterprise = class extends InheritClass {
   static {
     __name(this, "QCObjectsEnterprise");
   }
-  install(switchCommander) {
+  install() {
     const instance = this;
     return instance.installEnterprise(license, email);
   }
@@ -34,7 +49,6 @@ var QCObjectsEnterprise = class extends InheritClass {
 
   Please tell me your e-Mail (\u{1F48C}):
   `, (email2) => {
-        const asterisk = "*";
         if (email2 !== "") {
           var phoneNumberQuestion = /* @__PURE__ */ __name(function() {
             rl.question("Please tell me your phone number (\u{1F919}): \n", (phonenumber) => {
@@ -57,7 +71,7 @@ var QCObjectsEnterprise = class extends InheritClass {
                   logger.infoEnabled = true;
                   switch (interaction_option) {
                     case "1":
-                      switchCommander.register(email2, phonenumber).then(function(response) {
+                      switchCommander.register(email2, phonenumber).then(function() {
                         logger.info(`\u{1F44F} Congrats! You have been successfully registered to the cloud! \u{1F44F}
   One of our executives will be in touch with you as soon as possible to give you the next steps
   to get a new License Number and start using QCObjects Entrprise Edition!
@@ -65,7 +79,7 @@ var QCObjectsEnterprise = class extends InheritClass {
   (In the meantime, you can continue using all the features of the QCObjects Community Edition)
   `);
                         rl.close();
-                      }).catch((e) => {
+                      }).catch(() => {
                         rl.close();
                       });
                       break;
@@ -113,12 +127,11 @@ var QCObjectsEnterprise = class extends InheritClass {
     logger.info(`Your entered license number is ${asterisk.repeat(license2.length)} and the email that you have entered is ${email2}`);
     logger.info("Now, I'm installing QCObjects Enterprise Edition in your computer...");
     const cmdDownloadGit = `npm i --force -g git+https://license:${license2}@software.qcobjects.io/qcobjects-enterprise/qcobjects-enterprise.git`;
-    exec(cmdDownloadGit, (err, stdout, stderr) => {
-      if (!err) {
-        exec("qcobjects --version", (err2, stdout2, stderr2) => {
-          if (stdout2.lastIndexOf("Enterprise Edition") !== -1) {
-            logger.info("\u{1F44F} Congrats! Now you have installed QCObjects Entrprise Edition! \u{1F44F}");
-            logger.info(`You can test it using:
+    (0, import_node_child_process.execSync)(cmdDownloadGit);
+    const stdout = (0, import_node_child_process.execSync)("qcobjects --version");
+    if (stdout.lastIndexOf("Enterprise Edition") !== -1) {
+      logger.info("\u{1F44F} Congrats! Now you have installed QCObjects Entrprise Edition! \u{1F44F}");
+      logger.info(`You can test it using:
 > qcobjects --version
 
 To find more help, type the command:
@@ -127,26 +140,17 @@ To find more help, type the command:
 
 Enjoy!
 `);
-          } else {
-            console.log("\u{1F926} Something went wrong \u{1F926} when trying to update your license to QCObjects Enterprise Edition");
-            console.log("Ask your executive to help");
-          }
-        });
-      } else {
-        console.log("\u{1F926} Something went wrong \u{1F926} when trying to update your license to QCObjects Enterprise Edition");
-        if (stderr.lastIndexOf("Authentication failed") !== -1) {
-          console.log("Please ask to your executive for the right license number");
-        } else {
-          console.log(stderr);
-        }
-      }
-    }).stdout.on("data", function(data) {
-      console.log(data);
-    });
+    } else {
+      console.log("\u{1F926} Something went wrong \u{1F926} when trying to update your license to QCObjects Enterprise Edition");
+      console.log("Ask your executive to help");
+    }
   }
 };
 Package("org.qcobjects.enterprise.commands", [
   QCObjectsEnterprise
 ]);
-exports = { QCObjectsEnterprise };
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  QCObjectsEnterprise
+});
 //# sourceMappingURL=org.qcobjects.enterprise.commands.cjs.map

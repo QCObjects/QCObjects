@@ -21,11 +21,12 @@ const baseSettings = {
             "types": path.join(__dirname, "src/types/global/index.d.ts")
         })
     ],
-    external: ["os", "path", "http", "url", 
-        "child_process", "events", "fs", "process",
+    external: ["os", "path", "http", "url",
+        "child_process", "events", "fs", "process", 
         "node:fs", "node:os", "node:child_process", 
         "node:path", "readline", "node:net", "node:repl",
-        "node:vm", "http2", "vm", "qcobjects", "qcobjects-sdk"
+        "node:vm", "http2", "vm", "qcobjects", "qcobjects-sdk", 
+        "../package.json", "package.json", "./package.json"
     ]
 };
 

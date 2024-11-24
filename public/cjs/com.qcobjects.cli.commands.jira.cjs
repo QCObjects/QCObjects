@@ -1,20 +1,88 @@
 "use strict";
 var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // src/com.qcobjects.cli.commands.jira.ts
-var fs = require("fs");
+var com_qcobjects_cli_commands_jira_exports = {};
+__export(com_qcobjects_cli_commands_jira_exports, {
+  CommandHandler: () => CommandHandler
+});
+module.exports = __toCommonJS(com_qcobjects_cli_commands_jira_exports);
+
+// src/com.qcobjects.cli.commands.jira.client_services.ts
+var { Package, Service, logger } = require("qcobjects");
+var JiraCloud = class extends Service {
+  static {
+    __name(this, "JiraCloud");
+  }
+  constructor({
+    name = "jira_cloud",
+    external = true,
+    useHTTP2 = true,
+    cached = false,
+    method = "POST",
+    headers = {
+      "accept": "application/json",
+      "content-type": "application/json"
+    },
+    basePath = "",
+    url = "",
+    withCredentials = false
+  }) {
+    super({
+      name,
+      external,
+      useHTTP2,
+      cached,
+      method,
+      headers,
+      basePath,
+      url,
+      withCredentials
+    });
+    var o = this;
+    this.domain = `${o.domain}`;
+    this.basePath = `https://${this.domain}/`;
+    this.username_password = `${o.username}:${o.password}`;
+    this.headers["authorization"] = `Basic ${Buffer.from(this.username_password).toString("base64")}`;
+    this.url = this.basePath + o.apiMethod;
+    this.data = o.data;
+  }
+  done(service, standardResponse) {
+    logger.debug(standardResponse);
+  }
+  fail(e) {
+    logger.debug(e);
+  }
+};
+Package("com.qcobjects.cli.commands.jira.client_services", [
+  JiraCloud
+]);
+
+// src/com.qcobjects.cli.commands.jira.ts
 var path = require("path");
 var absolutePath = path.resolve(__dirname, "./");
-var templatePath = path.resolve(__dirname, "./templates/apps/") + "/";
-var templatePwaPath = path.resolve(__dirname, "./templates/pwa/") + "/";
-var package_config = require(absolutePath + "/../package.json");
 var {
   exec,
   execSync
 } = require("child_process");
-var { Package, InheritClass, _DataStringify, New, CONFIG, logger, serviceLoader } = require("qcobjects");
-var { JiraCloud } = require(absolutePath + "/com.qcobjects.cli.commands.jira.client_services");
+var { Package: Package2, InheritClass, _DataStringify, New, CONFIG, logger: logger2, serviceLoader } = require("qcobjects");
 var CommandHandler = class extends InheritClass {
   static {
     __name(this, "CommandHandler");
@@ -24,7 +92,7 @@ var CommandHandler = class extends InheritClass {
   }) {
     super({ switchCommander });
     this.choiceOption = {
-      issues: /* @__PURE__ */ __name(function(options) {
+      issues: /* @__PURE__ */ __name(function() {
         this.getIssueList().then(function(response) {
           console.log(_DataStringify(response));
         }).catch((e) => {
@@ -46,9 +114,9 @@ var CommandHandler = class extends InheritClass {
       }
     });
   }
-  getIssueList(username, password, project) {
+  getIssueList() {
     return new Promise(function(resolve, reject) {
-      logger.info("I'm going to get the issue list from the jira cloud...");
+      logger2.info("I'm going to get the issue list from the jira cloud...");
       const jira_config = CONFIG.get("jira", null);
       if (jira_config !== null) {
         const jira_username = jira_config.username;
@@ -69,20 +137,6 @@ var CommandHandler = class extends InheritClass {
           }
         });
         try {
-          const service = serviceLoader(cloudClient).then((successResponse) => {
-            const template = successResponse.service.template;
-            const responseHeaders = successResponse.responseHeaders;
-            if (responseHeaders[":status"] === 200 || !cloudClient.useHTTP2) {
-              const response = JSON.parse(template);
-              resolve(response);
-            } else {
-              console.error("\u{1F926} Something went wrong \u{1F926} when trying to get jira issues from the cloud. The status was: " + responseHeaders[":status"]);
-              reject(template);
-            }
-          }).catch((e) => {
-            console.error("\u{1F926} Something went wrong \u{1F926} when trying to get jira issues from the cloud");
-            reject(e);
-          });
         } catch (e) {
           console.error("\u{1F926} Something went wrong \u{1F926} when trying to get jira issues from the cloud");
           reject(e);
@@ -94,7 +148,11 @@ var CommandHandler = class extends InheritClass {
     });
   }
 };
-Package("com.qcobjects.cli.commands.jira", [
+Package2("com.qcobjects.cli.commands.jira", [
   CommandHandler
 ]);
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  CommandHandler
+});
 //# sourceMappingURL=com.qcobjects.cli.commands.jira.cjs.map

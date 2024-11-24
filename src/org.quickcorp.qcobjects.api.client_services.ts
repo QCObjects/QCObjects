@@ -32,7 +32,7 @@
 
 const {Package, Service, logger} = require("qcobjects");
 
-class QuickCorpCloud extends Service {
+export class QuickCorpCloud extends Service {
   constructor ({
     name= "quickcorp_cloud",
     external= true,
@@ -83,6 +83,3 @@ Package("org.quickcorp.qcobjects.api.client_services", [
 QuickCorpCloud
 ]);
 
-exports = {
-  QuickCorpCloud
-};
