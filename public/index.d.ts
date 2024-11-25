@@ -2,6 +2,7 @@
 declare module "com.qcobjects.cli.commands.jira.client_services" {
     const Service: any;
     export class JiraCloud extends Service {
+        static [x: string]: any;
         constructor({ name, external, useHTTP2, cached, method, headers, basePath, url, withCredentials }: {
             name?: string | undefined;
             external?: boolean | undefined;
@@ -23,6 +24,7 @@ declare module "com.qcobjects.cli.commands.jira.client_services" {
 declare module "com.qcobjects.cli.commands.jira" {
     const InheritClass: any;
     export class CommandHandler extends InheritClass {
+        static [x: string]: any;
         constructor({ switchCommander }: {
             switchCommander: any;
         });
@@ -32,6 +34,7 @@ declare module "com.qcobjects.cli.commands.jira" {
 declare module "com.qcobjects.cli.commands.version" {
     const InheritClass: any;
     export class CommandHandler extends InheritClass {
+        static [x: string]: any;
         constructor({ switchCommander }: {
             switchCommander: any;
         });
@@ -67,6 +70,7 @@ declare module "org.quickcorp.qcobjects.defaultsettings" {
 declare module "org.qcobjects.enterprise.commands" {
     const InheritClass: any;
     export class QCObjectsEnterprise extends InheritClass {
+        static [x: string]: any;
         install(): void;
         upgrade(switchCommander: any): void;
         installEnterprise(license: string | any[], email: any): void;
@@ -75,6 +79,7 @@ declare module "org.qcobjects.enterprise.commands" {
 declare module "org.quickcorp.qcobjects.api.client_services" {
     const Service: any;
     export class QuickCorpCloud extends Service {
+        static [x: string]: any;
         constructor({ name, external, useHTTP2, cached, method, headers, basePath, url, withCredentials }: {
             name?: string | undefined;
             external?: boolean | undefined;
@@ -101,6 +106,7 @@ declare module "org.quickcorp.qcobjects.cli" {
     export * as customCommands from "com.qcobjects.cli.commands";
     export const getPluginCommandsList: () => any;
     export class SwitchCommander extends InheritClass {
+        static [x: string]: any;
         choiceOption: {
             generateSw: (_appName: boolean, options: {
                 dir: any;
@@ -127,6 +133,7 @@ declare module "qcobjects-cli" {
     const InheritClass: any;
     export * as defaultSettings from "org.quickcorp.qcobjects.defaultsettings";
     export class Main extends InheritClass {
+        static [x: string]: any;
         constructor();
     }
     const __main__: Main;
@@ -139,6 +146,7 @@ declare module "index" {
 declare module "org.qcobjects.common.pipelog" {
     const InheritClass: any;
     export class PipeLog extends InheritClass {
+        static [x: string]: any;
         pipe(o: any): string;
     }
 }
