@@ -3888,7 +3888,7 @@ var SwitchCommander = class extends InheritClass4 {
   }
   generateServiceWorker(appName, dirPrefix = "./") {
     const writeContent = /* @__PURE__ */ __name((component) => {
-      const parsedText = component.parseTemplate(component.template);
+      const parsedText = component.parsedAssignmentText;
       logger7.debug("Starting to write the sw file...");
       fs2.writeFile(`${dirPrefix}/sw.js`, parsedText, (err) => {
         if (err) {
@@ -3918,6 +3918,7 @@ var SwitchCommander = class extends InheritClass4 {
       template = "";
       constructor({ name, data }) {
         super({ name, data });
+        this.data = data;
       }
       done({ request, component }) {
         super.done({ request, component });

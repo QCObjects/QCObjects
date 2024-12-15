@@ -261,7 +261,7 @@ export class SwitchCommander extends InheritClass {
 
   generateServiceWorker(appName: any, dirPrefix = "./") {
     const writeContent = (component: any) => {
-      const parsedText = component.parseTemplate(component.template);
+      const parsedText = component.parsedAssignmentText;
       logger.debug("Starting to write the sw file...");
       fs.writeFile(`${dirPrefix}/sw.js`, parsedText, (err: string | undefined) => {
         if (err) {
@@ -292,6 +292,7 @@ export class SwitchCommander extends InheritClass {
 
       constructor({name, data}:{name:string, data:any}){
         super({name, data});
+        this.data = data;
       }
 
       done({ request, component }:{request:any, component:any}) {
