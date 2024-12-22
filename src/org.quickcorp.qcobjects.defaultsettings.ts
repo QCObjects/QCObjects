@@ -30,12 +30,12 @@
 /*eslint no-undef: "off"*/
 "use strict";
 
-require ("qcobjects");
-
-const { CONFIG, global, logger, _Crypt, findPackageNodePath, Export } = require("qcobjects");
+import "qcobjects";
+import {readFileSync} from "node:fs";
+import path from "node:path";
+import { CONFIG, global, logger, _Crypt, findPackageNodePath, Export, _DataStringify } from "qcobjects";
 
 export const __get_version__ = () => {
-  const path = require("path");
 
   const absolutePath = path.resolve(__dirname, "./");
   const package_config = require(path.resolve(process.cwd(), "package.json"));
@@ -106,7 +106,15 @@ const __load_default_settings__ = () => {
   };
 
   try {
-    var _config = require(CONFIG.get("projectPath") + "config.json");
+
+    const loadConfig = () => {
+      const configPath = path.resolve(CONFIG.get("projectPath"),"config.json");
+      const configText = readFileSync(configPath).toString();
+      const configJson = JSON.parse(configText);
+      return configJson;
+    };
+
+    var _config = loadConfig();
     logger.debug("Loading settings from your config.json");
 
     const _secretKey = (Object.hasOwn(_config, "domain")) ? (_config["domain"]) : ("_secret_");
