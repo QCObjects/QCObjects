@@ -60,6 +60,7 @@ declare module "com.qcobjects.cli.commands" {
     export * as jiraCommand from "com.qcobjects.cli.commands.jira";
 }
 declare module "org.quickcorp.qcobjects.defaultsettings" {
+    import "qcobjects";
     export const __get_version__: () => {
         qcobjects: any;
         sdk: any;
@@ -150,16 +151,4 @@ declare module "org.qcobjects.common.pipelog" {
         pipe(o: any): string;
     }
 }
-declare module "org.quickcorp.qcobjects.collab.server" { }
-declare module "org.quickcorp.qcobjects.main.file" { }
-declare module "org.quickcorp.qcobjects.main.http.gae.server" { }
-declare module "org.quickcorp.qcobjects.main.http.server" { }
-declare module "org.quickcorp.qcobjects.main.http2.server" { }
-declare module "qcobjects-collab" { }
-declare module "qcobjects-createcert" { }
-declare module "qcobjects-gae-http-server" { }
-declare module "qcobjects-http-server" { }
-declare module "qcobjects-http2-server" { }
 declare module "qcobjects-shell" { }
-declare module "backend/com.qcobjects.backend.microservice.static" { }
-declare module "backend/org.qcobjects.backend.php" { }

@@ -28,7 +28,8 @@
 /*eslint strict: "off"*/
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
-"use strict";
+(() => {
+  "use strict";
 
 const {findPackageNodePath, Import, Package, InheritClass, CONFIG, logger, New, global, ClassFactory} = require ("qcobjects");
 
@@ -417,3 +418,4 @@ Package("org.quickcorp.qcobjects.main.http2.server", [
   HTTP2ServerResponse, HTTP2ServerRequest, HTTP2Server
 
 ]);
+})();

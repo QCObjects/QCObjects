@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
+    "skipLibCheck": true,
+    "traceResolution":true,
     "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "nodenext",
+    "moduleDetection": "auto",
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -33,13 +37,14 @@
     "src/**/*",
     "src/types/**/*"
   ],
-  "exclude": ["src/**/*.js", "node_modules/**/*", "**/node_modules/*"],
+  "exclude": ["src/**/*.js", "node_modules/**/*", "**/node_modules/*", "node_modules"],
   "ts-node": {
     // It is faster to skip typechecking.
     // Remove if you want ts-node to do typechecking.
     "transpileOnly": true,
     "files": true,
     "compilerOptions": {
+      "skipLibCheck": true,
       "rootDir": "./src",
       "baseUrl": ".",
       "paths": {
@@ -48,6 +53,6 @@
         ]
       }
     },
-    "exclude": ["node_modules/**/*", "**/node_modules/*"]
+    "exclude": ["node_modules/**/*", "**/node_modules/*", "node_modules"]
   }
 }

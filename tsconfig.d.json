@@ -20,13 +20,14 @@
     "typeRoots": ["./node_modules/@types"],
     "paths": {
       "types": ["src/types/global"]
-    }
+    },
+    "types": ["node"]
   },
   "include": [
     "src/**/*",
     "src/types/**/*"
   ],
-  "exclude": ["src/**/*.mts", "src/**/*.cts", "node_modules/**/*", "**/node_modules/*", "src/**/*.js"],
+  "exclude": ["src/**/*.mts", "src/**/*.cts", "node_modules/**/*", "**/node_modules/*", "src/**/*.js", "node_modules"],
 "ts-node": {
     // It is faster to skip typechecking.
     // Remove if you want ts-node to do typechecking.
@@ -41,7 +42,7 @@
       }
         
     },
-    "exclude": ["node_modules/**/*", "**/node_modules/*"]
+    "exclude": ["node_modules/**/*", "**/node_modules/*", "node_modules"]
 
   }
 }

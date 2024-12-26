@@ -28,7 +28,8 @@
 /*eslint strict: "off"*/
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
-"use strict";
+(() => {
+  "use strict";
 
 const {findPackageNodePath, Import, Package, InheritClass, CONFIG, logger, New, global, ClassFactory, Export} = require ("qcobjects");
 
@@ -549,3 +550,4 @@ HTTPServer,
 HTTPServerRequest,
 HTTPServerResponse
 ]);
+})();

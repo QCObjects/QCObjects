@@ -30,25 +30,29 @@
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
 "use strict";
-const path = require("path");
-const absolutePath = path.resolve( __dirname, "./" );
+(() => {
+  "use strict";
 
-const {InheritClass, New, logger} = require("qcobjects");
+  const path = require("path");
+  const absolutePath = path.resolve(__dirname, "./");
 
-require(absolutePath+"/org.quickcorp.qcobjects.defaultsettings.js");
+  const { InheritClass, New, logger } = require("qcobjects");
 
-const {HTTPServer} = require(absolutePath+"/org.quickcorp.qcobjects.main.http.gae.server.js");
+  require(absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
 
-class Main extends InheritClass {
+  const { HTTPServer } = require(absolutePath + "/org.quickcorp.qcobjects.main.http.gae.server.js");
 
-  constructor (){
-    super();
-    const app = New(HTTPServer);
-    app.start();
+  class Main extends InheritClass {
 
-    logger.debug("initialized");
+    constructor() {
+      super();
+      const app = New(HTTPServer);
+      app.start();
 
+      logger.debug("initialized");
+
+    }
   }
-}
 
-const __main__ = new Main ();
+  const __main__ = new Main();
+})();
