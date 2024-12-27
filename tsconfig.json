@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "skipLibCheck": true,
-    "traceResolution":true,
+    "traceResolution":false,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "nodenext",
     "moduleDetection": "auto",

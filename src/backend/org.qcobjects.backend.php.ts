@@ -28,20 +28,17 @@
 /* eslint strict: "off" */
 /* eslint no-mixed-operators: "off" */
 /* eslint no-undef: "off" */
-(() => {
+(async () => {
   "use strict";
-  const fs = require("node:fs");
-  const os = require("node:os");
-  const {
-    exec,
-    execSync
-  } = require("node:child_process");
-  // MY_ENV_VAR="HELLO WORLD" php -f index.php
+  const fs = await import("node:fs");
+  const os = await import("node:os");
+  const { exec, execSync } = await import("node:child_process");
+    // MY_ENV_VAR="HELLO WORLD" php -f index.php
 
-  const { Package, BackendMicroservice, logger, CONFIG, Class } = require("qcobjects");
-  const path = require("node:path");
+  const { Package, BackendMicroservice, logger, CONFIG, Class } = await import("qcobjects");
+  const path = await import("node:path");
   const absolutePath = path.resolve(__dirname, "./");
-  const { PipeLog } = require(absolutePath + "/org.qcobjects.common.pipelog.js");
+  const { PipeLog } = await import(absolutePath + "/org.qcobjects.common.pipelog.js");
 
   const fixWinCmd = function (commandline: string) {
     if (!process.platform.toLowerCase().startsWith("win")) {
@@ -52,6 +49,14 @@
 
 
   class PHPMicroservice extends BackendMicroservice {
+    request: any;
+    stream: any;
+    scriptFilePath: any;
+    domain: any;
+    tempFileName!: string;
+    route: any;
+    body: any;
+    headers:any;
     constructor() {
       super();
       const o = this;
@@ -347,4 +352,5 @@ EOF`;
     PHPMicroservice,
     Microservice
   };
-})();
+})()
+.catch(e => {console.error(e);});

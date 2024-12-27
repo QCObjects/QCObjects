@@ -29,18 +29,16 @@
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
 "use strict";
-const path = require("path");
-const absolutePath = path.resolve(__dirname, "./");
-const {
-  exec,
-  execSync
-} = require("child_process");
-
-const { Package, InheritClass, _DataStringify, New, CONFIG, logger, serviceLoader } = require("qcobjects");
+import path from "node:path";
 
 import { JiraCloud } from "./com.qcobjects.cli.commands.jira.client_services";
+import { Package, InheritClass, _DataStringify, New, CONFIG, logger } from "qcobjects";
+const absolutePath = path.resolve(__dirname, "./");
 
 export class CommandHandler extends InheritClass {
+  choiceOption: {
+    [x: string]: any; issues: () => void;
+  };
   constructor({
     switchCommander
   }: { switchCommander: any }) {
@@ -118,6 +116,7 @@ export class CommandHandler extends InheritClass {
 
 
 }
+
 
 Package("com.qcobjects.cli.commands.jira", [
   CommandHandler

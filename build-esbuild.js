@@ -64,10 +64,10 @@ const copyDir = async (source, dest, exclude) => {
 
 const baseSettings = {
     entryPoints: ["src/**/*.ts"], // Your entry file
-    bundle: true,
+    bundle: false,
     outdir: "public/cjs", // Output dir
     format: "cjs", // or "esm" depending on your module system    
-    target: ["esnext"], // Adjust based on your target environment
+    target: ["node22"], // Adjust based on your target environment
     tsconfig: "tsconfig.json", // Path to your tsconfig.json,
     globalName: "global",
     minify: false,
@@ -79,13 +79,6 @@ const baseSettings = {
         alias({
             "types": path.join(__dirname, "src/types/global/index.d.ts")
         })
-    ],
-    external: ["os", "path", "http", "url",
-        "child_process", "events", "fs", "process", "node:process",
-        "node:fs", "node:os", "node:child_process",
-        "node:path", "readline", "node:net", "node:repl",
-        "node:vm", "http2", "vm", "qcobjects-sdk",
-        "../package.json", "package.json", "./package.json"
     ]
 };
 

@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/index.ts"],
+  "sourcesContent": ["import * as cli from \"./qcobjects-cli.js\";\nexport default cli;"],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA,YAAqB;AACrB,MAAO,gBAAQ;",
+  "names": []
+}

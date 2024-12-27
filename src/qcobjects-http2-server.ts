@@ -29,17 +29,17 @@
 /*eslint strict: "off"*/
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
-(() => {
+(async () => {
   "use strict";
-  const path = require("path");
+  const path = await import("path");
   const absolutePath = path.resolve(__dirname, "./");
 
-  require("qcobjects");
-  const { CONFIG, InheritClass, New, logger } = require("qcobjects");
+  await import("qcobjects");
+  const { CONFIG, InheritClass, New, logger } = await import("qcobjects");
 
-  require(absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
-  const HTTPServer: any = require(absolutePath + "/org.quickcorp.qcobjects.main.http.server.js");
-  const HTTP2Server = require(absolutePath + "/org.quickcorp.qcobjects.main.http2.server.js");
+  await import(absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
+  const HTTPServer: any = await import(absolutePath + "/org.quickcorp.qcobjects.main.http.server.js");
+  const HTTP2Server = await import(absolutePath + "/org.quickcorp.qcobjects.main.http2.server.js");
 
   class Main extends InheritClass {
     constructor() {
@@ -56,4 +56,5 @@
   }
 
   const __main__ = new Main();
-})();
+})()
+.catch(e => console.error(e));

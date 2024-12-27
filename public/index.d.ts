@@ -22,9 +22,12 @@ declare module "com.qcobjects.cli.commands.jira.client_services" {
     }
 }
 declare module "com.qcobjects.cli.commands.jira" {
-    const InheritClass: any;
+    import { InheritClass } from "qcobjects";
     export class CommandHandler extends InheritClass {
-        static [x: string]: any;
+        choiceOption: {
+            [x: string]: any;
+            issues: () => void;
+        };
         constructor({ switchCommander }: {
             switchCommander: any;
         });
@@ -101,13 +104,36 @@ declare module "org.quickcorp.qcobjects.api.client_services" {
     }
 }
 declare module "org.quickcorp.qcobjects.cli" {
-    const InheritClass: any;
+    /**
+     * QCObjects CLI 2.4.x
+     * ________________
+     *
+     * Author: Jean Machuca <correojean@gmail.com>
+     *
+     * Cross Browser Javascript Framework for MVC Patterns
+     * QuickCorp/QCObjects is licensed under the
+     * GNU Lesser General Public License v3.0
+     * [LICENSE] (https://github.com/QuickCorp/QCObjects/blob/master/LICENSE.txt)
+     *
+     * Permissions of this copyleft license are conditioned on making available
+     * complete source code of licensed works and modifications under the same
+     * license or the GNU GPLv3. Copyright and license notices must be preserved.
+     * Contributors provide an express grant of patent rights. However, a larger
+     * work using the licensed work through interfaces provided by the licensed
+     * work may be distributed under different terms and without source code for
+     * the larger work.
+     *
+     * Copyright (C) 2015 Jean Machuca,<correojean@gmail.com>
+     *
+     * Everyone is permitted to copy and distribute verbatim copies of this
+     * license document, but changing it is not allowed.
+    */
     export * as EnterpriseCommands from "org.qcobjects.enterprise.commands";
+    import { InheritClass } from "qcobjects";
     export * as QuickCorpServices from "org.quickcorp.qcobjects.api.client_services";
     export * as customCommands from "com.qcobjects.cli.commands";
     export const getPluginCommandsList: () => any;
     export class SwitchCommander extends InheritClass {
-        static [x: string]: any;
         choiceOption: {
             generateSw: (_appName: boolean, options: {
                 dir: any;
@@ -121,9 +147,10 @@ declare module "org.quickcorp.qcobjects.cli" {
             publish(_appName: any, _options: any): void;
             upgradeToEnterprise(_appName: any, _options: any): void;
         };
+        program: any;
         constructor();
         shellCommands(_shell_commands: any[]): Promise<unknown>;
-        fileListRecursive(dir: string): string | any[];
+        fileListRecursive(dir: string): string | string[];
         register(email: any, phonenumber: any): Promise<unknown>;
         generateServiceWorker(appName: any, dirPrefix?: string): Promise<unknown>;
         copyTemplate(source: any, dest: any): Promise<void>;
@@ -151,4 +178,8 @@ declare module "org.qcobjects.common.pipelog" {
         pipe(o: any): string;
     }
 }
+declare module "org.quickcorp.qcobjects.main.http.gae.server" { }
+declare module "org.quickcorp.qcobjects.main.http2.server" { }
+declare module "qcobjects-createcert" { }
 declare module "qcobjects-shell" { }
+declare module "backend/com.qcobjects.backend.microservice.static" { }

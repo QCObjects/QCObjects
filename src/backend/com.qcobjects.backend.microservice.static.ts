@@ -29,17 +29,22 @@
 /* eslint no-mixed-operators: "off" */
 /* eslint no-undef: "off" */
 /* eslint no-useless-escape: "off" */
-(() => {
+import mime from "mime";
+(async () => {
   "use strict";
-  const fs = require("fs");
-  const path = require("path");
+  const fs = await import("fs");
+  const path = await import("path");
   const absolutePath = path.resolve(__dirname, "./");
-  const mime = require("mime");
 
-  const { Package, BackendMicroservice, CONFIG, logger } = require("qcobjects");
+  const { Package, BackendMicroservice, CONFIG, logger } = await import("qcobjects");
 
   Package("com.qcobjects.backend.microservice.static", [
     class Microservice extends BackendMicroservice {
+      stream: any;
+      fileName: any;
+      route: any;
+      request: any;
+      body!: void;
 
       finishWithBody() { }
       done() {
@@ -112,7 +117,7 @@
 
             stream.writeHead(200, headers);
 
-            stream.write(fs.readFileSync(fileName));
+            stream.write(fs.readFileSync(fileName).toString());
             stream.on("close", () => {
               logger.info("closing static file", fileName);
             });
@@ -275,4 +280,5 @@
     }
 
   ]);
-})();
+})()
+.catch(e => console.error(e));

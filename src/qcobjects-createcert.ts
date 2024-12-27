@@ -29,12 +29,12 @@
 /*eslint strict: "off"*/
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
-(() => {
+import path from "node:path";
+import os from "node:os";
+(async () => {
   "use strict";
-  const path = require("path");
   const absolutePath = path.resolve(__dirname, "./");
   const templatePath = path.resolve(__dirname, "./templates/apps/") + "/";
-  const os = require("os");
   const isWindows = () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return os.platform().toLowerCase().startsWith("win");
@@ -45,11 +45,11 @@
   };
 
 
-  const { InheritClass, CONFIG } = require("qcobjects");
+  const { InheritClass, CONFIG } = await import("qcobjects");
 
-  require(absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
+  await import(absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
 
-  const { execSync } = require("child_process");
+  const { execSync } = await import("node:child_process");
 
   class Main extends InheritClass {
     constructor() {
@@ -86,4 +86,4 @@
   }
 
   const __main__ = new Main();
-})();
+})().catch(e => console.error(e));

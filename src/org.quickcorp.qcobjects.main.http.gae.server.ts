@@ -28,17 +28,20 @@
 /*eslint strict: "off"*/
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
-(() => {
-  "use strict";
-  const { findPackageNodePath, Import, Package, InheritClass, CONFIG, logger, New, global, ClassFactory, Export } = require("qcobjects");
+import os from "node:os";
+import path from "node:path";
+import fs from "node:fs";
+import http from "node:http";
+import mime from "mime";
 
-  const path = require("path");
+(async () => {
+  "use strict";
+  const { findPackageNodePath, Import, Package, InheritClass, CONFIG, logger, New, global, ClassFactory, Export } = await import("qcobjects");
+
   const absolutePath = path.resolve(__dirname, "./");
 
-  const fs = require("fs");
-  const mime = require("mime");
-  const { FileDispatcher } = require(absolutePath + "/org.quickcorp.qcobjects.main.file.js");
-  const { PipeLog } = require(absolutePath + "/org.qcobjects.common.pipelog.js");
+  const { FileDispatcher } = await import(absolutePath + "/org.quickcorp.qcobjects.main.file.js");
+  const { PipeLog } = await import(absolutePath + "/org.qcobjects.common.pipelog.js");
 
   const ImportMicroservice = function (microservicePackage: string) {
     var _ret_;
@@ -50,13 +53,23 @@
       if (nonStandardPath !== null) {
         _ret_ = Import(absolutePath + "/backend/" + microservicePackage);
       } else {
-        _ret_ = Promise.resolve(require(microservicePackage));
+        _ret_ = Promise.resolve( async () => (await import (microservicePackage))());
       }
     }
     return _ret_;
   };
 
   class BackendMicroservice extends InheritClass {
+    domain: any;
+    basePath: any;
+    server: any;
+    request: any;
+    req: any;
+    get: any;
+    route: any;
+    headers: any;
+    body!: object;
+    stream: any;
 
     constructor(o: any) {
       super(o);
@@ -195,6 +208,11 @@
   Export(BackendMicroservice);
 
   class HTTPServerResponse extends InheritClass {
+    body!: string;
+    stream: any;
+    headers: { ":status": number; "content-type": string; };
+    fileDispatcher: any;
+    request: any;
     constructor(o: { stream: any; }) {
       super(o);
       var self = this;
@@ -207,7 +225,7 @@
       };
     }
 
-    sendFile(stream: { setHeader: (arg0: string, arg1: any) => void; end: (arg0?: any) => void; write: (arg0: string) => void; on: (arg0: string, arg1: () => void) => void; }, fileName: string) {
+    sendFile(stream:any, fileName: string) {
       // read and send file content in the stream
 
       try {
@@ -265,7 +283,7 @@
       response.fileDispatcher = New(FileDispatcher, {
         scriptname: response.request.scriptname,
         pathname: response.request.pathname,
-        done(headers: { [x: string]: number; }, body: any, templateURI: any, isTemplate: any) {
+        done(headers: any, body: any, templateURI: any, isTemplate: any) {
           response.headers = headers;
           var stream = response.stream;
           if (isTemplate) {
@@ -309,12 +327,34 @@
       pathname = "",
       href = ""
     }) {
-      super(...arguments);
+      super({
+        scriptname,
+        path,
+        method,
+        url,
+        headers,
+        flags,
+        protocol,
+        slashes,
+        auth,
+        host,
+        port,
+        hostname,
+        hash,
+        search,
+        query,
+        pathname,
+        href
+      });
 
     }
   }
 
   class HTTPServer extends InheritClass {
+    interceptorInstances: any[];
+    server: any;
+    request: any;
+    response: any;
     constructor({
       request = null,
       response = "",
@@ -344,7 +384,6 @@
       logger.info("Go to: \n" + this.showPossibleURL());
       this.interceptorInstances = interceptorInstances;
 
-      const http = require("http");
 
       oHTTPServer.server = http.createServer((req: any, res: any) => {
 
@@ -471,10 +510,9 @@
 
     showIPAddress() {
       var _ret_ = "";
-      var os = require("os");
       var ifaces = os.networkInterfaces();
       Object.keys(ifaces).forEach(function (iface) {
-        ifaces[iface].map(function (ipGroup: any) {
+        ifaces[iface]?.forEach(function (ipGroup: any) {
           _ret_ += iface + ": " + (new PipeLog()).pipe(ipGroup) + "\n";
         });
       });
@@ -483,10 +521,9 @@
 
     showPossibleURL() {
       var _ret_ = "";
-      var os = require("os");
       var ifaces = os.networkInterfaces();
       Object.keys(ifaces).forEach(function (iface) {
-        ifaces[iface].map(function (ipGroup: { [x: string]: string; }) {
+        ifaces[iface]?.forEach((ipGroup: any) => {
           if (ipGroup["family"].toLowerCase() == "ipv4") {
             _ret_ += "http://" + ipGroup["address"] + ":" + CONFIG.get("serverPortHTTP").toString() + "/\n";
           }
@@ -506,4 +543,4 @@
     BackendMicroservice, HTTPServer, HTTPServerRequest, HTTPServerResponse
 
   ]);
-})();
+})().catch(e => console.error(e));
