@@ -28,18 +28,21 @@
 /*eslint strict: "off"*/
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
-(() => {
+import os from "node:os";
+import path from "node:path";
+import {findPackageNodePath, Import, Package, InheritClass, CONFIG, logger, New, global, ClassFactory, Export} from "qcobjects";
+import fs from "fs";
+import mime from "mime";
+import http from "http";
+import URL from "url";
+
+(async () => {
   "use strict";
 
-const {findPackageNodePath, Import, Package, InheritClass, CONFIG, logger, New, global, ClassFactory, Export} = require ("qcobjects");
-
-const path = require("path");
 const absolutePath = path.resolve(__dirname, "./");
 
-const fs = require("fs");
-const mime = require("mime");
-const { FileDispatcher} = require(absolutePath + "/org.quickcorp.qcobjects.main.file.js");
-const {PipeLog} = require(absolutePath + "/org.qcobjects.common.pipelog.js");
+const {FileDispatcher} = await import(absolutePath + "/org.quickcorp.qcobjects.main.file.js");
+const {PipeLog} = await import(absolutePath + "/org.qcobjects.common.pipelog.js");
 
 const ImportMicroservice = function (microservicePackage: string) {
   var _ret_;
@@ -51,7 +54,7 @@ const ImportMicroservice = function (microservicePackage: string) {
     if (nonStandardPath !== null){
       _ret_ = Import(absolutePath + "/backend/" + microservicePackage);
     } else {
-      _ret_ = Promise.resolve(require (microservicePackage));
+      _ret_ = Promise.resolve(async () => (await import(microservicePackage))());
     }
   }
   return _ret_;
@@ -59,6 +62,13 @@ const ImportMicroservice = function (microservicePackage: string) {
 
 
 class BackendMicroservice extends InheritClass {
+  body: any;
+  stream: any;
+  req: any;
+  get: any;
+  route: any;
+  headers: any;
+  request: any;
   constructor({
     domain=CONFIG.get("domain"),
     basePath=CONFIG.get("basePath"),
@@ -214,6 +224,11 @@ Export (BackendMicroservice);
 
 
 class HTTPServerResponse extends InheritClass {
+  stream!: null;
+  fileDispatcher: any;
+  request: any;
+  headers!: { [x: string]: any; };
+  body: any;
   constructor ({
     headers={
       "status": 200,
@@ -237,7 +252,7 @@ class HTTPServerResponse extends InheritClass {
 
   }
 
-  sendFile(stream: { setHeader: (arg0: string, arg1: number) => void; end: (arg0?: any) => void; write: (arg0: string) => void; on: (arg0: string, arg1: () => void) => void; }, fileName: string) {
+  sendFile(stream: any, fileName: string) {
     // read and send file content in the stream
 
     try {
@@ -311,14 +326,14 @@ class HTTPServerResponse extends InheritClass {
         var stream = response.stream;
         if (isTemplate){
           response.body = body;
-          Object.keys(headers).map((header)=>stream.setHeader(header, headers[header]));
-          stream.write(response.body);
-          stream.end();
+          Object.keys(headers).map((header)=>(stream as any).setHeader(header, headers[header]));
+          (stream as any).write(response.body);
+          (stream as any).end();
         } else if (headers["status"] == 200 || headers[":status"] == 200) {
           response.sendFile(stream, templateURI);
         } else {
-          Object.keys(headers).map((header)=>stream.setHeader(header, headers[header]));
-          stream.end();
+          Object.keys(headers).map((header)=>(stream as any).setHeader(header, headers[header]));
+          (stream as any).end();
         }
       }
     });
@@ -347,11 +362,33 @@ class HTTPServerRequest extends InheritClass {
     pathname = "",
     href = ""
   }) {
-    super(...arguments);
+    super({
+      scriptname,
+      path,
+      method,
+      url,
+      headers,
+      flags,
+      protocol,
+      slashes,
+      auth,
+      host,
+      port,
+      hostname,
+      hash,
+      search,
+      query,
+      pathname,
+      href
+    });
   }
 }
 
 class HTTPServer extends InheritClass {
+  interceptorInstances: never[];
+  server: any;
+  request: any;
+  response: any;
   constructor({
     request = null,
     response = "",
@@ -359,7 +396,13 @@ class HTTPServer extends InheritClass {
     scriptname = "",
     interceptorInstances = []
   }) {
-    super(...arguments);
+    super({
+      request,
+      response,
+      server,
+      scriptname,
+      interceptorInstances
+    });
 
     const welcometo = "Welcome to \n";
     const instructions = "QCObjects Legacy HTTPServer \n";
@@ -372,7 +415,6 @@ class HTTPServer extends InheritClass {
     logger.info("Go to: \n"+this.showPossibleURL());
     this.interceptorInstances = interceptorInstances;
 
-    const http = require("http");
     this.server = http.createServer((req: any, res: any) => {
       logger.debug("Legacy Server Instantiated.");
     });
@@ -381,7 +423,7 @@ class HTTPServer extends InheritClass {
 
     if (global.get("backendAvailable")){
       logger.info("Loading backend interceptors...");
-      let interceptors = CONFIG.get("backend", {}).interceptors;
+      const interceptors = CONFIG.get("backend", {}).interceptors;
       if (typeof interceptors !== "undefined") {
         logger.info("Backend Interceptors Available");
         interceptors.map((interceptor: { microservice: string; }) => {
@@ -394,14 +436,14 @@ class HTTPServer extends InheritClass {
             interceptor: interceptor,
             server: this.server
           });
-          this.interceptorInstances.push(interceptorInstance);
+          this.interceptorInstances.push(interceptorInstance as never);
         });
       }
     }
 
     this.server.on("request", (req: { url: any; headers: any; method: any; }, res: { destroyed: any; writeHeader: (arg0: number, arg1: { "content-type": string; }) => void; on: (arg0: string, arg1: () => void) => void; write: (arg0: string) => void; end: () => void; }) => {
 
-      let request = Object.assign(New(HTTPServerRequest),require("url").parse(req.url));
+      const request = Object.assign(New(HTTPServerRequest),URL.parse(req.url));
       request.headers = req.headers;
       this.request = request;
       this.request.method = req.method;
@@ -447,16 +489,16 @@ class HTTPServer extends InheritClass {
         logger.info("Backend Legacy Microservices Available...");
 
         logger.info("Loading backend routes...");
-        let routes = CONFIG.get("backend", {}).routes;
-        let selectedRoute = routes.filter((route: { path: string; }) => {
-          let standardRoutePath = route.path.replace(/{(.*?)}/g, "(?<$1>.*)");
+        const routes = CONFIG.get("backend", {}).routes;
+        const selectedRoute = routes.filter((route: { path: string; }) => {
+          const standardRoutePath = route.path.replace(/{(.*?)}/g, "(?<$1>.*)");
           return (new RegExp(standardRoutePath, "g")).test(request.path);
         });
         if (selectedRoute.length > 0) {
           selectedRoute.map((route: { path: string; microservice: string; }) => {
-            let standardRoutePath = route.path.replace(/{(.*?)}/g, "(?<$1>.*)"); //allowing {param}
+            const standardRoutePath = route.path.replace(/{(.*?)}/g, "(?<$1>.*)"); //allowing {param}
             console.log(standardRoutePath);
-            let selectedRouteParams = {
+            const selectedRouteParams = {
               ...[...request.path.matchAll((new RegExp(standardRoutePath, "g")))][0]["groups"]
             };
             ImportMicroservice(route.microservice).then (()=>{
@@ -514,10 +556,9 @@ class HTTPServer extends InheritClass {
 
   showIPAddress(){
     var _ret_ = "";
-    var os = require("os");
     var ifaces = os.networkInterfaces();
     Object.keys(ifaces).forEach(function (iface) {
-      ifaces[iface].map(function (ipGroup: any) {
+      ifaces[iface]?.forEach(function (ipGroup: any) {
         _ret_ += iface + ": " + (new PipeLog()).pipe(ipGroup) + "\n";
       });
     });
@@ -525,10 +566,9 @@ class HTTPServer extends InheritClass {
   }
   showPossibleURL(){
     var _ret_ = "";
-    var os = require("os");
     var ifaces = os.networkInterfaces();
     Object.keys(ifaces).forEach(function (iface){
-      ifaces[iface].map(function (ipGroup: { [x: string]: string; }){
+      ifaces[iface]?.forEach(function (ipGroup: any){
         if (ipGroup["family"].toLowerCase()=="ipv4"){
           _ret_ += "http://"+ipGroup["address"]+":"+CONFIG.get("serverPortHTTP").toString()+"/\n";
         }
@@ -550,4 +590,4 @@ HTTPServer,
 HTTPServerRequest,
 HTTPServerResponse
 ]);
-})();
+})().catch(e => console.error(e));

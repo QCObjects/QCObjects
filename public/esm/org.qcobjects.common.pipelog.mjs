@@ -1,6 +1,6 @@
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const { Package, InheritClass } = require("qcobjects");
+import { Package, InheritClass } from "qcobjects";
 class PipeLog extends InheritClass {
   static {
     __name(this, "PipeLog");

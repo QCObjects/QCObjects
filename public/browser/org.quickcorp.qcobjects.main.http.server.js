@@ -1,44 +1,74 @@
 "use strict";
 var global = (() => {
+  var __create = Object.create;
   var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __getProtoOf = Object.getPrototypeOf;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
   var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
   var __commonJS = (cb, mod) => function __require() {
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+    }
+    return to;
+  };
+  var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+    // If the importer is in node compatibility mode or this is not an ESM
+    // file that has been converted to a CommonJS file using a Babel-
+    // compatible transform (i.e. "__esModule" has not been set), then set
+    // "default" to the CommonJS "module.exports" for node compatibility.
+    isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+    mod
+  ));
   var require_org_quickcorp_qcobjects_main_http_server = __commonJS({
     "src/org.quickcorp.qcobjects.main.http.server.ts"() {
-      (() => {
+      var import_node_os = __toESM(require("node:os"));
+      var import_node_path = __toESM(require("node:path"));
+      var import_qcobjects = require("qcobjects");
+      var import_fs = __toESM(require("fs"));
+      var import_mime = __toESM(require("mime"));
+      var import_http = __toESM(require("http"));
+      var import_url = __toESM(require("url"));
+      (async () => {
         "use strict";
-        const { findPackageNodePath, Import, Package, InheritClass, CONFIG, logger, New, global, ClassFactory, Export } = require("qcobjects");
-        const path = require("path");
-        const absolutePath = path.resolve(__dirname, "./");
-        const fs = require("fs");
-        const mime = require("mime");
-        const { FileDispatcher } = require(absolutePath + "/org.quickcorp.qcobjects.main.file.js");
-        const { PipeLog } = require(absolutePath + "/org.qcobjects.common.pipelog.js");
+        const absolutePath = import_node_path.default.resolve(__dirname, "./");
+        const { FileDispatcher } = await import(absolutePath + "/org.quickcorp.qcobjects.main.file.js");
+        const { PipeLog } = await import(absolutePath + "/org.qcobjects.common.pipelog.js");
         const ImportMicroservice = /* @__PURE__ */ __name(function(microservicePackage) {
           var _ret_;
-          var standardPath = findPackageNodePath(microservicePackage) || findPackageNodePath(microservicePackage + ".js");
+          var standardPath = (0, import_qcobjects.findPackageNodePath)(microservicePackage) || (0, import_qcobjects.findPackageNodePath)(microservicePackage + ".js");
           if (standardPath !== null) {
-            _ret_ = Import(microservicePackage);
+            _ret_ = (0, import_qcobjects.Import)(microservicePackage);
           } else {
-            var nonStandardPath = findPackageNodePath(absolutePath + "/backend/" + microservicePackage) || findPackageNodePath(absolutePath + "/backend/" + microservicePackage + ".js");
+            var nonStandardPath = (0, import_qcobjects.findPackageNodePath)(absolutePath + "/backend/" + microservicePackage) || (0, import_qcobjects.findPackageNodePath)(absolutePath + "/backend/" + microservicePackage + ".js");
             if (nonStandardPath !== null) {
-              _ret_ = Import(absolutePath + "/backend/" + microservicePackage);
+              _ret_ = (0, import_qcobjects.Import)(absolutePath + "/backend/" + microservicePackage);
             } else {
-              _ret_ = Promise.resolve(require(microservicePackage));
+              _ret_ = Promise.resolve(async () => (await import(microservicePackage))());
             }
           }
           return _ret_;
         }, "ImportMicroservice");
-        class BackendMicroservice extends InheritClass {
+        class BackendMicroservice extends import_qcobjects.InheritClass {
           static {
             __name(this, "BackendMicroservice");
           }
+          body;
+          stream;
+          req;
+          get;
+          route;
+          headers;
+          request;
           constructor({
-            domain = CONFIG.get("domain"),
-            basePath = CONFIG.get("basePath"),
+            domain = import_qcobjects.CONFIG.get("domain"),
+            basePath = import_qcobjects.CONFIG.get("basePath"),
             body = null,
             stream = null,
             request = null
@@ -50,7 +80,7 @@ var global = (() => {
               stream,
               request
             });
-            logger.debug("Initializing Legacy BackendMicroservice...");
+            import_qcobjects.logger.debug("Initializing Legacy BackendMicroservice...");
             const microservice = this;
             if (typeof this.body === "undefined") {
               this.body = null;
@@ -86,7 +116,7 @@ var global = (() => {
           }
           cors() {
             if (this.route.cors) {
-              logger.debug("Validating CORS...");
+              import_qcobjects.logger.debug("Validating CORS...");
               const {
                 allow_origins,
                 allow_credentials,
@@ -101,48 +131,48 @@ var global = (() => {
                 microservice.route.responseHeaders = {};
               }
               if (typeof allow_origins !== "undefined") {
-                logger.debug("CORS: allow_origins available. Validating origins...");
+                import_qcobjects.logger.debug("CORS: allow_origins available. Validating origins...");
                 if (allow_origins === "*" || typeof microservice.request.headers.origin === "undefined" || [...allow_origins].indexOf(microservice.request.headers.origin) !== -1) {
-                  logger.debug("CORS: Adding header Access-Control-Allow-Origin=*");
+                  import_qcobjects.logger.debug("CORS: Adding header Access-Control-Allow-Origin=*");
                   microservice.route.responseHeaders["Access-Control-Allow-Origin"] = "*";
                 } else {
-                  logger.debug("CORS: Origin is not allowed: " + microservice.request.headers.origin);
-                  logger.debug("CORS: Forcing to finish the response...");
+                  import_qcobjects.logger.debug("CORS: Origin is not allowed: " + microservice.request.headers.origin);
+                  import_qcobjects.logger.debug("CORS: Forcing to finish the response...");
                   this.body = {};
                   try {
                     this.done();
                   } catch (e) {
-                    logger.debug(`It was not possible to finish the call to the microservice: ${e}`);
+                    import_qcobjects.logger.debug(`It was not possible to finish the call to the microservice: ${e}`);
                   }
                 }
               } else {
-                logger.debug("CORS: no allow_origins available. Allowing all origins...");
-                logger.debug("CORS: Adding header Access-Control-Allow-Origin=*");
+                import_qcobjects.logger.debug("CORS: no allow_origins available. Allowing all origins...");
+                import_qcobjects.logger.debug("CORS: Adding header Access-Control-Allow-Origin=*");
                 microservice.route.responseHeaders["Access-Control-Allow-Origin"] = "*";
               }
               if (typeof allow_credentials !== "undefined") {
-                logger.debug(`CORS: allow_credentials present. Allowing ${allow_credentials}...`);
+                import_qcobjects.logger.debug(`CORS: allow_credentials present. Allowing ${allow_credentials}...`);
                 microservice.route.responseHeaders["Access-Control-Allow-Credentials"] = allow_credentials.toString();
               } else {
-                logger.debug("CORS: No allow_credentials present. Allowing all credentials.");
+                import_qcobjects.logger.debug("CORS: No allow_credentials present. Allowing all credentials.");
                 microservice.route.responseHeaders["Access-Control-Allow-Credentials"] = "true";
               }
               if (typeof allow_methods !== "undefined") {
-                logger.debug(`CORS: allow_methods present. Allowing ${allow_methods}...`);
+                import_qcobjects.logger.debug(`CORS: allow_methods present. Allowing ${allow_methods}...`);
                 microservice.route.responseHeaders["Access-Control-Allow-Methods"] = [...allow_methods].join(",");
               } else {
-                logger.debug("CORS: No allow_methods present. Allowing only GET, OPTIONS and POST");
+                import_qcobjects.logger.debug("CORS: No allow_methods present. Allowing only GET, OPTIONS and POST");
                 microservice.route.responseHeaders["Access-Control-Allow-Methods"] = "GET, OPTIONS, POST";
               }
               if (typeof allow_headers !== "undefined") {
-                logger.debug(`CORS: allow_headers present. Allowing ${allow_headers}...`);
+                import_qcobjects.logger.debug(`CORS: allow_headers present. Allowing ${allow_headers}...`);
                 microservice.route.responseHeaders["Access-Control-Allow-Headers"] = [...allow_headers].join(",");
               } else {
-                logger.debug("CORS: No allow_headers present. Allowing all headers...");
+                import_qcobjects.logger.debug("CORS: No allow_headers present. Allowing all headers...");
                 microservice.route.responseHeaders["Access-Control-Allow-Headers"] = "*";
               }
             } else {
-              logger.debug("No CORS validation available. You can specify cors in CONFIG.backend.routes[].cors");
+              import_qcobjects.logger.debug("No CORS validation available. You can specify cors in CONFIG.backend.routes[].cors");
             }
           }
           head(formData) {
@@ -174,7 +204,7 @@ var global = (() => {
               stream.write(JSON.stringify(this.body));
               stream.end();
             } catch (e) {
-              logger.debug(`Something wrong writing the response for microservice: ${e}`);
+              import_qcobjects.logger.debug(`Something wrong writing the response for microservice: ${e}`);
               throw Error(e);
             }
           }
@@ -184,7 +214,7 @@ var global = (() => {
             try {
               stream.writeHead(200, microservice.headers);
             } catch (e) {
-              logger.debug(`Something went wront while sending headers in http... ${e}`);
+              import_qcobjects.logger.debug(`Something went wront while sending headers in http... ${e}`);
               throw Error(e);
             }
             if (microservice.body != null) {
@@ -192,11 +222,16 @@ var global = (() => {
             }
           }
         }
-        Export(BackendMicroservice);
-        class HTTPServerResponse extends InheritClass {
+        (0, import_qcobjects.Export)(BackendMicroservice);
+        class HTTPServerResponse extends import_qcobjects.InheritClass {
           static {
             __name(this, "HTTPServerResponse");
           }
+          stream;
+          fileDispatcher;
+          request;
+          headers;
+          body;
           constructor({
             headers = {
               "status": 200,
@@ -221,21 +256,21 @@ var global = (() => {
           sendFile(stream, fileName) {
             try {
               console.log("trying to read " + fileName);
-              const fd = fs.openSync(fileName, "r");
-              const stat = fs.fstatSync(fd);
+              const fd = import_fs.default.openSync(fileName, "r");
+              const stat = import_fs.default.fstatSync(fd);
               const headers = {
                 "content-length": stat.size,
                 "last-modified": stat.mtime.toUTCString(),
-                "content-type": mime.getType(fileName),
-                "cache-control": CONFIG.get("cacheControl", "max-age=31536000")
+                "content-type": import_mime.default.getType(fileName),
+                "cache-control": import_qcobjects.CONFIG.get("cacheControl", "max-age=31536000")
               };
-              logger.debug("closing file " + fileName);
-              fs.closeSync(fd);
+              import_qcobjects.logger.debug("closing file " + fileName);
+              import_fs.default.closeSync(fd);
               stream.setHeader("content-length", headers["content-length"]);
               stream.setHeader("last-modified", headers["last-modified"]);
               stream.setHeader("content-type", headers["content-type"]);
               stream.setHeader("cache-control", headers["cache-control"]);
-              var readStream = fs.createReadStream(fileName);
+              var readStream = import_fs.default.createReadStream(fileName);
               readStream.on("open", function() {
                 readStream.pipe(stream);
               });
@@ -245,7 +280,7 @@ var global = (() => {
               readStream.on("error", function(err) {
                 const headers2 = {
                   "status": 500,
-                  "content-type": mime.getType(fileName)
+                  "content-type": import_mime.default.getType(fileName)
                 };
                 stream.setHeader("content-type", headers2["content-type"]);
                 stream.setHeader("status", headers2["status"]);
@@ -258,13 +293,13 @@ var global = (() => {
               if (e.errno == -2) {
                 const headers = {
                   "status": 404,
-                  "content-type": mime.getType(fileName)
+                  "content-type": import_mime.default.getType(fileName)
                 };
                 stream.setHeader("content-type", headers["content-type"]);
                 stream.setHeader("status", headers["status"]);
                 stream.write("<h1>404 - FILE NOT FOUND</h1>");
                 stream.on("close", () => {
-                  logger.debug("closing file " + fileName);
+                  import_qcobjects.logger.debug("closing file " + fileName);
                 });
                 stream.end();
               }
@@ -272,7 +307,7 @@ var global = (() => {
           }
           _generateResponse() {
             var response = this;
-            response.fileDispatcher = New(FileDispatcher, {
+            response.fileDispatcher = (0, import_qcobjects.New)(FileDispatcher, {
               scriptname: response.request.scriptname,
               pathname: response.request.pathname,
               done(headers, body, templateURI, isTemplate) {
@@ -293,7 +328,7 @@ var global = (() => {
             });
           }
         }
-        class HTTPServerRequest extends InheritClass {
+        class HTTPServerRequest extends import_qcobjects.InheritClass {
           static {
             __name(this, "HTTPServerRequest");
           }
@@ -316,13 +351,35 @@ var global = (() => {
             pathname = "",
             href = ""
           }) {
-            super(...arguments);
+            super({
+              scriptname,
+              path: path2,
+              method,
+              url,
+              headers,
+              flags,
+              protocol,
+              slashes,
+              auth,
+              host,
+              port,
+              hostname,
+              hash,
+              search,
+              query,
+              pathname,
+              href
+            });
           }
         }
-        class HTTPServer extends InheritClass {
+        class HTTPServer extends import_qcobjects.InheritClass {
           static {
             __name(this, "HTTPServer");
           }
+          interceptorInstances;
+          server;
+          request;
+          response;
           constructor({
             request = null,
             response = "",
@@ -330,7 +387,13 @@ var global = (() => {
             scriptname = "",
             interceptorInstances = []
           }) {
-            super(...arguments);
+            super({
+              request,
+              response,
+              server,
+              scriptname,
+              interceptorInstances
+            });
             const welcometo = "Welcome to \n";
             const instructions = "QCObjects Legacy HTTPServer \n";
             const logo = ` .d88888b.  .d8888b.  .d88888b. 888       d8b                888            \r
@@ -347,27 +410,26 @@ Y88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r
             console.log(welcometo);
             console.log(logo);
             console.log(instructions);
-            logger.debug(this.showIPAddress());
-            logger.info("Listening on HTTP PORT: " + CONFIG.get("serverPortHTTP").toString());
-            logger.info("Go to: \n" + this.showPossibleURL());
+            import_qcobjects.logger.debug(this.showIPAddress());
+            import_qcobjects.logger.info("Listening on HTTP PORT: " + import_qcobjects.CONFIG.get("serverPortHTTP").toString());
+            import_qcobjects.logger.info("Go to: \n" + this.showPossibleURL());
             this.interceptorInstances = interceptorInstances;
-            const http = require("http");
-            this.server = http.createServer((req, res) => {
-              logger.debug("Legacy Server Instantiated.");
+            this.server = import_http.default.createServer((req, res) => {
+              import_qcobjects.logger.debug("Legacy Server Instantiated.");
             });
             this.server.on("error", (err) => console.error(err));
-            if (global.get("backendAvailable")) {
-              logger.info("Loading backend interceptors...");
-              let interceptors = CONFIG.get("backend", {}).interceptors;
+            if (import_qcobjects.global.get("backendAvailable")) {
+              import_qcobjects.logger.info("Loading backend interceptors...");
+              const interceptors = import_qcobjects.CONFIG.get("backend", {}).interceptors;
               if (typeof interceptors !== "undefined") {
-                logger.info("Backend Interceptors Available");
+                import_qcobjects.logger.info("Backend Interceptors Available");
                 interceptors.map((interceptor) => {
                   ImportMicroservice(interceptor.microservice);
-                  var interceptorClassFactory = ClassFactory(interceptor.microservice + ".Interceptor");
-                  var interceptorInstance = New(interceptorClassFactory, {
-                    domain: CONFIG.get("domain"),
-                    basePath: CONFIG.get("basePath"),
-                    projectPath: CONFIG.get("projectPath"),
+                  var interceptorClassFactory = (0, import_qcobjects.ClassFactory)(interceptor.microservice + ".Interceptor");
+                  var interceptorInstance = (0, import_qcobjects.New)(interceptorClassFactory, {
+                    domain: import_qcobjects.CONFIG.get("domain"),
+                    basePath: import_qcobjects.CONFIG.get("basePath"),
+                    projectPath: import_qcobjects.CONFIG.get("projectPath"),
                     interceptor,
                     server: this.server
                   });
@@ -376,18 +438,18 @@ Y88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r
               }
             }
             this.server.on("request", (req, res) => {
-              let request2 = Object.assign(New(HTTPServerRequest), require("url").parse(req.url));
+              const request2 = Object.assign((0, import_qcobjects.New)(HTTPServerRequest), import_url.default.parse(req.url));
               request2.headers = req.headers;
               this.request = request2;
               this.request.method = req.method;
               this.request.path = req.url;
               this.server.setMaxListeners(9999999999);
-              CONFIG.set("backendTimeout", CONFIG.get("backendTimeout") || 2e4);
+              import_qcobjects.CONFIG.set("backendTimeout", import_qcobjects.CONFIG.get("backendTimeout") || 2e4);
               var timeoutHandler = /* @__PURE__ */ __name(() => {
                 try {
                   if (!res.destroyed) {
-                    logger.info("A timeout occurred..." + CONFIG.get("backendTimeout").toString());
-                    logger.info("Killing session...");
+                    import_qcobjects.logger.info("A timeout occurred..." + import_qcobjects.CONFIG.get("backendTimeout").toString());
+                    import_qcobjects.logger.info("Killing session...");
                     res.writeHeader(500, {
                       "content-type": "text/html"
                     });
@@ -396,47 +458,47 @@ Y88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r
                     res.write("<h1>500 - INTERNAL SERVER ERROR (TIMEOUT)</h1>");
                     res.end();
                   } else {
-                    logger.debug("Session was normally finishing...");
+                    import_qcobjects.logger.debug("Session was normally finishing...");
                   }
                 } catch (e) {
-                  logger.debug(`An unhandled error occurred during timeout catching: ${e}`);
+                  import_qcobjects.logger.debug(`An unhandled error occurred during timeout catching: ${e}`);
                 }
                 this.server.removeListener("timeout", timeoutHandler);
               }, "timeoutHandler");
               if (!res.destroyed) {
-                this.server.setTimeout(CONFIG.get("backendTimeout"), timeoutHandler);
+                this.server.setTimeout(import_qcobjects.CONFIG.get("backendTimeout"), timeoutHandler);
               }
               if (this.request.pathname.indexOf(".") < 0) {
-                this.request.scriptname = CONFIG.get("documentRootFileIndex");
+                this.request.scriptname = import_qcobjects.CONFIG.get("documentRootFileIndex");
               } else {
                 this.request.scriptname = this.request.pathname.split("/").reverse()[0];
               }
               this.request.pathname = this.request.pathname.substr(0, this.request.pathname.lastIndexOf("/"));
-              logger.debug(new PipeLog().pipe(this.request));
-              if (global.get("backendAvailable")) {
-                logger.info("Backend Legacy Microservices Available...");
-                logger.info("Loading backend routes...");
-                let routes = CONFIG.get("backend", {}).routes;
-                let selectedRoute = routes.filter((route) => {
-                  let standardRoutePath = route.path.replace(/{(.*?)}/g, "(?<$1>.*)");
+              import_qcobjects.logger.debug(new PipeLog().pipe(this.request));
+              if (import_qcobjects.global.get("backendAvailable")) {
+                import_qcobjects.logger.info("Backend Legacy Microservices Available...");
+                import_qcobjects.logger.info("Loading backend routes...");
+                const routes = import_qcobjects.CONFIG.get("backend", {}).routes;
+                const selectedRoute = routes.filter((route) => {
+                  const standardRoutePath = route.path.replace(/{(.*?)}/g, "(?<$1>.*)");
                   return new RegExp(standardRoutePath, "g").test(request2.path);
                 });
                 if (selectedRoute.length > 0) {
                   selectedRoute.map((route) => {
-                    let standardRoutePath = route.path.replace(/{(.*?)}/g, "(?<$1>.*)");
+                    const standardRoutePath = route.path.replace(/{(.*?)}/g, "(?<$1>.*)");
                     console.log(standardRoutePath);
-                    let selectedRouteParams = {
+                    const selectedRouteParams = {
                       ...[...request2.path.matchAll(new RegExp(standardRoutePath, "g"))][0]["groups"]
                     };
                     ImportMicroservice(route.microservice).then(() => {
-                      logger.debug(`Trying to execute ${route.microservice + ".Microservice"}...`);
-                      var microServiceClassFactory = ClassFactory(route.microservice + ".Microservice");
+                      import_qcobjects.logger.debug(`Trying to execute ${route.microservice + ".Microservice"}...`);
+                      var microServiceClassFactory = (0, import_qcobjects.ClassFactory)(route.microservice + ".Microservice");
                       if (typeof microServiceClassFactory !== "undefined") {
                         const server2 = this.server;
-                        this.response = New(microServiceClassFactory, {
-                          domain: CONFIG.get("domain"),
-                          basePath: CONFIG.get("basePath"),
-                          projectPath: CONFIG.get("projectPath"),
+                        this.response = (0, import_qcobjects.New)(microServiceClassFactory, {
+                          domain: import_qcobjects.CONFIG.get("domain"),
+                          basePath: import_qcobjects.CONFIG.get("basePath"),
+                          projectPath: import_qcobjects.CONFIG.get("projectPath"),
                           route,
                           routeParams: selectedRouteParams,
                           server: server2,
@@ -452,10 +514,10 @@ Y88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r
                     });
                   });
                 } else {
-                  this.response = New(HTTPServerResponse, {
-                    domain: CONFIG.get("domain"),
-                    basePath: CONFIG.get("basePath"),
-                    projectPath: CONFIG.get("projectPath"),
+                  this.response = (0, import_qcobjects.New)(HTTPServerResponse, {
+                    domain: import_qcobjects.CONFIG.get("domain"),
+                    basePath: import_qcobjects.CONFIG.get("basePath"),
+                    projectPath: import_qcobjects.CONFIG.get("projectPath"),
                     server: this.server,
                     stream: res,
                     req,
@@ -463,7 +525,7 @@ Y88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r
                   });
                 }
               } else {
-                this.response = New(HTTPServerResponse, {
+                this.response = (0, import_qcobjects.New)(HTTPServerResponse, {
                   server: this.server,
                   stream: res,
                   req,
@@ -474,10 +536,9 @@ Y88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r
           }
           showIPAddress() {
             var _ret_ = "";
-            var os = require("os");
-            var ifaces = os.networkInterfaces();
+            var ifaces = import_node_os.default.networkInterfaces();
             Object.keys(ifaces).forEach(function(iface) {
-              ifaces[iface].map(function(ipGroup) {
+              ifaces[iface]?.forEach(function(ipGroup) {
                 _ret_ += iface + ": " + new PipeLog().pipe(ipGroup) + "\n";
               });
             });
@@ -485,12 +546,11 @@ Y88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r
           }
           showPossibleURL() {
             var _ret_ = "";
-            var os = require("os");
-            var ifaces = os.networkInterfaces();
+            var ifaces = import_node_os.default.networkInterfaces();
             Object.keys(ifaces).forEach(function(iface) {
-              ifaces[iface].map(function(ipGroup) {
+              ifaces[iface]?.forEach(function(ipGroup) {
                 if (ipGroup["family"].toLowerCase() == "ipv4") {
-                  _ret_ += "http://" + ipGroup["address"] + ":" + CONFIG.get("serverPortHTTP").toString() + "/\n";
+                  _ret_ += "http://" + ipGroup["address"] + ":" + import_qcobjects.CONFIG.get("serverPortHTTP").toString() + "/\n";
                 }
               });
             });
@@ -498,16 +558,16 @@ Y88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r
           }
           start() {
             var server = this.server;
-            server.listen(process.env.PORT || CONFIG.get("serverPortHTTP"));
+            server.listen(process.env.PORT || import_qcobjects.CONFIG.get("serverPortHTTP"));
           }
         }
-        Package("org.quickcorp.qcobjects.main.http.server", [
+        (0, import_qcobjects.Package)("org.quickcorp.qcobjects.main.http.server", [
           BackendMicroservice,
           HTTPServer,
           HTTPServerRequest,
           HTTPServerResponse
         ]);
-      })();
+      })().catch((e) => console.error(e));
     }
   });
   return require_org_quickcorp_qcobjects_main_http_server();

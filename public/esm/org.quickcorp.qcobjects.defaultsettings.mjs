@@ -3,12 +3,19 @@ var __name = (target, value) => __defProp(target, "name", { value, configurable:
 import "qcobjects";
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import fs from "node:fs";
 import { CONFIG, global, logger, _Crypt, findPackageNodePath, Export } from "qcobjects";
 const __get_version__ = /* @__PURE__ */ __name(() => {
   const absolutePath = path.resolve(__dirname, "./");
-  const package_config = require(path.resolve(process.cwd(), "package.json"));
-  const qcobjects_pkg_config = require("qcobjects/package.json");
-  const qcobjects_sdk_pkg_config = require("qcobjects-sdk/package.json");
+  const package_config_path = path.resolve(process.cwd(), "package.json");
+  const qcobjects_pkg_config_path = `${findPackageNodePath("qcobjects/package.json")}/qcobjects/package.json`;
+  const qcobjects_sdk_pkg_config_path = `${findPackageNodePath("qcobjects-sdk/package.json")}/qcobjects-sdk/package.json`;
+  const package_config_text = readFileSync(package_config_path).toString();
+  const qcobjects_pkg_config_text = readFileSync(qcobjects_pkg_config_path).toString();
+  const qcobjects_sdk_pkg_config_text = readFileSync(qcobjects_sdk_pkg_config_path).toString();
+  const package_config = JSON.parse(package_config_text);
+  const qcobjects_pkg_config = JSON.parse(qcobjects_pkg_config_text);
+  const qcobjects_sdk_pkg_config = JSON.parse(qcobjects_sdk_pkg_config_text);
   return {
     "qcobjects": qcobjects_pkg_config.version,
     "sdk": qcobjects_sdk_pkg_config.version,
@@ -97,12 +104,11 @@ const __load_default_settings__ = /* @__PURE__ */ __name(() => {
     logger.debug("Something went wrong trying to load config.json file in your project");
   }
   (async function() {
-    const path2 = require("path");
     const projectPath = CONFIG.get("projectPath", `${process.cwd()}/`);
     const loadDefaultRoutes = /* @__PURE__ */ __name(async () => {
       return await new Promise((resolve, reject) => {
-        const sdkPath = path2.resolve(findPackageNodePath("qcobjects-sdk"), "qcobjects-sdk");
-        const qcobjectsPath = path2.resolve(findPackageNodePath("qcobjects"), "qcobjects");
+        const sdkPath = path.resolve(findPackageNodePath("qcobjects-sdk"), "qcobjects-sdk");
+        const qcobjectsPath = path.resolve(findPackageNodePath("qcobjects"), "qcobjects");
         let backend = CONFIG.get("backend");
         if (typeof backend === "undefined") {
           backend = {};
@@ -116,7 +122,7 @@ const __load_default_settings__ = /* @__PURE__ */ __name(() => {
             "description": "Redirection of QCObjects.js",
             "path": "^/QCObjects.js$",
             "microservice": "com.qcobjects.backend.microservice.static",
-            "redirect_to": path2.resolve(qcobjectsPath, "src", "QCObjects.js"),
+            "redirect_to": path.resolve(qcobjectsPath, "src", "QCObjects.js"),
             "responseHeaders": {},
             "cors": {
               "allow_origins": "*"
@@ -127,7 +133,7 @@ const __load_default_settings__ = /* @__PURE__ */ __name(() => {
             "description": "Redirection of QCObjects SDK",
             "path": "^/js/packages/QCObjects-SDK.js$",
             "microservice": "com.qcobjects.backend.microservice.static",
-            "redirect_to": path2.resolve(sdkPath, "src/QCObjects-SDK.js"),
+            "redirect_to": path.resolve(sdkPath, "src/QCObjects-SDK.js"),
             "responseHeaders": {},
             "cors": {
               "allow_origins": "*"
@@ -138,7 +144,7 @@ const __load_default_settings__ = /* @__PURE__ */ __name(() => {
             "description": "Redirection of QCObjects SDK",
             "path": "^/qcobjects-sdk/(.*)$",
             "microservice": "com.qcobjects.backend.microservice.static",
-            "redirect_to": path2.resolve(sdkPath, "$1"),
+            "redirect_to": path.resolve(sdkPath, "$1"),
             "responseHeaders": {},
             "cors": {
               "allow_origins": "*"
@@ -154,12 +160,10 @@ const __load_default_settings__ = /* @__PURE__ */ __name(() => {
     logger.warn(`An error ocurred loading default settings: ${e}`);
   });
   (function() {
-    const path2 = require("path");
-    const fs = require("fs");
     const projectPath = CONFIG.get("projectPath", `${process.cwd()}/`);
     logger.debug(`CONFIG.projectPath is set to ${projectPath}`);
     const findPath = /* @__PURE__ */ __name((p) => {
-      const packagePath = path2.resolve(findPackageNodePath(p), p);
+      const packagePath = path.resolve(findPackageNodePath(p), p);
       return packagePath;
     }, "findPath");
     const getPackageJSON = /* @__PURE__ */ __name((p) => {
@@ -167,7 +171,7 @@ const __load_default_settings__ = /* @__PURE__ */ __name(() => {
       try {
         const packagePath = findPath(p);
         if (typeof packagePath !== "undefined") {
-          _json = JSON.parse(fs.readFileSync(path2.resolve(`${packagePath}`, "./package.json")).toString());
+          _json = JSON.parse(fs.readFileSync(path.resolve(`${packagePath}`, "./package.json")).toString());
         } else {
           _json = {};
         }
@@ -204,7 +208,7 @@ const __load_default_settings__ = /* @__PURE__ */ __name(() => {
       let deps = [];
       return () => {
         if (typeof deps === "undefined") {
-          deps = Object.keys(JSON.parse(fs.readFileSync(path2.resolve(`${projectPath}`, "./package.json")).toString()).dependencies);
+          deps = Object.keys(JSON.parse(fs.readFileSync(path.resolve(`${projectPath}`, "./package.json")).toString()).dependencies);
           setBackendValue("dependencies", deps);
         }
         return deps;
@@ -214,7 +218,7 @@ const __load_default_settings__ = /* @__PURE__ */ __name(() => {
       let deps = [];
       return () => {
         if (typeof deps === "undefined") {
-          deps = Object.keys(JSON.parse(fs.readFileSync(path2.resolve(`${projectPath}`, "./package.json")).toString()).devDependencies);
+          deps = Object.keys(JSON.parse(fs.readFileSync(path.resolve(`${projectPath}`, "./package.json")).toString()).devDependencies);
           setBackendValue("devDependencies", deps);
         }
         return deps;

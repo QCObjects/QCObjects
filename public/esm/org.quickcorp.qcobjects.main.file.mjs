@@ -4,19 +4,26 @@ var __name = (target, value) => __defProp(target, "name", { value, configurable:
 var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
+import path from "path";
+import fs from "fs";
+import mime from "mime";
+import { InheritClass, CONFIG, logger, New, Component, Package } from "qcobjects";
 var require_org_quickcorp_qcobjects_main_file = __commonJS({
   "src/org.quickcorp.qcobjects.main.file.ts"(exports) {
     (() => {
       "use strict";
-      const path = require("path");
-      const fs = require("fs");
-      const mime = require("mime");
-      const { InheritClass, CONFIG, logger, New, Component, Package } = require("qcobjects");
       const absolutePath = path.resolve(__dirname, "./");
       class FileDispatcher extends InheritClass {
         static {
           __name(this, "FileDispatcher");
         }
+        scriptname;
+        filename;
+        pathname;
+        headers;
+        templateURI;
+        template;
+        body;
         constructor({
           name = CONFIG.get("documentRootFileIndex"),
           template = "",

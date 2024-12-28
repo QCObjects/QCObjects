@@ -35,14 +35,10 @@ __export(qcobjects_cli_exports, {
   defaultSettings: () => defaultSettings
 });
 module.exports = __toCommonJS(qcobjects_cli_exports);
+var import_qcobjects = require("qcobjects");
 var defaultSettings = __toESM(require("./org.quickcorp.qcobjects.defaultsettings"));
 var import_org_quickcorp_qcobjects = require("./org.quickcorp.qcobjects.cli");
-const path = require("path");
-const absolutePath = path.resolve(__dirname, "./");
-const templatePath = path.resolve(__dirname, "./templates/apps/") + "/";
-const package_config = require(path.resolve(process.cwd(), "package.json"));
-const { logger, InheritClass } = require("qcobjects");
-logger.debugEnabled = false;
+import_qcobjects.logger.debugEnabled = false;
 const welcometo = "Welcome to \n";
 const instructions = `
 Community Edition
@@ -71,10 +67,10 @@ if (process.argv.length < 3 || process.argv[2] === "create") {
   console.log(logo);
   console.log(instructions);
 }
-logger.debugEnabled = false;
-logger.warnEnabled = false;
-logger.infoEnabled = false;
-class Main extends InheritClass {
+import_qcobjects.logger.debugEnabled = false;
+import_qcobjects.logger.warnEnabled = false;
+import_qcobjects.logger.infoEnabled = false;
+class Main extends import_qcobjects.InheritClass {
   static {
     __name(this, "Main");
   }
@@ -83,7 +79,7 @@ class Main extends InheritClass {
     const main = this;
     const switchCommander = new import_org_quickcorp_qcobjects.SwitchCommander();
     switchCommander.initCommand();
-    logger.debug("initialized");
+    import_qcobjects.logger.debug("initialized");
   }
 }
 const __main__ = new Main();

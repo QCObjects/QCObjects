@@ -36,12 +36,19 @@ module.exports = __toCommonJS(org_quickcorp_qcobjects_defaultsettings_exports);
 var import_qcobjects = require("qcobjects");
 var import_node_fs = require("node:fs");
 var import_node_path = __toESM(require("node:path"));
+var import_node_fs2 = __toESM(require("node:fs"));
 var import_qcobjects2 = require("qcobjects");
 const __get_version__ = /* @__PURE__ */ __name(() => {
   const absolutePath = import_node_path.default.resolve(__dirname, "./");
-  const package_config = require(import_node_path.default.resolve(process.cwd(), "package.json"));
-  const qcobjects_pkg_config = require("qcobjects/package.json");
-  const qcobjects_sdk_pkg_config = require("qcobjects-sdk/package.json");
+  const package_config_path = import_node_path.default.resolve(process.cwd(), "package.json");
+  const qcobjects_pkg_config_path = `${(0, import_qcobjects2.findPackageNodePath)("qcobjects/package.json")}/qcobjects/package.json`;
+  const qcobjects_sdk_pkg_config_path = `${(0, import_qcobjects2.findPackageNodePath)("qcobjects-sdk/package.json")}/qcobjects-sdk/package.json`;
+  const package_config_text = (0, import_node_fs.readFileSync)(package_config_path).toString();
+  const qcobjects_pkg_config_text = (0, import_node_fs.readFileSync)(qcobjects_pkg_config_path).toString();
+  const qcobjects_sdk_pkg_config_text = (0, import_node_fs.readFileSync)(qcobjects_sdk_pkg_config_path).toString();
+  const package_config = JSON.parse(package_config_text);
+  const qcobjects_pkg_config = JSON.parse(qcobjects_pkg_config_text);
+  const qcobjects_sdk_pkg_config = JSON.parse(qcobjects_sdk_pkg_config_text);
   return {
     "qcobjects": qcobjects_pkg_config.version,
     "sdk": qcobjects_sdk_pkg_config.version,
@@ -130,12 +137,11 @@ const __load_default_settings__ = /* @__PURE__ */ __name(() => {
     import_qcobjects2.logger.debug("Something went wrong trying to load config.json file in your project");
   }
   (async function() {
-    const path2 = require("path");
     const projectPath = import_qcobjects2.CONFIG.get("projectPath", `${process.cwd()}/`);
     const loadDefaultRoutes = /* @__PURE__ */ __name(async () => {
       return await new Promise((resolve, reject) => {
-        const sdkPath = path2.resolve((0, import_qcobjects2.findPackageNodePath)("qcobjects-sdk"), "qcobjects-sdk");
-        const qcobjectsPath = path2.resolve((0, import_qcobjects2.findPackageNodePath)("qcobjects"), "qcobjects");
+        const sdkPath = import_node_path.default.resolve((0, import_qcobjects2.findPackageNodePath)("qcobjects-sdk"), "qcobjects-sdk");
+        const qcobjectsPath = import_node_path.default.resolve((0, import_qcobjects2.findPackageNodePath)("qcobjects"), "qcobjects");
         let backend = import_qcobjects2.CONFIG.get("backend");
         if (typeof backend === "undefined") {
           backend = {};
@@ -149,7 +155,7 @@ const __load_default_settings__ = /* @__PURE__ */ __name(() => {
             "description": "Redirection of QCObjects.js",
             "path": "^/QCObjects.js$",
             "microservice": "com.qcobjects.backend.microservice.static",
-            "redirect_to": path2.resolve(qcobjectsPath, "src", "QCObjects.js"),
+            "redirect_to": import_node_path.default.resolve(qcobjectsPath, "src", "QCObjects.js"),
             "responseHeaders": {},
             "cors": {
               "allow_origins": "*"
@@ -160,7 +166,7 @@ const __load_default_settings__ = /* @__PURE__ */ __name(() => {
             "description": "Redirection of QCObjects SDK",
             "path": "^/js/packages/QCObjects-SDK.js$",
             "microservice": "com.qcobjects.backend.microservice.static",
-            "redirect_to": path2.resolve(sdkPath, "src/QCObjects-SDK.js"),
+            "redirect_to": import_node_path.default.resolve(sdkPath, "src/QCObjects-SDK.js"),
             "responseHeaders": {},
             "cors": {
               "allow_origins": "*"
@@ -171,7 +177,7 @@ const __load_default_settings__ = /* @__PURE__ */ __name(() => {
             "description": "Redirection of QCObjects SDK",
             "path": "^/qcobjects-sdk/(.*)$",
             "microservice": "com.qcobjects.backend.microservice.static",
-            "redirect_to": path2.resolve(sdkPath, "$1"),
+            "redirect_to": import_node_path.default.resolve(sdkPath, "$1"),
             "responseHeaders": {},
             "cors": {
               "allow_origins": "*"
@@ -187,12 +193,10 @@ const __load_default_settings__ = /* @__PURE__ */ __name(() => {
     import_qcobjects2.logger.warn(`An error ocurred loading default settings: ${e}`);
   });
   (function() {
-    const path2 = require("path");
-    const fs = require("fs");
     const projectPath = import_qcobjects2.CONFIG.get("projectPath", `${process.cwd()}/`);
     import_qcobjects2.logger.debug(`CONFIG.projectPath is set to ${projectPath}`);
     const findPath = /* @__PURE__ */ __name((p) => {
-      const packagePath = path2.resolve((0, import_qcobjects2.findPackageNodePath)(p), p);
+      const packagePath = import_node_path.default.resolve((0, import_qcobjects2.findPackageNodePath)(p), p);
       return packagePath;
     }, "findPath");
     const getPackageJSON = /* @__PURE__ */ __name((p) => {
@@ -200,7 +204,7 @@ const __load_default_settings__ = /* @__PURE__ */ __name(() => {
       try {
         const packagePath = findPath(p);
         if (typeof packagePath !== "undefined") {
-          _json = JSON.parse(fs.readFileSync(path2.resolve(`${packagePath}`, "./package.json")).toString());
+          _json = JSON.parse(import_node_fs2.default.readFileSync(import_node_path.default.resolve(`${packagePath}`, "./package.json")).toString());
         } else {
           _json = {};
         }
@@ -237,7 +241,7 @@ const __load_default_settings__ = /* @__PURE__ */ __name(() => {
       let deps = [];
       return () => {
         if (typeof deps === "undefined") {
-          deps = Object.keys(JSON.parse(fs.readFileSync(path2.resolve(`${projectPath}`, "./package.json")).toString()).dependencies);
+          deps = Object.keys(JSON.parse(import_node_fs2.default.readFileSync(import_node_path.default.resolve(`${projectPath}`, "./package.json")).toString()).dependencies);
           setBackendValue("dependencies", deps);
         }
         return deps;
@@ -247,7 +251,7 @@ const __load_default_settings__ = /* @__PURE__ */ __name(() => {
       let deps = [];
       return () => {
         if (typeof deps === "undefined") {
-          deps = Object.keys(JSON.parse(fs.readFileSync(path2.resolve(`${projectPath}`, "./package.json")).toString()).devDependencies);
+          deps = Object.keys(JSON.parse(import_node_fs2.default.readFileSync(import_node_path.default.resolve(`${projectPath}`, "./package.json")).toString()).devDependencies);
           setBackendValue("devDependencies", deps);
         }
         return deps;

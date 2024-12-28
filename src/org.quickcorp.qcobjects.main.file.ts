@@ -28,17 +28,25 @@
 /*eslint strict: "off"*/
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
-(() => {
-  "use strict";
-  const path = require("path");
-  const fs = require("fs");
-  const mime = require("mime");
+import path from "path";
+import fs from "fs";
+import mime from "mime";
 
-  const { InheritClass, CONFIG, logger, New, Component, Package } = require("qcobjects");
+import { InheritClass, CONFIG, logger, New, Component, Package } from "qcobjects";
+
+( () => {
+  "use strict";
 
   const absolutePath = path.resolve(__dirname, "./");
 
   class FileDispatcher extends InheritClass {
+    scriptname: any;
+    filename: any;
+    pathname!: string;
+    headers: any;
+    templateURI!: string;
+    template: any;
+    body: any;
     constructor({
       name = CONFIG.get("documentRootFileIndex"),
       template = "",

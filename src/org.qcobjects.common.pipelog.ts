@@ -30,7 +30,7 @@
 /*eslint no-undef: "off"*/
 "use strict";
 
-const {Package, InheritClass} = require("qcobjects");
+import {Package, InheritClass} from "qcobjects";
 
 export class PipeLog extends InheritClass {
 

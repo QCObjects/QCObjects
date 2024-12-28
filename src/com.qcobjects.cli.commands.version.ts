@@ -29,13 +29,23 @@
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
 "use strict";
-const fs = require("fs");
-const path = require("path");
-const { exec, execSync } = require("child_process");
+import fs from "node:fs";
+import path from "node:path";
+import { exec, execSync } from "node:child_process";
 
-const { Package, InheritClass, logger } = require("qcobjects");
+import { Package, InheritClass, logger } from "qcobjects";
 
 export class CommandHandler extends InheritClass {
+  choiceOption: {
+    getVersionStringFromFile(filename: string): string;
+    parseVersionSuffix(versionString: any): string;
+    parseVersionString(versionString: any): string;
+    buildNewVersionString(arg0: { major: number; minor: number; patch: number; }, versionSuffix: any): string;
+    saveNewVersionFile(filename: string, newVersion: any): string;
+    syncGit(newVersion: any, commitMsg: any, syncNpm: any): string;
+    switchCommander: any; v_major(filename: string, options: any): void; v_minor(filename: string, options: any): void; v_patch(filename: string, options: any): void; v_sync(filename: string, options: any): void; v_changelog(): void;
+  };
+  switchCommander: any;
 
   constructor({ switchCommander }: { switchCommander: any }) {
     super({ switchCommander });
@@ -152,7 +162,7 @@ export class CommandHandler extends InheritClass {
 
         });
       }
-    };
+    } as any;
 
     switchCommander.program.command("v-major [filename]")
       .option("--git, --sync-git", "Sync with Git")
@@ -190,7 +200,7 @@ export class CommandHandler extends InheritClass {
     switchCommander.program.command("v-changelog")
       .description("Semantic Versioning: Shows a changelog using Semantic Versioning")
       .action(function (args: any, options: any) {
-        commandHandler.choiceOption.v_changelog.call(commandHandler, args, options);
+        commandHandler.choiceOption.v_changelog.call(commandHandler);
       });
 
 

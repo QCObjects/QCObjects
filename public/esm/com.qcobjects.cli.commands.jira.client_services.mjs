@@ -1,10 +1,19 @@
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const { Package, Service, logger } = require("qcobjects");
+import { Package, Service, logger } from "qcobjects";
 class JiraCloud extends Service {
   static {
     __name(this, "JiraCloud");
   }
+  domain;
+  basePath;
+  username_password;
+  username;
+  password;
+  headers;
+  url;
+  apiMethod;
+  data;
   constructor({
     name = "jira_cloud",
     external = true,

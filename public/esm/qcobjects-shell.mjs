@@ -7,6 +7,8 @@ var __commonJS = (cb, mod) => function __require() {
 };
 import path from "path";
 import vm from "vm";
+import { InheritClass, global } from "qcobjects";
+import "./org.quickcorp.qcobjects.defaultsettings";
 import readline from "readline";
 var require_qcobjects_shell = __commonJS({
   "src/qcobjects-shell.ts"(exports, module) {
@@ -24,9 +26,6 @@ Y88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r
                                          d88P                               \r
                                        888P"   `;
     const absolutePath = path.resolve(__dirname, "./");
-    const { InheritClass, global } = require("qcobjects");
-    require(absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
-    const package_config = require(absolutePath + "/package.json");
     class Main extends InheritClass {
       static {
         __name(this, "Main");

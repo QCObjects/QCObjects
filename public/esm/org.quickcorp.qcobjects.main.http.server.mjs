@@ -4,17 +4,20 @@ var __name = (target, value) => __defProp(target, "name", { value, configurable:
 var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
+import os from "node:os";
+import path from "node:path";
+import { findPackageNodePath, Import, Package, InheritClass, CONFIG, logger, New, global, ClassFactory, Export } from "qcobjects";
+import fs from "fs";
+import mime from "mime";
+import http from "http";
+import URL from "url";
 var require_org_quickcorp_qcobjects_main_http_server = __commonJS({
   "src/org.quickcorp.qcobjects.main.http.server.ts"() {
-    (() => {
+    (async () => {
       "use strict";
-      const { findPackageNodePath, Import, Package, InheritClass, CONFIG, logger, New, global, ClassFactory, Export } = require("qcobjects");
-      const path = require("path");
       const absolutePath = path.resolve(__dirname, "./");
-      const fs = require("fs");
-      const mime = require("mime");
-      const { FileDispatcher } = require(absolutePath + "/org.quickcorp.qcobjects.main.file.js");
-      const { PipeLog } = require(absolutePath + "/org.qcobjects.common.pipelog.js");
+      const { FileDispatcher } = await import(absolutePath + "/org.quickcorp.qcobjects.main.file.js");
+      const { PipeLog } = await import(absolutePath + "/org.qcobjects.common.pipelog.js");
       const ImportMicroservice = /* @__PURE__ */ __name(function(microservicePackage) {
         var _ret_;
         var standardPath = findPackageNodePath(microservicePackage) || findPackageNodePath(microservicePackage + ".js");
@@ -25,7 +28,7 @@ var require_org_quickcorp_qcobjects_main_http_server = __commonJS({
           if (nonStandardPath !== null) {
             _ret_ = Import(absolutePath + "/backend/" + microservicePackage);
           } else {
-            _ret_ = Promise.resolve(require(microservicePackage));
+            _ret_ = Promise.resolve(async () => (await import(microservicePackage))());
           }
         }
         return _ret_;
@@ -34,6 +37,13 @@ var require_org_quickcorp_qcobjects_main_http_server = __commonJS({
         static {
           __name(this, "BackendMicroservice");
         }
+        body;
+        stream;
+        req;
+        get;
+        route;
+        headers;
+        request;
         constructor({
           domain = CONFIG.get("domain"),
           basePath = CONFIG.get("basePath"),
@@ -195,6 +205,11 @@ var require_org_quickcorp_qcobjects_main_http_server = __commonJS({
         static {
           __name(this, "HTTPServerResponse");
         }
+        stream;
+        fileDispatcher;
+        request;
+        headers;
+        body;
         constructor({
           headers = {
             "status": 200,
@@ -314,13 +329,35 @@ var require_org_quickcorp_qcobjects_main_http_server = __commonJS({
           pathname = "",
           href = ""
         }) {
-          super(...arguments);
+          super({
+            scriptname,
+            path: path2,
+            method,
+            url,
+            headers,
+            flags,
+            protocol,
+            slashes,
+            auth,
+            host,
+            port,
+            hostname,
+            hash,
+            search,
+            query,
+            pathname,
+            href
+          });
         }
       }
       class HTTPServer extends InheritClass {
         static {
           __name(this, "HTTPServer");
         }
+        interceptorInstances;
+        server;
+        request;
+        response;
         constructor({
           request = null,
           response = "",
@@ -328,7 +365,13 @@ var require_org_quickcorp_qcobjects_main_http_server = __commonJS({
           scriptname = "",
           interceptorInstances = []
         }) {
-          super(...arguments);
+          super({
+            request,
+            response,
+            server,
+            scriptname,
+            interceptorInstances
+          });
           const welcometo = "Welcome to \n";
           const instructions = "QCObjects Legacy HTTPServer \n";
           const logo = ` .d88888b.  .d8888b.  .d88888b. 888       d8b                888            \r
@@ -349,14 +392,13 @@ Y88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r
           logger.info("Listening on HTTP PORT: " + CONFIG.get("serverPortHTTP").toString());
           logger.info("Go to: \n" + this.showPossibleURL());
           this.interceptorInstances = interceptorInstances;
-          const http = require("http");
           this.server = http.createServer((req, res) => {
             logger.debug("Legacy Server Instantiated.");
           });
           this.server.on("error", (err) => console.error(err));
           if (global.get("backendAvailable")) {
             logger.info("Loading backend interceptors...");
-            let interceptors = CONFIG.get("backend", {}).interceptors;
+            const interceptors = CONFIG.get("backend", {}).interceptors;
             if (typeof interceptors !== "undefined") {
               logger.info("Backend Interceptors Available");
               interceptors.map((interceptor) => {
@@ -374,7 +416,7 @@ Y88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r
             }
           }
           this.server.on("request", (req, res) => {
-            let request2 = Object.assign(New(HTTPServerRequest), require("url").parse(req.url));
+            const request2 = Object.assign(New(HTTPServerRequest), URL.parse(req.url));
             request2.headers = req.headers;
             this.request = request2;
             this.request.method = req.method;
@@ -414,16 +456,16 @@ Y88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r
             if (global.get("backendAvailable")) {
               logger.info("Backend Legacy Microservices Available...");
               logger.info("Loading backend routes...");
-              let routes = CONFIG.get("backend", {}).routes;
-              let selectedRoute = routes.filter((route) => {
-                let standardRoutePath = route.path.replace(/{(.*?)}/g, "(?<$1>.*)");
+              const routes = CONFIG.get("backend", {}).routes;
+              const selectedRoute = routes.filter((route) => {
+                const standardRoutePath = route.path.replace(/{(.*?)}/g, "(?<$1>.*)");
                 return new RegExp(standardRoutePath, "g").test(request2.path);
               });
               if (selectedRoute.length > 0) {
                 selectedRoute.map((route) => {
-                  let standardRoutePath = route.path.replace(/{(.*?)}/g, "(?<$1>.*)");
+                  const standardRoutePath = route.path.replace(/{(.*?)}/g, "(?<$1>.*)");
                   console.log(standardRoutePath);
-                  let selectedRouteParams = {
+                  const selectedRouteParams = {
                     ...[...request2.path.matchAll(new RegExp(standardRoutePath, "g"))][0]["groups"]
                   };
                   ImportMicroservice(route.microservice).then(() => {
@@ -472,10 +514,9 @@ Y88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r
         }
         showIPAddress() {
           var _ret_ = "";
-          var os = require("os");
           var ifaces = os.networkInterfaces();
           Object.keys(ifaces).forEach(function(iface) {
-            ifaces[iface].map(function(ipGroup) {
+            ifaces[iface]?.forEach(function(ipGroup) {
               _ret_ += iface + ": " + new PipeLog().pipe(ipGroup) + "\n";
             });
           });
@@ -483,10 +524,9 @@ Y88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r
         }
         showPossibleURL() {
           var _ret_ = "";
-          var os = require("os");
           var ifaces = os.networkInterfaces();
           Object.keys(ifaces).forEach(function(iface) {
-            ifaces[iface].map(function(ipGroup) {
+            ifaces[iface]?.forEach(function(ipGroup) {
               if (ipGroup["family"].toLowerCase() == "ipv4") {
                 _ret_ += "http://" + ipGroup["address"] + ":" + CONFIG.get("serverPortHTTP").toString() + "/\n";
               }
@@ -505,7 +545,7 @@ Y88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r
         HTTPServerRequest,
         HTTPServerResponse
       ]);
-    })();
+    })().catch((e) => console.error(e));
   }
 });
 export default require_org_quickcorp_qcobjects_main_http_server();

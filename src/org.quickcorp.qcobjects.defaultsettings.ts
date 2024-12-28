@@ -33,14 +33,23 @@
 import "qcobjects";
 import {readFileSync} from "node:fs";
 import path from "node:path";
+import fs from "node:fs";
 import { CONFIG, global, logger, _Crypt, findPackageNodePath, Export, _DataStringify } from "qcobjects";
 
 export const __get_version__ = () => {
 
   const absolutePath = path.resolve(__dirname, "./");
-  const package_config = require(path.resolve(process.cwd(), "package.json"));
-  const qcobjects_pkg_config = require("qcobjects/package.json");
-  const qcobjects_sdk_pkg_config = require("qcobjects-sdk/package.json");
+  const package_config_path = path.resolve(process.cwd(), "package.json");
+  const qcobjects_pkg_config_path = `${findPackageNodePath("qcobjects/package.json")}/qcobjects/package.json`;
+  const qcobjects_sdk_pkg_config_path = `${findPackageNodePath("qcobjects-sdk/package.json")}/qcobjects-sdk/package.json`;
+
+  const package_config_text = readFileSync(package_config_path).toString();
+  const qcobjects_pkg_config_text = readFileSync(qcobjects_pkg_config_path).toString();
+  const qcobjects_sdk_pkg_config_text = readFileSync(qcobjects_sdk_pkg_config_path).toString();
+  const package_config = JSON.parse(package_config_text);
+  const qcobjects_pkg_config = JSON.parse(qcobjects_pkg_config_text);
+  const qcobjects_sdk_pkg_config = JSON.parse(qcobjects_sdk_pkg_config_text);
+
   return {
     "qcobjects": qcobjects_pkg_config.version,
     "sdk": qcobjects_sdk_pkg_config.version,
@@ -147,7 +156,6 @@ const __load_default_settings__ = () => {
   }
 
   (async function () {
-    const path = require("path");
     const projectPath = CONFIG.get("projectPath", `${process.cwd()}/`);
     const loadDefaultRoutes = async () => {
       return await new Promise<void>((resolve, reject) => {
@@ -206,8 +214,6 @@ const __load_default_settings__ = () => {
 
   (function () {
     /* Auto Discover dependencies (lib, handlers, commands) */
-    const path = require("path");
-    const fs = require("fs");
     const projectPath = CONFIG.get("projectPath", `${process.cwd()}/`);
     logger.debug(`CONFIG.projectPath is set to ${projectPath}`);
     const findPath = (p: string) => {

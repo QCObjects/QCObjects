@@ -5,15 +5,14 @@ var __name = (target, value) => __defProp(target, "name", { value, configurable:
 var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
+import path from "path";
+import { InheritClass, New, logger } from "qcobjects";
 var require_qcobjects_gae_http_server = __commonJS({
   "src/qcobjects-gae-http-server.ts"() {
-    (() => {
-      "use strict";
-      const path = require("path");
+    (async () => {
       const absolutePath = path.resolve(__dirname, "./");
-      const { InheritClass, New, logger } = require("qcobjects");
-      require(absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
-      const { HTTPServer } = require(absolutePath + "/org.quickcorp.qcobjects.main.http.gae.server.js");
+      await import(absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
+      const { HTTPServer } = await import(absolutePath + "/org.quickcorp.qcobjects.main.http.gae.server.js");
       class Main extends InheritClass {
         static {
           __name(this, "Main");
@@ -26,7 +25,7 @@ var require_qcobjects_gae_http_server = __commonJS({
         }
       }
       const __main__ = new Main();
-    })();
+    })().catch((e) => console.error(e));
   }
 });
 export default require_qcobjects_gae_http_server();

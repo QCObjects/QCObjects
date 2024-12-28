@@ -40,11 +40,10 @@ const absolutePath = path.resolve( __dirname, "./" );
 
 import vm from "vm";
 
-const {InheritClass, global} = require("qcobjects");
-require(absolutePath+"/org.quickcorp.qcobjects.defaultsettings.js");
+import {InheritClass, global} from "qcobjects";
+import "./org.quickcorp.qcobjects.defaultsettings";
 import readline from "readline";
 
-const package_config = require(absolutePath+"/package.json");
 
 class Main extends InheritClass {
   constructor(){

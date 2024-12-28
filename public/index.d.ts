@@ -1,8 +1,16 @@
 #!/usr/bin/env node
 declare module "com.qcobjects.cli.commands.jira.client_services" {
-    const Service: any;
+    import { Service } from "qcobjects";
     export class JiraCloud extends Service {
-        static [x: string]: any;
+        domain: string;
+        basePath: string;
+        username_password: string;
+        username: any;
+        password: any;
+        headers: any;
+        url: any;
+        apiMethod: any;
+        data: any;
         constructor({ name, external, useHTTP2, cached, method, headers, basePath, url, withCredentials }: {
             name?: string | undefined;
             external?: boolean | undefined;
@@ -35,9 +43,27 @@ declare module "com.qcobjects.cli.commands.jira" {
     }
 }
 declare module "com.qcobjects.cli.commands.version" {
-    const InheritClass: any;
+    import { InheritClass } from "qcobjects";
     export class CommandHandler extends InheritClass {
-        static [x: string]: any;
+        choiceOption: {
+            getVersionStringFromFile(filename: string): string;
+            parseVersionSuffix(versionString: any): string;
+            parseVersionString(versionString: any): string;
+            buildNewVersionString(arg0: {
+                major: number;
+                minor: number;
+                patch: number;
+            }, versionSuffix: any): string;
+            saveNewVersionFile(filename: string, newVersion: any): string;
+            syncGit(newVersion: any, commitMsg: any, syncNpm: any): string;
+            switchCommander: any;
+            v_major(filename: string, options: any): void;
+            v_minor(filename: string, options: any): void;
+            v_patch(filename: string, options: any): void;
+            v_sync(filename: string, options: any): void;
+            v_changelog(): void;
+        };
+        switchCommander: any;
         constructor({ switchCommander }: {
             switchCommander: any;
         });
@@ -47,7 +73,7 @@ declare module "com.qcobjects.cli.commands.version" {
             minor: string;
             patch: string;
         };
-        getVersionStringFromFile(filename: any): any;
+        getVersionStringFromFile(filename: any): string;
         buildNewSemVersionString({ major, minor, patch }: {
             major: string;
             minor: string;
@@ -72,18 +98,20 @@ declare module "org.quickcorp.qcobjects.defaultsettings" {
     export const __get_version_string__: () => string;
 }
 declare module "org.qcobjects.enterprise.commands" {
-    const InheritClass: any;
+    import { InheritClass } from "qcobjects";
     export class QCObjectsEnterprise extends InheritClass {
-        static [x: string]: any;
         install(): void;
-        upgrade(switchCommander: any): void;
-        installEnterprise(license: string | any[], email: any): void;
+        static upgrade(switchCommander: any): Promise<void>;
+        installEnterprise(license: string, email: string): void;
     }
 }
 declare module "org.quickcorp.qcobjects.api.client_services" {
-    const Service: any;
+    import { Service } from "qcobjects";
     export class QuickCorpCloud extends Service {
-        static [x: string]: any;
+        headers: any;
+        url: any;
+        basePath: any;
+        data: any;
         constructor({ name, external, useHTTP2, cached, method, headers, basePath, url, withCredentials }: {
             name?: string | undefined;
             external?: boolean | undefined;
@@ -158,10 +186,9 @@ declare module "org.quickcorp.qcobjects.cli" {
     }
 }
 declare module "qcobjects-cli" {
-    const InheritClass: any;
+    import { InheritClass } from "qcobjects";
     export * as defaultSettings from "org.quickcorp.qcobjects.defaultsettings";
     export class Main extends InheritClass {
-        static [x: string]: any;
         constructor();
     }
     const __main__: Main;
@@ -172,14 +199,21 @@ declare module "index" {
     export default cli;
 }
 declare module "org.qcobjects.common.pipelog" {
-    const InheritClass: any;
+    import { InheritClass } from "qcobjects";
     export class PipeLog extends InheritClass {
-        static [x: string]: any;
         pipe(o: any): string;
     }
 }
+declare module "org.quickcorp.qcobjects.collab.server" { }
+declare module "org.quickcorp.qcobjects.main.file" { }
 declare module "org.quickcorp.qcobjects.main.http.gae.server" { }
+declare module "org.quickcorp.qcobjects.main.http.server" { }
 declare module "org.quickcorp.qcobjects.main.http2.server" { }
+declare module "qcobjects-collab" { }
 declare module "qcobjects-createcert" { }
-declare module "qcobjects-shell" { }
+declare module "qcobjects-gae-http-server" { }
+declare module "qcobjects-http-server" { }
+declare module "qcobjects-shell" {
+    import "org.quickcorp.qcobjects.defaultsettings";
+}
 declare module "backend/com.qcobjects.backend.microservice.static" { }

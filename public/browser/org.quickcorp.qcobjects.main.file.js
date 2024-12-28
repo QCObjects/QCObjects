@@ -1,28 +1,55 @@
 "use strict";
 var global = (() => {
+  var __create = Object.create;
   var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __getProtoOf = Object.getPrototypeOf;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
   var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
   var __commonJS = (cb, mod) => function __require() {
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+    }
+    return to;
+  };
+  var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+    // If the importer is in node compatibility mode or this is not an ESM
+    // file that has been converted to a CommonJS file using a Babel-
+    // compatible transform (i.e. "__esModule" has not been set), then set
+    // "default" to the CommonJS "module.exports" for node compatibility.
+    isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+    mod
+  ));
   var require_org_quickcorp_qcobjects_main_file = __commonJS({
     "src/org.quickcorp.qcobjects.main.file.ts"(exports) {
+      var import_path = __toESM(require("path"));
+      var import_fs = __toESM(require("fs"));
+      var import_mime = __toESM(require("mime"));
+      var import_qcobjects = require("qcobjects");
       (() => {
         "use strict";
-        const path = require("path");
-        const fs = require("fs");
-        const mime = require("mime");
-        const { InheritClass, CONFIG, logger, New, Component, Package } = require("qcobjects");
-        const absolutePath = path.resolve(__dirname, "./");
-        class FileDispatcher extends InheritClass {
+        const absolutePath = import_path.default.resolve(__dirname, "./");
+        class FileDispatcher extends import_qcobjects.InheritClass {
           static {
             __name(this, "FileDispatcher");
           }
+          scriptname;
+          filename;
+          pathname;
+          headers;
+          templateURI;
+          template;
+          body;
           constructor({
-            name = CONFIG.get("documentRootFileIndex"),
+            name = import_qcobjects.CONFIG.get("documentRootFileIndex"),
             template = "",
-            templateURI = CONFIG.get("documentRootFileIndex"),
+            templateURI = import_qcobjects.CONFIG.get("documentRootFileIndex"),
             headers = {},
             body = "",
             filename = "",
@@ -49,11 +76,11 @@ var global = (() => {
               };
             }
             appTemplateInstance.done = o.done.bind(appTemplateInstance);
-            appTemplateInstance.templateURI = CONFIG.get("documentRoot") + pathname + scriptname;
+            appTemplateInstance.templateURI = import_qcobjects.CONFIG.get("documentRoot") + pathname + scriptname;
             appTemplateInstance.templateURI = appTemplateInstance.templateURI.replace("//", "/");
             if (appTemplateInstance.isTemplate()) {
-              fs.readFile(appTemplateInstance.templateURI, function(err, data) {
-                logger.debug("reading data from " + appTemplateInstance.templateURI);
+              import_fs.default.readFile(appTemplateInstance.templateURI, function(err, data) {
+                import_qcobjects.logger.debug("reading data from " + appTemplateInstance.templateURI);
                 if (typeof data !== "undefined") {
                   appTemplateInstance.template = data.toString();
                   appTemplateInstance._done();
@@ -68,12 +95,12 @@ var global = (() => {
                     "notfound.html",
                     false
                   );
-                  logger.debug("file not found");
+                  import_qcobjects.logger.debug("file not found");
                 }
               });
             } else {
               appTemplateInstance.headers[":status"] = 200;
-              appTemplateInstance.headers["content-type"] = mime.getType(appTemplateInstance.templateURI);
+              appTemplateInstance.headers["content-type"] = import_mime.default.getType(appTemplateInstance.templateURI);
               appTemplateInstance.done(
                 appTemplateInstance.headers,
                 "",
@@ -81,19 +108,19 @@ var global = (() => {
                 false
               );
             }
-            logger.info("FileDispatcher initialized");
+            import_qcobjects.logger.info("FileDispatcher initialized");
           }
           file_extension() {
             return this.filename.substr(this.filename.indexOf("."));
           }
           isTemplate() {
-            return CONFIG.get("useTemplate") && (this.file_extension() == ".html" || this.file_extension() == ".tpl.html");
+            return import_qcobjects.CONFIG.get("useTemplate") && (this.file_extension() == ".html" || this.file_extension() == ".tpl.html");
           }
           _done() {
             var appTemplateInstance = this;
             const source = appTemplateInstance.template;
             if (appTemplateInstance.isTemplate()) {
-              New(Component, {
+              (0, import_qcobjects.New)(import_qcobjects.Component, {
                 name: "static_source",
                 template: source,
                 cached: false,
@@ -126,8 +153,8 @@ var global = (() => {
               ".js",
               ".svg"
             ].includes(appTemplateInstance.file_extension())) {
-              appTemplateInstance.headers["content-type"] = mime.getType(appTemplateInstance.templateURI);
-              appTemplateInstance.headers["cache-control"] = CONFIG.get("cacheControl", "max-age=31536000");
+              appTemplateInstance.headers["content-type"] = import_mime.default.getType(appTemplateInstance.templateURI);
+              appTemplateInstance.headers["cache-control"] = import_qcobjects.CONFIG.get("cacheControl", "max-age=31536000");
               appTemplateInstance.done(
                 appTemplateInstance.headers,
                 appTemplateInstance.body,
@@ -149,7 +176,7 @@ var global = (() => {
           done(headers, body, templateURI = "", isTemplate = false) {
           }
         }
-        Package("org.quickcorp.qcobjects.main.file", [
+        (0, import_qcobjects.Package)("org.quickcorp.qcobjects.main.file", [
           FileDispatcher
         ]);
         exports = {

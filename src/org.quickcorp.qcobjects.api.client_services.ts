@@ -30,22 +30,26 @@
 /*eslint no-undef: "off"*/
 "use strict";
 
-const {Package, Service, logger} = require("qcobjects");
+import { Package, Service, logger } from "qcobjects";
 
 export class QuickCorpCloud extends Service {
-  constructor ({
-    name= "quickcorp_cloud",
-    external= true,
-    useHTTP2=true,
-    cached= false,
-    method= "post",
-    headers= {
+  headers: any;
+  url: any;
+  basePath: any;
+  data: any;
+  constructor({
+    name = "quickcorp_cloud",
+    external = true,
+    useHTTP2 = true,
+    cached = false,
+    method = "post",
+    headers = {
       "origin": "localhost",
       "content-type": "application/json"
     },
-    basePath= "https://cloud.quickcorp.org/",
-    url= "",
-    withCredentials= false
+    basePath = "https://cloud.quickcorp.org/",
+    url = "",
+    withCredentials = false
   }) {
     super({
       name,
@@ -61,25 +65,25 @@ export class QuickCorpCloud extends Service {
 
   }
 
-  _new_(o:any) {
+  _new_(o: any) {
     // service instantiated
     this.headers["authorization"] = "Basic token";
     this.url = this.basePath + o.apiMethod;
     this.data = o.data;
   }
-  
-  done(service:any,standardResponse:any) {
+
+  done(service: any, standardResponse: any) {
     // service loaded
     logger.debug(standardResponse);
   }
 
-  fail(e:any){
-      logger.debug(e);
+  fail(e: any) {
+    logger.debug(e);
   }
 
 }
 
 Package("org.quickcorp.qcobjects.api.client_services", [
-QuickCorpCloud
+  QuickCorpCloud
 ]);
 

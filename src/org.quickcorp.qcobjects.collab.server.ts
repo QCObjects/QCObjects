@@ -28,24 +28,22 @@
 /*eslint strict: "off"*/
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
+import { CONFIG, Package, InheritClass, logger, global } from "qcobjects";
+import os from "os";
+import fs from "fs";
+import net from "node:net";
+import repl from "node:repl";
+import vm from "node:vm";
+import path from "path";
+import { exec, execSync } from "child_process";
+
 (() => {
   "use strict";
-  const { CONFIG, Package, InheritClass, logger, global } = require("qcobjects");
-
-  const os = require("os");
-  const fs = require("fs");
-  const net = require("node:net");
-  const repl = require("node:repl");
-  const vm = require("node:vm");
-
 
   const welcometo = "Welcome to \n";
   const instructions = "Type:\n .exit to quit\n .help for see a quick guide\n And any other command to execute like pure javascript \n All the QCObjects stuff is already loaded for you";
-  //const logo = ' .88888.    a88888b.  .88888.  dP       oo                     dP            \r\nd8\'   `8b  d8\'   `88 d8\'   `8b 88                              88            \r\n88     88  88        88     88 88d888b. dP .d8888b. .d8888b. d8888P .d8888b. \r\n88  db 88  88        88     88 88\'  `88 88 88ooood8 88\'  `\"\"   88   Y8ooooo. \r\nY8.  Y88P  Y8.   .88 Y8.   .8P 88.  .88 88 88.  ... 88.  ...   88         88 \r\n `8888PY8b  Y88888P\'  `8888P\'  88Y8888\' 88 `88888P\' `88888P\'   dP   `88888P\' \r\noooooooooooooooooooooooooooooooooooooooo88~oooooooooooooooooooooooooooooooooo\r\n                                        dP    ';
   const logo = " .d88888b.  .d8888b.  .d88888b. 888       d8b                888            \r\nd88P\" \"Y88bd88P  Y88bd88P\" \"Y88b888       Y8P                888            \r\n888     888888    888888     888888                          888            \r\n888     888888       888     88888888b.  8888 .d88b.  .d8888b888888.d8888b  \r\n888     888888       888     888888 \"88b \"888d8P  Y8bd88P\"   888   88K      \r\n888 Y8b 888888    888888     888888  888  88888888888888     888   \"Y8888b. \r\nY88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r\n \"Y888888\"  \"Y8888P\"  \"Y88888P\" 88888P\"   888 \"Y8888  \"Y8888P \"Y888 88888P' \r\n       Y8b                                888                               \r\n                                         d88P                               \r\n                                       888P\"   ";
-  const path = require("path");
   const absolutePath = path.resolve(__dirname, "./");
-  const { exec, execSync } = require("child_process");
 
   console.log(welcometo);
   console.log(logo);
@@ -85,6 +83,9 @@ You can also use a Unix Socket to connect yourself to the engine:
   };
 
   class CollabServer extends InheritClass {
+    protected_symbols: string[];
+    replServer:any;
+    commands: { loadcmd_json: { help: string; action(args: string): void; }; loadcmd_str: { help: string; action(args: string): void; }; save_json: { help: string; action(args: string): void; }; load_json: { help: string; action(args: string): void; }; cmd: { help: string; action(...args: string[]): void; }; };
     constructor() {
       super();
       this.protected_symbols = ["clearInterval",
@@ -111,6 +112,7 @@ You can also use a Unix Socket to connect yourself to the engine:
         "Fade", "Radius", "CanvasTool",
         "BasicLayout"
       ];
+      const replServer = this.replServer;
       this.commands = {
         loadcmd_json: {
           help: `
@@ -125,7 +127,7 @@ You can also use a Unix Socket to connect yourself to the engine:
               as JSON format
 `,
           action(args: string) {
-            const _rplServer = repl;
+            const _rplServer = replServer;
             var commandArgs = args.split(" ");
             if (commandArgs.length > 2) {
               var _variableName = commandArgs[0];
@@ -141,7 +143,7 @@ You can also use a Unix Socket to connect yourself to the engine:
                     logger.debug("It was not possible to parse the data.");
                   }
                   _rplServer.displayPrompt();
-                }).stdout.on("data", function (data: any) {
+                }).stdout?.on("data", function (data: any) {
                   console.log(data);
                 });
               } else {
@@ -165,7 +167,7 @@ You can also use a Unix Socket to connect yourself to the engine:
               The above command will save the output of "ls *" into the variable global.foo as string
 `,
           action(args: string) {
-            const _rplServer = repl;
+            const _rplServer = replServer;
             var commandArgs = args.split(" ");
             if (commandArgs.length > 2) {
               var _variableName = commandArgs[0];
@@ -177,7 +179,7 @@ You can also use a Unix Socket to connect yourself to the engine:
                 exec(cmdArguments, (err: any, stdout: any, stderr: any) => {
                   _rplServer.context[_variableName] = stdout;
                   _rplServer.displayPrompt();
-                }).stdout.on("data", function (data: any) {
+                }).stdout?.on("data", function (data: any) {
                   console.log(data);
                 });
               } else {
@@ -201,7 +203,7 @@ You can also use a Unix Socket to connect yourself to the engine:
               The above command will save the stringified content of foo into ./filename
 `,
           action(args: string) {
-            const _rplServer = repl;
+            const _rplServer = replServer;
             var commandArgs = args.split(" ");
             if (commandArgs.length >= 2) {
               var _variableName = commandArgs[0];
@@ -230,7 +232,7 @@ You can also use a Unix Socket to connect yourself to the engine:
               The above command will load a json from ./filename and save it in global.foo as an object
 `,
           action(args: string) {
-            const _rplServer = repl;
+            const _rplServer = replServer;
             var commandArgs = args.split(" ");
             if (commandArgs.length > 2) {
               var _variableName = commandArgs[0];
@@ -262,13 +264,13 @@ You can also use a Unix Socket to connect yourself to the engine:
         cmd: {
           help: "Executes a CMD Shell Command",
           action(...args: string[]) {
-            const _rplServer = repl;
+            const _rplServer = replServer;
             var cmdArguments = args.join(" ");
             _rplServer.clearBufferedCommand();
             logger.debug(`Executing... ${cmdArguments}`);
             exec(cmdArguments, (err: any, stdout: any, stderr: any) => {
               _rplServer.displayPrompt();
-            }).stdout.on("data", function (data: any) {
+            }).stdout?.on("data", function (data: any) {
               console.log(data);
             });
           }
@@ -337,20 +339,23 @@ You can also use a Unix Socket to connect yourself to the engine:
         terminal: true,
         useGlobal: false
       });
-      replServer.context = globalContext;
 
-      replServer.on("exit", () => {
+      this.replServer = replServer;
+
+      this.replServer.context.global = globalContext;
+
+      this.replServer.on("exit", () => {
         unlink_socket();
 
         console.log("Thank you for using QCObjects Collab for Data Science!");
         console.log("Have a nice day!");
         process.exit();
       });
-      _defineReplCommands(replServer, collabServer.commands);
+      _defineReplCommands(this.replServer, collabServer.commands);
 
 
 
-      const unixsocket_server = net.createServer(function (unixsocket: { on: (arg0: string, arg1: () => void) => void; end: () => void; }) {
+      const unixsocket_server = net.createServer(function (unixsocket: any) {
         unixsocket.on("end", () => {
           logger.debug("A Unix socket connection was ended");
         });
@@ -365,12 +370,12 @@ You can also use a Unix Socket to connect yourself to the engine:
         unixReplServer.on("exit", function () {
           unixsocket.end();
         });
-        unixReplServer.context = global;
+        unixReplServer.context.global = global;
         _defineReplCommands(unixReplServer, collabServer.commands);
       }).listen(CONFIG.get("collab-unix-socket", unixsocket_default));
 
 
-      const http_server = net.createServer(function (httpsocket: { on: (arg0: string, arg1: () => void) => void; end: () => void; }) {
+      const http_server = net.createServer(function (httpsocket: any) {
         httpsocket.on("end", () => {
           logger.debug("A http connection was ended");
         });
@@ -385,7 +390,7 @@ You can also use a Unix Socket to connect yourself to the engine:
         httpReplServer.on("exit", function () {
           httpsocket.end();
         });
-        httpReplServer.context = global;
+        httpReplServer.context.global = global;
         _defineReplCommands(httpReplServer, collabServer.commands);
       }).listen(CONFIG.get("collab-port", collab_port_default), CONFIG.get("collab-domain", collab_domain_default));
 

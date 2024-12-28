@@ -30,9 +30,18 @@
 /*eslint no-undef: "off"*/
 "use strict";
 
-const { Package, Service, logger } = require("qcobjects");
+import { Package, Service, logger } from "qcobjects";
 
 export class JiraCloud extends Service {
+  domain: string;
+  basePath: string;
+  username_password: string;
+  username: any;
+  password: any;
+  headers: any;
+  url: any;
+  apiMethod: any;
+  data: any;
   constructor({
     name = "jira_cloud",
     external = true,

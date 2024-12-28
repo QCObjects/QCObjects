@@ -1,8 +1,10 @@
 "use strict";
 var global = (() => {
+  var __create = Object.create;
   var __defProp = Object.defineProperty;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __getProtoOf = Object.getPrototypeOf;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
   var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
   var __export = (target, all) => {
@@ -17,19 +19,27 @@ var global = (() => {
     }
     return to;
   };
+  var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+    // If the importer is in node compatibility mode or this is not an ESM
+    // file that has been converted to a CommonJS file using a Babel-
+    // compatible transform (i.e. "__esModule" has not been set), then set
+    // "default" to the CommonJS "module.exports" for node compatibility.
+    isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+    mod
+  ));
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
   var com_qcobjects_cli_commands_version_exports = {};
   __export(com_qcobjects_cli_commands_version_exports, {
     CommandHandler: () => CommandHandler
   });
-  const fs = require("fs");
-  const path = require("path");
-  const { exec, execSync } = require("child_process");
-  const { Package, InheritClass, logger } = require("qcobjects");
-  class CommandHandler extends InheritClass {
+  var import_node_fs = __toESM(require("node:fs"));
+  var import_qcobjects = require("qcobjects");
+  class CommandHandler extends import_qcobjects.InheritClass {
     static {
       __name(this, "CommandHandler");
     }
+    choiceOption;
+    switchCommander;
     constructor({ switchCommander }) {
       super({ switchCommander });
       const commandHandler = this;
@@ -159,7 +169,7 @@ var global = (() => {
         commandHandler.choiceOption.v_sync.call(commandHandler, args, options);
       });
       switchCommander.program.command("v-changelog").description("Semantic Versioning: Shows a changelog using Semantic Versioning").action(function(args, options) {
-        commandHandler.choiceOption.v_changelog.call(commandHandler, args, options);
+        commandHandler.choiceOption.v_changelog.call(commandHandler);
       });
     }
     syncGit(versionString, commitMsg, syncNpm = false) {
@@ -192,11 +202,11 @@ var global = (() => {
         ]
       );
       this.switchCommander.shellCommands(_commands_).then(function(response) {
-        logger.info("Synced to Git");
-        logger.debug(response);
+        import_qcobjects.logger.info("Synced to Git");
+        import_qcobjects.logger.debug(response);
       }).catch(function(e) {
-        logger.info("Something went wrong trying to sync to git");
-        logger.debug(e);
+        import_qcobjects.logger.info("Something went wrong trying to sync to git");
+        import_qcobjects.logger.debug(e);
       });
     }
     parseVersionString(versionString) {
@@ -208,7 +218,7 @@ var global = (() => {
     getVersionStringFromFile(filename) {
       let versionString;
       try {
-        versionString = fs.readFileSync(filename).toString().replace("\n", "");
+        versionString = import_node_fs.default.readFileSync(filename).toString().replace("\n", "");
       } catch (e) {
         versionString = "0.0.1";
       }
@@ -228,10 +238,10 @@ var global = (() => {
       return `${semVersionString}${suffix}`;
     }
     saveNewVersionFile(filename, versionString) {
-      fs.writeFileSync(filename, versionString);
+      import_node_fs.default.writeFileSync(filename, versionString);
     }
   }
-  Package("com.qcobjects.cli.commands.version", [
+  (0, import_qcobjects.Package)("com.qcobjects.cli.commands.version", [
     CommandHandler
   ]);
   return __toCommonJS(com_qcobjects_cli_commands_version_exports);

@@ -22,11 +22,20 @@ __export(com_qcobjects_cli_commands_jira_client_services_exports, {
   JiraCloud: () => JiraCloud
 });
 module.exports = __toCommonJS(com_qcobjects_cli_commands_jira_client_services_exports);
-const { Package, Service, logger } = require("qcobjects");
-class JiraCloud extends Service {
+var import_qcobjects = require("qcobjects");
+class JiraCloud extends import_qcobjects.Service {
   static {
     __name(this, "JiraCloud");
   }
+  domain;
+  basePath;
+  username_password;
+  username;
+  password;
+  headers;
+  url;
+  apiMethod;
+  data;
   constructor({
     name = "jira_cloud",
     external = true,
@@ -61,13 +70,13 @@ class JiraCloud extends Service {
     this.data = o.data;
   }
   done(service, standardResponse) {
-    logger.debug(standardResponse);
+    import_qcobjects.logger.debug(standardResponse);
   }
   fail(e) {
-    logger.debug(e);
+    import_qcobjects.logger.debug(e);
   }
 }
-Package("com.qcobjects.cli.commands.jira.client_services", [
+(0, import_qcobjects.Package)("com.qcobjects.cli.commands.jira.client_services", [
   JiraCloud
 ]);
 // Annotate the CommonJS export names for ESM import in node:

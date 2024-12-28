@@ -25,6 +25,8 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 ));
 var import_path = __toESM(require("path"));
 var import_vm = __toESM(require("vm"));
+var import_qcobjects = require("qcobjects");
+var import_org_quickcorp_qcobjects = require("./org.quickcorp.qcobjects.defaultsettings");
 var import_readline = __toESM(require("readline"));
 const welcometo = "Welcome to \n";
 const instructions = "Type:\n .exit to quit\n .help for see a quick guide\n And any other command to execute like pure javascript \n All the QCObjects stuff is already loaded for you";
@@ -40,10 +42,7 @@ Y88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r
                                          d88P                               \r
                                        888P"   `;
 const absolutePath = import_path.default.resolve(__dirname, "./");
-const { InheritClass, global } = require("qcobjects");
-require(absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
-const package_config = require(absolutePath + "/package.json");
-class Main extends InheritClass {
+class Main extends import_qcobjects.InheritClass {
   static {
     __name(this, "Main");
   }
@@ -58,11 +57,11 @@ class Main extends InheritClass {
       __dirname: "./",
       __filename: "qcobjects-shell-file.js"
     };
-    global.context = import_vm.default.createContext(sandbox);
+    import_qcobjects.global.context = import_vm.default.createContext(sandbox);
     const runScript = /* @__PURE__ */ __name((code, logOutput = false) => {
       const options = { filename: sandbox.__filename };
       const backgroundRunScript = /* @__PURE__ */ __name((code2) => {
-        var output2 = import_vm.default.runInContext(code2, global.context, options);
+        var output2 = import_vm.default.runInContext(code2, import_qcobjects.global.context, options);
         return output2;
       }, "backgroundRunScript");
       var output = backgroundRunScript(code);
@@ -77,7 +76,7 @@ class Main extends InheritClass {
     import_readline.default.emitKeypressEvents(process.stdin);
     if (process.stdin.isTTY)
       process.stdin.setRawMode(true);
-    const qcobjects_version = global.__get_version_string__();
+    const qcobjects_version = import_qcobjects.global.__get_version_string__();
     const rl = import_readline.default.createInterface({
       input: process.stdin,
       output: process.stdout,

@@ -1,11 +1,7 @@
 #!/usr/bin/env node
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const path = require("path");
-const absolutePath = path.resolve(__dirname, "./");
-const templatePath = path.resolve(__dirname, "./templates/apps/") + "/";
-const package_config = require(path.resolve(process.cwd(), "package.json"));
-const { logger, InheritClass } = require("qcobjects");
+import { logger, InheritClass } from "qcobjects";
 logger.debugEnabled = false;
 const welcometo = "Welcome to \n";
 const instructions = `

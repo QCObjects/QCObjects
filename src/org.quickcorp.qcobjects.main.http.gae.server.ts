@@ -33,6 +33,7 @@ import path from "node:path";
 import fs from "node:fs";
 import http from "node:http";
 import mime from "mime";
+import {URL} from "url";
 
 (async () => {
   "use strict";
@@ -415,7 +416,7 @@ import mime from "mime";
 
       server.on("request", (req: { url: any; headers: any; method: any; }, res: { destroyed: any; writeHeader: (arg0: number, arg1: { "content-type": string; }) => void; on: (arg0: string, arg1: () => void) => void; write: (arg0: string) => void; end: () => void; }) => {
 
-        const request = Object.assign(New(HTTPServerRequest), require("url").parse(req.url));
+        const request = Object.assign(New(HTTPServerRequest), URL.parse(req.url));
         request.headers = req.headers;
         this.request = request;
         this.request.method = req.method;

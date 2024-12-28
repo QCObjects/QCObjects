@@ -22,11 +22,15 @@ __export(org_quickcorp_qcobjects_api_client_services_exports, {
   QuickCorpCloud: () => QuickCorpCloud
 });
 module.exports = __toCommonJS(org_quickcorp_qcobjects_api_client_services_exports);
-const { Package, Service, logger } = require("qcobjects");
-class QuickCorpCloud extends Service {
+var import_qcobjects = require("qcobjects");
+class QuickCorpCloud extends import_qcobjects.Service {
   static {
     __name(this, "QuickCorpCloud");
   }
+  headers;
+  url;
+  basePath;
+  data;
   constructor({
     name = "quickcorp_cloud",
     external = true,
@@ -59,13 +63,13 @@ class QuickCorpCloud extends Service {
     this.data = o.data;
   }
   done(service, standardResponse) {
-    logger.debug(standardResponse);
+    import_qcobjects.logger.debug(standardResponse);
   }
   fail(e) {
-    logger.debug(e);
+    import_qcobjects.logger.debug(e);
   }
 }
-Package("org.quickcorp.qcobjects.api.client_services", [
+(0, import_qcobjects.Package)("org.quickcorp.qcobjects.api.client_services", [
   QuickCorpCloud
 ]);
 // Annotate the CommonJS export names for ESM import in node:

@@ -1,13 +1,13 @@
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const fs = require("fs");
-const path = require("path");
-const { exec, execSync } = require("child_process");
-const { Package, InheritClass, logger } = require("qcobjects");
+import fs from "node:fs";
+import { Package, InheritClass, logger } from "qcobjects";
 class CommandHandler extends InheritClass {
   static {
     __name(this, "CommandHandler");
   }
+  choiceOption;
+  switchCommander;
   constructor({ switchCommander }) {
     super({ switchCommander });
     const commandHandler = this;
@@ -137,7 +137,7 @@ class CommandHandler extends InheritClass {
       commandHandler.choiceOption.v_sync.call(commandHandler, args, options);
     });
     switchCommander.program.command("v-changelog").description("Semantic Versioning: Shows a changelog using Semantic Versioning").action(function(args, options) {
-      commandHandler.choiceOption.v_changelog.call(commandHandler, args, options);
+      commandHandler.choiceOption.v_changelog.call(commandHandler);
     });
   }
   syncGit(versionString, commitMsg, syncNpm = false) {

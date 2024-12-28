@@ -9,6 +9,7 @@ import path from "node:path";
 import fs from "node:fs";
 import http from "node:http";
 import mime from "mime";
+import { URL } from "url";
 var require_org_quickcorp_qcobjects_main_http_gae_server = __commonJS({
   "src/org.quickcorp.qcobjects.main.http.gae.server.ts"() {
     (async () => {
@@ -365,7 +366,7 @@ Y88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r
             }
           }
           server.on("request", (req, res) => {
-            const request2 = Object.assign(New(HTTPServerRequest), require("url").parse(req.url));
+            const request2 = Object.assign(New(HTTPServerRequest), URL.parse(req.url));
             request2.headers = req.headers;
             this.request = request2;
             this.request.method = req.method;

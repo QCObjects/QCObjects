@@ -30,11 +30,10 @@ var global = (() => {
     "src/qcobjects-shell.ts"(exports, module) {
       var import_path = __toESM(require("path"));
       var import_vm = __toESM(require("vm"));
+      var import_qcobjects = require("qcobjects");
+      var import_org_quickcorp_qcobjects = require("./org.quickcorp.qcobjects.defaultsettings");
       var import_readline = __toESM(require("readline"));
       const absolutePath = import_path.default.resolve(__dirname, "./");
-      const { InheritClass, global } = require("qcobjects");
-      require(absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
-      const package_config = require(absolutePath + "/package.json");
     }
   });
   return require_qcobjects_shell();

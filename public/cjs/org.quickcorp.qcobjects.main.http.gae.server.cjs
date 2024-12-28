@@ -27,6 +27,7 @@ var import_node_path = __toESM(require("node:path"));
 var import_node_fs = __toESM(require("node:fs"));
 var import_node_http = __toESM(require("node:http"));
 var import_mime = __toESM(require("mime"));
+var import_url = require("url");
 (async () => {
   "use strict";
   const { findPackageNodePath, Import, Package, InheritClass, CONFIG, logger, New, global, ClassFactory, Export } = await import("qcobjects");
@@ -381,7 +382,7 @@ Y88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r
         }
       }
       server.on("request", (req, res) => {
-        const request2 = Object.assign(New(HTTPServerRequest), require("url").parse(req.url));
+        const request2 = Object.assign(New(HTTPServerRequest), import_url.URL.parse(req.url));
         request2.headers = req.headers;
         this.request = request2;
         this.request.method = req.method;

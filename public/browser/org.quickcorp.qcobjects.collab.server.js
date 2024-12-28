@@ -1,21 +1,43 @@
 "use strict";
 var global = (() => {
+  var __create = Object.create;
   var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __getProtoOf = Object.getPrototypeOf;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
   var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
   var __commonJS = (cb, mod) => function __require() {
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+    }
+    return to;
+  };
+  var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+    // If the importer is in node compatibility mode or this is not an ESM
+    // file that has been converted to a CommonJS file using a Babel-
+    // compatible transform (i.e. "__esModule" has not been set), then set
+    // "default" to the CommonJS "module.exports" for node compatibility.
+    isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+    mod
+  ));
   var require_org_quickcorp_qcobjects_collab_server = __commonJS({
     "src/org.quickcorp.qcobjects.collab.server.ts"(exports, module) {
+      var import_qcobjects = require("qcobjects");
+      var import_os = __toESM(require("os"));
+      var import_fs = __toESM(require("fs"));
+      var import_node_net = __toESM(require("node:net"));
+      var import_node_repl = __toESM(require("node:repl"));
+      var import_node_vm = __toESM(require("node:vm"));
+      var import_path = __toESM(require("path"));
+      var import_child_process = require("child_process");
       (() => {
         "use strict";
-        const { CONFIG, Package, InheritClass, logger, global } = require("qcobjects");
-        const os = require("os");
-        const fs = require("fs");
-        const net = require("node:net");
-        const repl = require("node:repl");
-        const vm = require("node:vm");
         const welcometo = "Welcome to \n";
         const instructions = "Type:\n .exit to quit\n .help for see a quick guide\n And any other command to execute like pure javascript \n All the QCObjects stuff is already loaded for you";
         const logo = ` .d88888b.  .d8888b.  .d88888b. 888       d8b                888            \r
@@ -29,12 +51,10 @@ Y88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r
        Y8b                                888                               \r
                                          d88P                               \r
                                        888P"   `;
-        const path = require("path");
-        const absolutePath = path.resolve(__dirname, "./");
-        const { exec, execSync } = require("child_process");
+        const absolutePath = import_path.default.resolve(__dirname, "./");
         console.log(welcometo);
         console.log(logo);
-        const unixsocket_default = os.tmpdir() + "/qcobjects-collab-socket" + Date.now().toString();
+        const unixsocket_default = import_os.default.tmpdir() + "/qcobjects-collab-socket" + Date.now().toString();
         const collab_port_default = 10300;
         const collab_domain_default = "0.0.0.0";
         if (process.argv.length < 3) {
@@ -47,11 +67,11 @@ QCObjects Collab is a tool that helps you to make data science math using JavaSc
 
 You can use a TCP socket to connect yourself to the engine:
 
-> ssh user@${CONFIG.get("domain", collab_domain_default)} nc ${CONFIG.get("collab-domain", collab_domain_default)} ${CONFIG.get("collab-port", collab_port_default)}
+> ssh user@${import_qcobjects.CONFIG.get("domain", collab_domain_default)} nc ${import_qcobjects.CONFIG.get("collab-domain", collab_domain_default)} ${import_qcobjects.CONFIG.get("collab-port", collab_port_default)}
 
 You can also use a Unix Socket to connect yourself to the engine:
 
-> ssh user@${CONFIG.get("domain", collab_domain_default)} nc -U ${CONFIG.get("collab-unix-socket", unixsocket_default)}
+> ssh user@${import_qcobjects.CONFIG.get("domain", collab_domain_default)} nc -U ${import_qcobjects.CONFIG.get("collab-unix-socket", unixsocket_default)}
 
 (change "user" for whathever your username is!)
 
@@ -64,10 +84,13 @@ You can also use a Unix Socket to connect yourself to the engine:
           __dirname: "./",
           __filename: "qcobjects-collab"
         };
-        class CollabServer extends InheritClass {
+        class CollabServer extends import_qcobjects.InheritClass {
           static {
             __name(this, "CollabServer");
           }
+          protected_symbols;
+          replServer;
+          commands;
           constructor() {
             super();
             this.protected_symbols = [
@@ -132,6 +155,7 @@ You can also use a Unix Socket to connect yourself to the engine:
               "CanvasTool",
               "BasicLayout"
             ];
+            const replServer = this.replServer;
             this.commands = {
               loadcmd_json: {
                 help: `
@@ -146,7 +170,7 @@ You can also use a Unix Socket to connect yourself to the engine:
               as JSON format
 `,
                 action(args) {
-                  const _rplServer = repl;
+                  const _rplServer = replServer;
                   var commandArgs = args.split(" ");
                   if (commandArgs.length > 2) {
                     var _variableName = commandArgs[0];
@@ -154,15 +178,15 @@ You can also use a Unix Socket to connect yourself to the engine:
                     if (_equal_sign === "=") {
                       var cmdArguments = commandArgs.slice(2).join(" ");
                       _rplServer.clearBufferedCommand();
-                      logger.debug(`Executing... ${cmdArguments}`);
-                      exec(cmdArguments, (err, stdout, stderr) => {
+                      import_qcobjects.logger.debug(`Executing... ${cmdArguments}`);
+                      (0, import_child_process.exec)(cmdArguments, (err, stdout, stderr) => {
                         try {
                           _rplServer.context[_variableName] = JSON.parse(stdout);
                         } catch (e) {
-                          logger.debug("It was not possible to parse the data.");
+                          import_qcobjects.logger.debug("It was not possible to parse the data.");
                         }
                         _rplServer.displayPrompt();
-                      }).stdout.on("data", function(data) {
+                      }).stdout?.on("data", function(data) {
                         console.log(data);
                       });
                     } else {
@@ -186,7 +210,7 @@ You can also use a Unix Socket to connect yourself to the engine:
               The above command will save the output of "ls *" into the variable global.foo as string
 `,
                 action(args) {
-                  const _rplServer = repl;
+                  const _rplServer = replServer;
                   var commandArgs = args.split(" ");
                   if (commandArgs.length > 2) {
                     var _variableName = commandArgs[0];
@@ -194,11 +218,11 @@ You can also use a Unix Socket to connect yourself to the engine:
                     if (_equal_sign === "=") {
                       var cmdArguments = commandArgs.slice(2).join(" ");
                       _rplServer.clearBufferedCommand();
-                      logger.debug(`Executing... ${cmdArguments}`);
-                      exec(cmdArguments, (err, stdout, stderr) => {
+                      import_qcobjects.logger.debug(`Executing... ${cmdArguments}`);
+                      (0, import_child_process.exec)(cmdArguments, (err, stdout, stderr) => {
                         _rplServer.context[_variableName] = stdout;
                         _rplServer.displayPrompt();
-                      }).stdout.on("data", function(data) {
+                      }).stdout?.on("data", function(data) {
                         console.log(data);
                       });
                     } else {
@@ -222,16 +246,16 @@ You can also use a Unix Socket to connect yourself to the engine:
               The above command will save the stringified content of foo into ./filename
 `,
                 action(args) {
-                  const _rplServer = repl;
+                  const _rplServer = replServer;
                   var commandArgs = args.split(" ");
                   if (commandArgs.length >= 2) {
                     var _variableName = commandArgs[0];
                     var _filename = commandArgs[1].toString();
-                    logger.debug(`Saving variable ${_variableName} in ${_filename}...`);
+                    import_qcobjects.logger.debug(`Saving variable ${_variableName} in ${_filename}...`);
                     var data = JSON.stringify(_rplServer.context[_variableName]);
-                    fs.writeFile(_filename, data, (err) => {
+                    import_fs.default.writeFile(_filename, data, (err) => {
                       if (err) throw err;
-                      logger.debug(`The data of the file ${_filename} has been saved!`);
+                      import_qcobjects.logger.debug(`The data of the file ${_filename} has been saved!`);
                       _rplServer.displayPrompt();
                     });
                   } else {
@@ -250,21 +274,21 @@ You can also use a Unix Socket to connect yourself to the engine:
               The above command will load a json from ./filename and save it in global.foo as an object
 `,
                 action(args) {
-                  const _rplServer = repl;
+                  const _rplServer = replServer;
                   var commandArgs = args.split(" ");
                   if (commandArgs.length > 2) {
                     var _variableName = commandArgs[0];
                     var _equal_sign = commandArgs[1].toString();
                     if (_equal_sign === "=") {
                       var _filename = commandArgs[2].toString();
-                      logger.debug(`Trying to read ${_variableName} from ${_filename}...`);
-                      fs.readFile(_filename, (err, data) => {
+                      import_qcobjects.logger.debug(`Trying to read ${_variableName} from ${_filename}...`);
+                      import_fs.default.readFile(_filename, (err, data) => {
                         if (err) throw err;
                         try {
                           _rplServer.context[_variableName] = JSON.parse(data.toString());
-                          logger.debug(`The data of the file ${_filename} has been loaded!`);
+                          import_qcobjects.logger.debug(`The data of the file ${_filename} has been loaded!`);
                         } catch (e) {
-                          logger.debug("It was not possible to parse the data.");
+                          import_qcobjects.logger.debug("It was not possible to parse the data.");
                         }
                         _rplServer.displayPrompt();
                       });
@@ -281,13 +305,13 @@ You can also use a Unix Socket to connect yourself to the engine:
               cmd: {
                 help: "Executes a CMD Shell Command",
                 action(...args) {
-                  const _rplServer = repl;
+                  const _rplServer = replServer;
                   var cmdArguments = args.join(" ");
                   _rplServer.clearBufferedCommand();
-                  logger.debug(`Executing... ${cmdArguments}`);
-                  exec(cmdArguments, (err, stdout, stderr) => {
+                  import_qcobjects.logger.debug(`Executing... ${cmdArguments}`);
+                  (0, import_child_process.exec)(cmdArguments, (err, stdout, stderr) => {
                     _rplServer.displayPrompt();
-                  }).stdout.on("data", function(data) {
+                  }).stdout?.on("data", function(data) {
                     console.log(data);
                   });
                 }
@@ -298,7 +322,7 @@ You can also use a Unix Socket to connect yourself to the engine:
             const runScript = /* @__PURE__ */ __name((code, logOutput = false) => {
               const options = { filename: sandbox.__filename };
               const backgroundRunScript = /* @__PURE__ */ __name((code2) => {
-                var output2 = vm.runInContext(code2, context, options);
+                var output2 = import_node_vm.default.runInContext(code2, context, options);
                 return output2;
               }, "backgroundRunScript");
               var output = backgroundRunScript(code);
@@ -309,23 +333,23 @@ You can also use a Unix Socket to connect yourself to the engine:
           }
           start() {
             var collabServer = this;
-            global.require = require.bind(global);
-            global.module = module;
-            global.__dirname = "./";
-            global.__filename = "qcobjects-collab";
-            const globalContext = vm.createContext(global);
+            import_qcobjects.global.require = require.bind(import_qcobjects.global);
+            import_qcobjects.global.module = module;
+            import_qcobjects.global.__dirname = "./";
+            import_qcobjects.global.__filename = "qcobjects-collab";
+            const globalContext = import_node_vm.default.createContext(import_qcobjects.global);
             globalContext.connections = 0;
             function unlink_socket() {
               try {
-                logger.debug("Trying to delete the socket... ");
-                fs.unlink(CONFIG.get("collab-unix-socket", unixsocket_default), (err) => {
+                import_qcobjects.logger.debug("Trying to delete the socket... ");
+                import_fs.default.unlink(import_qcobjects.CONFIG.get("collab-unix-socket", unixsocket_default), (err) => {
                   if (err) {
-                    logger.debug("Unix Socket does not exist");
+                    import_qcobjects.logger.debug("Unix Socket does not exist");
                   }
-                  logger.debug("Unix Socket was deleted before start");
+                  import_qcobjects.logger.debug("Unix Socket was deleted before start");
                 });
               } catch (e) {
-                logger.debug("Unix Socket was not deleted");
+                import_qcobjects.logger.debug("Unix Socket was not deleted");
               }
             }
             __name(unlink_socket, "unlink_socket");
@@ -335,26 +359,27 @@ You can also use a Unix Socket to connect yourself to the engine:
                 _cmdReplServer.defineCommand(_command, commands[_command]);
               }
             }, "_defineReplCommands");
-            const replServer = repl.start({
+            const replServer = import_node_repl.default.start({
               useColors: true,
               prompt: "QCObjects Collab> ",
               terminal: true,
               useGlobal: false
             });
-            replServer.context = globalContext;
-            replServer.on("exit", () => {
+            this.replServer = replServer;
+            this.replServer.context.global = globalContext;
+            this.replServer.on("exit", () => {
               unlink_socket();
               console.log("Thank you for using QCObjects Collab for Data Science!");
               console.log("Have a nice day!");
               process.exit();
             });
-            _defineReplCommands(replServer, collabServer.commands);
-            const unixsocket_server = net.createServer(function(unixsocket) {
+            _defineReplCommands(this.replServer, collabServer.commands);
+            const unixsocket_server = import_node_net.default.createServer(function(unixsocket) {
               unixsocket.on("end", () => {
-                logger.debug("A Unix socket connection was ended");
+                import_qcobjects.logger.debug("A Unix socket connection was ended");
               });
-              global.connections += 1;
-              const unixReplServer = repl.start({
+              import_qcobjects.global.connections += 1;
+              const unixReplServer = import_node_repl.default.start({
                 prompt: "QCObjects Collab> ",
                 input: unixsocket,
                 output: unixsocket,
@@ -364,15 +389,15 @@ You can also use a Unix Socket to connect yourself to the engine:
               unixReplServer.on("exit", function() {
                 unixsocket.end();
               });
-              unixReplServer.context = global;
+              unixReplServer.context.global = import_qcobjects.global;
               _defineReplCommands(unixReplServer, collabServer.commands);
-            }).listen(CONFIG.get("collab-unix-socket", unixsocket_default));
-            const http_server = net.createServer(function(httpsocket) {
+            }).listen(import_qcobjects.CONFIG.get("collab-unix-socket", unixsocket_default));
+            const http_server = import_node_net.default.createServer(function(httpsocket) {
               httpsocket.on("end", () => {
-                logger.debug("A http connection was ended");
+                import_qcobjects.logger.debug("A http connection was ended");
               });
-              global.connections += 1;
-              const httpReplServer = repl.start({
+              import_qcobjects.global.connections += 1;
+              const httpReplServer = import_node_repl.default.start({
                 prompt: "QCObjects Collab> ",
                 input: httpsocket,
                 output: httpsocket,
@@ -382,15 +407,15 @@ You can also use a Unix Socket to connect yourself to the engine:
               httpReplServer.on("exit", function() {
                 httpsocket.end();
               });
-              httpReplServer.context = global;
+              httpReplServer.context.global = import_qcobjects.global;
               _defineReplCommands(httpReplServer, collabServer.commands);
-            }).listen(CONFIG.get("collab-port", collab_port_default), CONFIG.get("collab-domain", collab_domain_default));
+            }).listen(import_qcobjects.CONFIG.get("collab-port", collab_port_default), import_qcobjects.CONFIG.get("collab-domain", collab_domain_default));
             http_server.on("error", function(e) {
               if (e.code == "EADDRINUSE") {
                 console.log("Collab HTTP Address in use, retrying...");
                 setTimeout(function() {
                   http_server.close();
-                  http_server.listen(CONFIG.get("collab-port", collab_port_default), CONFIG.get("collab-domain", collab_domain_default));
+                  http_server.listen(import_qcobjects.CONFIG.get("collab-port", collab_port_default), import_qcobjects.CONFIG.get("collab-domain", collab_domain_default));
                 }, 1e3);
               }
             });
@@ -399,13 +424,13 @@ You can also use a Unix Socket to connect yourself to the engine:
                 console.log("Collab Unix Socket Address in use, retrying...");
                 setTimeout(function() {
                   unixsocket_server.close();
-                  unixsocket_server.listen(CONFIG.get("collab-unix-socket", unixsocket_default));
+                  unixsocket_server.listen(import_qcobjects.CONFIG.get("collab-unix-socket", unixsocket_default));
                 }, 1e3);
               }
             });
           }
         }
-        Package("org.quickcorp.qcobjects.collab.server", [
+        (0, import_qcobjects.Package)("org.quickcorp.qcobjects.collab.server", [
           CollabServer
         ]);
         exports = { CollabServer };

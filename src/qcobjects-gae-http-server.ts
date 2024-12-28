@@ -30,17 +30,17 @@
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
 "use strict";
-(() => {
-  "use strict";
+import path from "path";
+import { InheritClass, New, logger } from "qcobjects";
 
-  const path = require("path");
+(async () => {
+
   const absolutePath = path.resolve(__dirname, "./");
 
-  const { InheritClass, New, logger } = require("qcobjects");
 
-  require(absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
+  await import(absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
 
-  const { HTTPServer } = require(absolutePath + "/org.quickcorp.qcobjects.main.http.gae.server.js");
+  const { HTTPServer } = await import(absolutePath + "/org.quickcorp.qcobjects.main.http.gae.server.js");
 
   class Main extends InheritClass {
 
@@ -55,4 +55,4 @@
   }
 
   const __main__ = new Main();
-})();
+})().catch(e => console.error(e));

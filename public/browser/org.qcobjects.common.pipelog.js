@@ -22,8 +22,8 @@ var global = (() => {
   __export(org_qcobjects_common_pipelog_exports, {
     PipeLog: () => PipeLog
   });
-  const { Package, InheritClass } = require("qcobjects");
-  class PipeLog extends InheritClass {
+  var import_qcobjects = require("qcobjects");
+  class PipeLog extends import_qcobjects.InheritClass {
     static {
       __name(this, "PipeLog");
     }
@@ -40,7 +40,7 @@ var global = (() => {
       return _o.join(" ");
     }
   }
-  Package("org.qcobjects.common.pipelog", [
+  (0, import_qcobjects.Package)("org.qcobjects.common.pipelog", [
     PipeLog
   ]);
   return __toCommonJS(org_qcobjects_common_pipelog_exports);
