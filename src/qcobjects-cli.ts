@@ -56,7 +56,7 @@ logger.debugEnabled = false;
 logger.warnEnabled = false;
 logger.infoEnabled = false;
 
-export * as defaultSettings from "./org.quickcorp.qcobjects.defaultsettings";
+export * as defaultSettings from "./defaultsettings";
 import {SwitchCommander} from "./org.quickcorp.qcobjects.cli";
 
 export class Main extends InheritClass {

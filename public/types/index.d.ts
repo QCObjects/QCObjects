@@ -88,7 +88,7 @@ declare module "com.qcobjects.cli.commands" {
     export * as versionCommand from "com.qcobjects.cli.commands.version";
     export * as jiraCommand from "com.qcobjects.cli.commands.jira";
 }
-declare module "org.quickcorp.qcobjects.defaultsettings" {
+declare module "defaultsettings" {
     import "qcobjects";
     export const __get_version__: () => {
         qcobjects: any;
@@ -187,7 +187,7 @@ declare module "org.quickcorp.qcobjects.cli" {
 }
 declare module "qcobjects-cli" {
     import { InheritClass } from "qcobjects";
-    export * as defaultSettings from "org.quickcorp.qcobjects.defaultsettings";
+    export * as defaultSettings from "defaultsettings";
     export class Main extends InheritClass {
         constructor();
     }
@@ -214,6 +214,6 @@ declare module "qcobjects-createcert" { }
 declare module "qcobjects-gae-http-server" { }
 declare module "qcobjects-http-server" { }
 declare module "qcobjects-shell" {
-    import "org.quickcorp.qcobjects.defaultsettings";
+    import "defaultsettings";
 }
 declare module "backend/com.qcobjects.backend.microservice.static" { }

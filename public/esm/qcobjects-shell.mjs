@@ -8,7 +8,7 @@ var __commonJS = (cb, mod) => function __require() {
 import path from "path";
 import vm from "vm";
 import { InheritClass, global } from "qcobjects";
-import "./org.quickcorp.qcobjects.defaultsettings";
+import "./defaultsettings";
 import readline from "readline";
 var require_qcobjects_shell = __commonJS({
   "src/qcobjects-shell.ts"(exports, module) {

@@ -27,12 +27,12 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-var org_quickcorp_qcobjects_defaultsettings_exports = {};
-__export(org_quickcorp_qcobjects_defaultsettings_exports, {
+var defaultsettings_exports = {};
+__export(defaultsettings_exports, {
   __get_version__: () => __get_version__,
   __get_version_string__: () => __get_version_string__
 });
-module.exports = __toCommonJS(org_quickcorp_qcobjects_defaultsettings_exports);
+module.exports = __toCommonJS(defaultsettings_exports);
 var import_qcobjects = require("qcobjects");
 var import_node_fs = require("node:fs");
 var import_node_path = __toESM(require("node:path"));
@@ -410,4 +410,4 @@ import_qcobjects2.global.__reset_settings__ = __reset_settings__;
   __get_version__,
   __get_version_string__
 });
-//# sourceMappingURL=org.quickcorp.qcobjects.defaultsettings.cjs.map
+//# sourceMappingURL=defaultsettings.cjs.map

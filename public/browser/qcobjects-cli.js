@@ -36,7 +36,7 @@ var global = (() => {
     defaultSettings: () => defaultSettings
   });
   var import_qcobjects = require("qcobjects");
-  var defaultSettings = __toESM(require("./org.quickcorp.qcobjects.defaultsettings"));
+  var defaultSettings = __toESM(require("./defaultsettings"));
   var import_org_quickcorp_qcobjects = require("./org.quickcorp.qcobjects.cli");
   import_qcobjects.logger.debugEnabled = false;
   const welcometo = "Welcome to \n";

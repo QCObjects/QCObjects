@@ -376,4 +376,4 @@ export {
   __get_version__,
   __get_version_string__
 };
-//# sourceMappingURL=org.quickcorp.qcobjects.defaultsettings.mjs.map
+//# sourceMappingURL=defaultsettings.mjs.map

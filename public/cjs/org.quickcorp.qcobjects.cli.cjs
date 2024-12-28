@@ -42,7 +42,7 @@ var import_org_qcobjects_enterprise = require("./org.qcobjects.enterprise.comman
 var QuickCorpServices = __toESM(require("./org.quickcorp.qcobjects.api.client_services"));
 var import_org_quickcorp_qcobjects_api = require("./org.quickcorp.qcobjects.api.client_services");
 var customCommands = __toESM(require("./com.qcobjects.cli.commands"));
-var import_org_quickcorp_qcobjects = require("./org.quickcorp.qcobjects.defaultsettings");
+var import_defaultsettings = require("./defaultsettings");
 var import_node_path = __toESM(require("node:path"));
 var import_node_fs = __toESM(require("node:fs"));
 var import_node_child_process = require("node:child_process");
@@ -65,7 +65,7 @@ class SwitchCommander extends import_qcobjects.InheritClass {
       });
     }, "generateSw"),
     create: /* @__PURE__ */ __name((_appName, options) => {
-      const version = (0, import_org_quickcorp_qcobjects.__get_version__)();
+      const version = (0, import_defaultsettings.__get_version__)();
       const switchCommander = this;
       const appName = typeof _appName === "undefined" || _appName === true ? "MyAppName" : _appName;
       let appTemplateName;
@@ -334,7 +334,7 @@ class SwitchCommander extends import_qcobjects.InheritClass {
     const switchCommander = this;
     if (process.argv.length > 1) {
       import_qcobjects.logger.debug("Installing Commands...");
-      switchCommander.program.version((0, import_org_quickcorp_qcobjects.__get_version_string__)());
+      switchCommander.program.version((0, import_defaultsettings.__get_version_string__)());
       switchCommander.program.command("create <appname>").description("Creates an app with <appname>").option("--pwa, --create-pwa", "Creates the progressive web app assets").option("--amp, --create-amp", "Creates the accelerated mobile pages assets").option("--php, --create-php", "Creates the PWA PHP assets").option("--custom, --create-custom <templateappname>", "Creates an App from any NPM package template").option("--tests, --create-tests", "Creates the test suite").action(function(args, options) {
         switchCommander.choiceOption.create.call(switchCommander, args, options);
       });

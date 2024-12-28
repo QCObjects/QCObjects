@@ -28,8 +28,8 @@ var global = (() => {
     mod
   ));
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-  var org_quickcorp_qcobjects_defaultsettings_exports = {};
-  __export(org_quickcorp_qcobjects_defaultsettings_exports, {
+  var defaultsettings_exports = {};
+  __export(defaultsettings_exports, {
     __get_version__: () => __get_version__,
     __get_version_string__: () => __get_version_string__
   });
@@ -405,6 +405,6 @@ var global = (() => {
     import_qcobjects2.global.__load_default_settings__();
   }, "__reset_settings__");
   import_qcobjects2.global.__reset_settings__ = __reset_settings__;
-  return __toCommonJS(org_quickcorp_qcobjects_defaultsettings_exports);
+  return __toCommonJS(defaultsettings_exports);
 })();
-//# sourceMappingURL=org.quickcorp.qcobjects.defaultsettings.js.map
+//# sourceMappingURL=defaultsettings.js.map

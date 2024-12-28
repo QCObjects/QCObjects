@@ -31,7 +31,7 @@ var global = (() => {
       var import_path = __toESM(require("path"));
       var import_vm = __toESM(require("vm"));
       var import_qcobjects = require("qcobjects");
-      var import_org_quickcorp_qcobjects = require("./org.quickcorp.qcobjects.defaultsettings");
+      var import_defaultsettings = require("./defaultsettings");
       var import_readline = __toESM(require("readline"));
       const absolutePath = import_path.default.resolve(__dirname, "./");
     }

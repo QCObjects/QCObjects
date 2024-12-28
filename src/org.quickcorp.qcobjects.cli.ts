@@ -35,7 +35,7 @@ import { QCObjectsEnterprise } from "./org.qcobjects.enterprise.commands";
 export * as QuickCorpServices from "./org.quickcorp.qcobjects.api.client_services";
 import { QuickCorpCloud } from "./org.quickcorp.qcobjects.api.client_services";
 export * as customCommands from "./com.qcobjects.cli.commands";
-import { __get_version__, __get_version_string__ } from "./org.quickcorp.qcobjects.defaultsettings";
+import { __get_version__, __get_version_string__ } from "./defaultsettings";
 import path from "node:path";
 import fs from "node:fs";
 import { exec, execSync } from "node:child_process";

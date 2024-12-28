@@ -29,7 +29,7 @@
     ],
     "paths": {
       "types": [
-        "src/types/global"
+        "src/types/global/index.d.ts"
       ]
     }
   },
@@ -37,7 +37,15 @@
     "src/**/*",
     "src/types/**/*"
   ],
-  "exclude": ["src/**/*.js", "node_modules/**/*", "**/node_modules/*", "node_modules"],
+  "exclude": [
+    "**/*.js",
+    "src/index.mts",
+    "src/index.cts",
+    "node_modules",
+    "node_modules/**/*",
+    "**/node_modules/*",
+    "public/types"
+  ],
   "ts-node": {
     // It is faster to skip typechecking.
     // Remove if you want ts-node to do typechecking.
@@ -53,6 +61,6 @@
         ]
       }
     },
-    "exclude": ["node_modules/**/*", "**/node_modules/*", "node_modules"]
+    "exclude": ["node_modules/**/*", "**/node_modules/*", "node_modules",     "public/types"  ]
   }
 }

@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "skipLibCheck": true,
     "noEmit": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
@@ -26,14 +27,24 @@
     ],
     "paths": {
       "types": [
-        "src/types/global"
+        "src/types/global/index.d.ts"
       ],
       "qcobjects-sdk": ["spec/mocks/qcobjects-sdk.mock.ts"]
     }
   },
   "include": [
-    "spec/**/*"
+    "spec/**/*",
+    "src/**/*",
+    "src/types/**/*"
   ],
-  "exclude": ["src/**/*", "node_modules/**/*", "**/node_modules/*", "node_modules"]
+  "exclude": [
+    "**/*.js",
+    "src/index.mts",
+    "src/index.cts",
+    "node_modules",
+    "node_modules/**/*",
+    "**/node_modules/*",
+    "public/types"
+  ],
 
 }

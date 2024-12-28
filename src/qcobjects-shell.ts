@@ -41,7 +41,7 @@ const absolutePath = path.resolve( __dirname, "./" );
 import vm from "vm";
 
 import {InheritClass, global} from "qcobjects";
-import "./org.quickcorp.qcobjects.defaultsettings";
+import "./defaultsettings";
 import readline from "readline";
 
 

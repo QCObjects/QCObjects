@@ -34,7 +34,7 @@ if (process.argv.length < 3 || process.argv[2] === "create") {
 logger.debugEnabled = false;
 logger.warnEnabled = false;
 logger.infoEnabled = false;
-import * as defaultSettings from "./org.quickcorp.qcobjects.defaultsettings";
+import * as defaultSettings from "./defaultsettings";
 import { SwitchCommander } from "./org.quickcorp.qcobjects.cli";
 class Main extends InheritClass {
   static {
