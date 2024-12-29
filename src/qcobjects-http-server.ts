@@ -32,16 +32,13 @@
 "use strict";
 import path from "path";
 import { InheritClass, New, logger } from "qcobjects";
-
-(async () => {
-  "use strict";
+import "./defaultsettings";
+import { HTTPServer } from "./main-http-server";
 
   const absolutePath = path.resolve(__dirname, "./");
 
 
-  await import (absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
 
-  const { HTTPServer } = await import(absolutePath + "/org.quickcorp.qcobjects.main.http.server.js");
 
   class Main extends InheritClass {
     constructor() {
@@ -55,4 +52,3 @@ import { InheritClass, New, logger } from "qcobjects";
   }
 
   const __main__ = new Main();
-})().catch(e => console.error(e));

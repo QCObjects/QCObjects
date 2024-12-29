@@ -28,21 +28,19 @@
 /*eslint strict: "off"*/
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
+"use strict";
 import os from "node:os";
 import path from "node:path";
-import {findPackageNodePath, Import, Package, InheritClass, CONFIG, logger, New, global, ClassFactory, Export} from "qcobjects";
+import { findPackageNodePath, Import, Package, InheritClass, CONFIG, logger, New, global, ClassFactory, Export } from "qcobjects";
 import fs from "fs";
 import mime from "mime";
 import http from "http";
 import URL from "url";
+import { FileDispatcher } from "./main-file";
+import { PipeLog } from "./common-pipelog";
 
-(async () => {
-  "use strict";
 
 const absolutePath = path.resolve(__dirname, "./");
-
-const {FileDispatcher} = await import(absolutePath + "/org.quickcorp.qcobjects.main.file.js");
-const {PipeLog} = await import(absolutePath + "/org.qcobjects.common.pipelog.js");
 
 const ImportMicroservice = function (microservicePackage: string) {
   var _ret_;
@@ -51,7 +49,7 @@ const ImportMicroservice = function (microservicePackage: string) {
     _ret_ = Import(microservicePackage);
   } else {
     var nonStandardPath = findPackageNodePath(absolutePath + "/backend/" + microservicePackage) || findPackageNodePath(absolutePath + "/backend/" + microservicePackage + ".js");
-    if (nonStandardPath !== null){
+    if (nonStandardPath !== null) {
       _ret_ = Import(absolutePath + "/backend/" + microservicePackage);
     } else {
       _ret_ = Promise.resolve(async () => (await import(microservicePackage))());
@@ -70,12 +68,12 @@ class BackendMicroservice extends InheritClass {
   headers: any;
   request: any;
   constructor({
-    domain=CONFIG.get("domain"),
-    basePath=CONFIG.get("basePath"),
-    body=null,
-    stream=null,
-    request=null
-  }:{domain:string, basePath:string, body:any, stream:any, request:any}){
+    domain = CONFIG.get("domain"),
+    basePath = CONFIG.get("basePath"),
+    body = null,
+    stream = null,
+    request = null
+  }: { domain: string, basePath: string, body: any, stream: any, request: any }) {
     super({
       domain,
       basePath,
@@ -89,7 +87,7 @@ class BackendMicroservice extends InheritClass {
     if (typeof this.body === "undefined") {
       this.body = null;
     }
-    if (typeof body !== "undefined"){
+    if (typeof body !== "undefined") {
       this.body = body;
     }
     this.cors();
@@ -97,25 +95,27 @@ class BackendMicroservice extends InheritClass {
     microservice.req.on("data", (data: any) => {
       // data from POST, GET
       var requestMethod = request?.method.toLowerCase();
-      var supportedMethods:any = {"post":microservice.post.bind(this),
-                            };
-      if (Object.hasOwnProperty.call(supportedMethods,requestMethod)) {
-        supportedMethods[requestMethod].call(microservice,data);
+      var supportedMethods: any = {
+        "post": microservice.post.bind(this),
+      };
+      if (Object.hasOwnProperty.call(supportedMethods, requestMethod)) {
+        supportedMethods[requestMethod].call(microservice, data);
       }
     });
 
     // data from POST, GET
     var requestMethod = request.method.toLowerCase();
-    var supportedMethods:any = {"get":microservice.get.bind(this),
-                            "head":microservice.head.bind(this),
-                            "put":microservice.put.bind(this),
-                            "delete":microservice.delete.bind(this),
-                            "connect":microservice.connect.bind(this),
-                            "options":microservice.options.bind(this),
-                            "trace":microservice.trace.bind(this),
-                            "patch":microservice.patch.bind(this)
-                          };
-    if (Object.hasOwnProperty.call(supportedMethods,requestMethod)) {
+    var supportedMethods: any = {
+      "get": microservice.get.bind(this),
+      "head": microservice.head.bind(this),
+      "put": microservice.put.bind(this),
+      "delete": microservice.delete.bind(this),
+      "connect": microservice.connect.bind(this),
+      "options": microservice.options.bind(this),
+      "trace": microservice.trace.bind(this),
+      "patch": microservice.patch.bind(this)
+    };
+    if (Object.hasOwnProperty.call(supportedMethods, requestMethod)) {
       supportedMethods[requestMethod].call(microservice);
     }
 
@@ -151,7 +151,7 @@ class BackendMicroservice extends InheritClass {
           this.body = {};
           try {
             this.done();
-          } catch (e:any) {
+          } catch (e: any) {
             logger.debug(`It was not possible to finish the call to the microservice: ${e}`);
           }
         }
@@ -185,34 +185,34 @@ class BackendMicroservice extends InheritClass {
       logger.debug("No CORS validation available. You can specify cors in CONFIG.backend.routes[].cors");
     }
   }
-  head(formData: any){this.done();}
-  post(formData: any){this.done();}
-  put(formData: any){this.done();}
-  delete(formData: any){this.done();}
-  connect(formData: any){this.done();}
-  options(formData: any){this.done();}
-  trace(formData: any){this.done();}
-  patch(formData: any){this.done();}
-  finishWithBody(stream: { write: (arg0: string) => void; end: () => void; }){
+  head(formData: any) { this.done(); }
+  post(formData: any) { this.done(); }
+  put(formData: any) { this.done(); }
+  delete(formData: any) { this.done(); }
+  connect(formData: any) { this.done(); }
+  options(formData: any) { this.done(); }
+  trace(formData: any) { this.done(); }
+  patch(formData: any) { this.done(); }
+  finishWithBody(stream: { write: (arg0: string) => void; end: () => void; }) {
     try {
       stream.write(JSON.stringify(this.body));
       stream.end();
-    } catch (e:any){
+    } catch (e: any) {
       logger.debug(`Something wrong writing the response for microservice: ${e}`);
       throw Error(e);
     }
   }
-  done(){
+  done() {
     var microservice = this;
     var stream = microservice.stream;
     try {
       stream.writeHead(200, microservice.headers);
-    } catch (e:any){
+    } catch (e: any) {
       logger.debug(`Something went wront while sending headers in http... ${e}`);
       throw Error(e);
     }
-    if (microservice.body != null){
-      microservice.finishWithBody.call(microservice,stream);
+    if (microservice.body != null) {
+      microservice.finishWithBody.call(microservice, stream);
     }
   }
 
@@ -220,7 +220,7 @@ class BackendMicroservice extends InheritClass {
 
 }
 
-Export (BackendMicroservice);
+Export(BackendMicroservice);
 
 
 class HTTPServerResponse extends InheritClass {
@@ -229,8 +229,8 @@ class HTTPServerResponse extends InheritClass {
   request: any;
   headers!: { [x: string]: any; };
   body: any;
-  constructor ({
-    headers={
+  constructor({
+    headers = {
       "status": 200,
       "content-type": "text/html"
     },
@@ -256,7 +256,7 @@ class HTTPServerResponse extends InheritClass {
     // read and send file content in the stream
 
     try {
-      console.log("trying to read "+ fileName);
+      console.log("trying to read " + fileName);
       const fd = fs.openSync(fileName, "r");
       const stat = fs.fstatSync(fd);
       const headers = {
@@ -281,12 +281,12 @@ class HTTPServerResponse extends InheritClass {
         readStream.pipe(stream);
       });
 
-      readStream.on("end",function (){
+      readStream.on("end", function () {
         stream.end();
       });
 
       // This catches any errors that happen while creating the readable stream (usually invalid names)
-      readStream.on("error", function(err: any) {
+      readStream.on("error", function (err: any) {
         const headers = {
           "status": 500,
           "content-type": mime.getType(fileName)
@@ -300,8 +300,8 @@ class HTTPServerResponse extends InheritClass {
         stream.end(err);
       });
 
-    } catch (e:any){
-      if (e.errno==-2){
+    } catch (e: any) {
+      if (e.errno == -2) {
         const headers = {
           "status": 404,
           "content-type": mime.getType(fileName)
@@ -316,23 +316,23 @@ class HTTPServerResponse extends InheritClass {
       }
     }
   }
-  _generateResponse(){
+  _generateResponse() {
     var response = this;
-    response.fileDispatcher = New(FileDispatcher,{
-      scriptname:response.request.scriptname,
-      pathname:response.request.pathname,
-      done(headers: { [x: string]: any; },body: any,templateURI: any,isTemplate: any){
+    response.fileDispatcher = New(FileDispatcher, {
+      scriptname: response.request.scriptname,
+      pathname: response.request.pathname,
+      done(headers: { [x: string]: any; }, body: any, templateURI: any, isTemplate: any) {
         response.headers = headers;
         var stream = response.stream;
-        if (isTemplate){
+        if (isTemplate) {
           response.body = body;
-          Object.keys(headers).map((header)=>(stream as any).setHeader(header, headers[header]));
+          Object.keys(headers).map((header) => (stream as any).setHeader(header, headers[header]));
           (stream as any).write(response.body);
           (stream as any).end();
         } else if (headers["status"] == 200 || headers[":status"] == 200) {
           response.sendFile(stream, templateURI);
         } else {
-          Object.keys(headers).map((header)=>(stream as any).setHeader(header, headers[header]));
+          Object.keys(headers).map((header) => (stream as any).setHeader(header, headers[header]));
           (stream as any).end();
         }
       }
@@ -384,7 +384,7 @@ class HTTPServerRequest extends InheritClass {
   }
 }
 
-class HTTPServer extends InheritClass {
+export class HTTPServer extends InheritClass {
   interceptorInstances: never[];
   server: any;
   request: any;
@@ -411,8 +411,8 @@ class HTTPServer extends InheritClass {
     console.log(logo);
     console.log(instructions);
     logger.debug(this.showIPAddress());
-    logger.info("Listening on HTTP PORT: "+CONFIG.get("serverPortHTTP").toString());
-    logger.info("Go to: \n"+this.showPossibleURL());
+    logger.info("Listening on HTTP PORT: " + CONFIG.get("serverPortHTTP").toString());
+    logger.info("Go to: \n" + this.showPossibleURL());
     this.interceptorInstances = interceptorInstances;
 
     this.server = http.createServer((req: any, res: any) => {
@@ -421,7 +421,7 @@ class HTTPServer extends InheritClass {
 
     this.server.on("error", (err: any) => console.error(err));
 
-    if (global.get("backendAvailable")){
+    if (global.get("backendAvailable")) {
       logger.info("Loading backend interceptors...");
       const interceptors = CONFIG.get("backend", {}).interceptors;
       if (typeof interceptors !== "undefined") {
@@ -443,47 +443,47 @@ class HTTPServer extends InheritClass {
 
     this.server.on("request", (req: { url: any; headers: any; method: any; }, res: { destroyed: any; writeHeader: (arg0: number, arg1: { "content-type": string; }) => void; on: (arg0: string, arg1: () => void) => void; write: (arg0: string) => void; end: () => void; }) => {
 
-      const request = Object.assign(New(HTTPServerRequest),URL.parse(req.url));
+      const request = Object.assign(New(HTTPServerRequest), URL.parse(req.url));
       request.headers = req.headers;
       this.request = request;
       this.request.method = req.method;
       this.request.path = req.url;
       this.server.setMaxListeners(9999999999);
-      CONFIG.set("backendTimeout",CONFIG.get("backendTimeout") || 20000);
-      var timeoutHandler = ()=>{
+      CONFIG.set("backendTimeout", CONFIG.get("backendTimeout") || 20000);
+      var timeoutHandler = () => {
         // end the stream on timeout
         try {
-          if (!res.destroyed){
+          if (!res.destroyed) {
             logger.info("A timeout occurred..." + CONFIG.get("backendTimeout").toString());
             logger.info("Killing session...");
 
-            res.writeHeader( 500, {
+            res.writeHeader(500, {
               "content-type": "text/html"
             });
-            res.on("error",()=>{});
+            res.on("error", () => { });
             res.write("<h1>500 - INTERNAL SERVER ERROR (TIMEOUT)</h1>");
             res.end();
           } else {
             logger.debug("Session was normally finishing...");
           }
-        } catch (e:any) {
+        } catch (e: any) {
           logger.debug(`An unhandled error occurred during timeout catching: ${e}`);
         }
-        this.server.removeListener("timeout",timeoutHandler);
+        this.server.removeListener("timeout", timeoutHandler);
 
       };
-      if (!res.destroyed){
+      if (!res.destroyed) {
         this.server.setTimeout(CONFIG.get("backendTimeout"), timeoutHandler);
       }
 
-      if (this.request.pathname.indexOf(".")<0){
-          this.request.scriptname = CONFIG.get("documentRootFileIndex");
+      if (this.request.pathname.indexOf(".") < 0) {
+        this.request.scriptname = CONFIG.get("documentRootFileIndex");
       } else {
         this.request.scriptname = this.request.pathname.split("/").reverse()[0];
       }
-      this.request.pathname = this.request.pathname.substr(0,this.request.pathname.lastIndexOf("/"));
+      this.request.pathname = this.request.pathname.substr(0, this.request.pathname.lastIndexOf("/"));
 
-      logger.debug((new PipeLog()).pipe(this.request));
+      logger.debug(PipeLog.pipe(this.request));
 
       if (global.get("backendAvailable")) {
         logger.info("Backend Legacy Microservices Available...");
@@ -501,10 +501,10 @@ class HTTPServer extends InheritClass {
             const selectedRouteParams = {
               ...[...request.path.matchAll((new RegExp(standardRoutePath, "g")))][0]["groups"]
             };
-            ImportMicroservice(route.microservice).then (()=>{
+            ImportMicroservice(route.microservice).then(() => {
               logger.debug(`Trying to execute ${route.microservice + ".Microservice"}...`);
               var microServiceClassFactory = ClassFactory(route.microservice + ".Microservice");
-              if (typeof microServiceClassFactory !== "undefined"){
+              if (typeof microServiceClassFactory !== "undefined") {
                 const server = this.server;
                 this.response = New(microServiceClassFactory, {
                   domain: CONFIG.get("domain"),
@@ -514,37 +514,37 @@ class HTTPServer extends InheritClass {
                   routeParams: selectedRouteParams,
                   server: server,
                   stream: res,
-                  req:req,
+                  req: req,
                   request: request
                 });
-  
+
               } else {
-                throw Error (`${route.microservice + ".Microservice"} not defined.`);
+                throw Error(`${route.microservice + ".Microservice"} not defined.`);
               }
-            }).catch ((e: string | undefined)=> {
-              throw Error (e);
+            }).catch((e: string | undefined) => {
+              throw Error(e);
             });
           });
         } else {
-          this.response = New(HTTPServerResponse,{
+          this.response = New(HTTPServerResponse, {
             domain: CONFIG.get("domain"),
             basePath: CONFIG.get("basePath"),
-            projectPath: CONFIG.get("projectPath"),              
-            server:this.server,
-            stream:res,
-            req:req,
-            request:this.request
+            projectPath: CONFIG.get("projectPath"),
+            server: this.server,
+            stream: res,
+            req: req,
+            request: this.request
           });
         }
 
       } else {
         // ...
 
-        this.response = New(HTTPServerResponse,{
-          server:this.server,
-          stream:res,
-          req:req,
-          request:this.request
+        this.response = New(HTTPServerResponse, {
+          server: this.server,
+          stream: res,
+          req: req,
+          request: this.request
         });
 
       }
@@ -554,40 +554,39 @@ class HTTPServer extends InheritClass {
   }
 
 
-  showIPAddress(){
+  showIPAddress() {
     var _ret_ = "";
     var ifaces = os.networkInterfaces();
     Object.keys(ifaces).forEach(function (iface) {
       ifaces[iface]?.forEach(function (ipGroup: any) {
-        _ret_ += iface + ": " + (new PipeLog()).pipe(ipGroup) + "\n";
+        _ret_ += iface + ": " + PipeLog.pipe(ipGroup) + "\n";
       });
     });
     return _ret_;
   }
-  showPossibleURL(){
+  showPossibleURL() {
     var _ret_ = "";
     var ifaces = os.networkInterfaces();
-    Object.keys(ifaces).forEach(function (iface){
-      ifaces[iface]?.forEach(function (ipGroup: any){
-        if (ipGroup["family"].toLowerCase()=="ipv4"){
-          _ret_ += "http://"+ipGroup["address"]+":"+CONFIG.get("serverPortHTTP").toString()+"/\n";
+    Object.keys(ifaces).forEach(function (iface) {
+      ifaces[iface]?.forEach(function (ipGroup: any) {
+        if (ipGroup["family"].toLowerCase() == "ipv4") {
+          _ret_ += "http://" + ipGroup["address"] + ":" + CONFIG.get("serverPortHTTP").toString() + "/\n";
         }
       });
     });
     return _ret_;
   }
-  start(){
+  start() {
     var server = this.server;
     server.listen(process.env.PORT || CONFIG.get("serverPortHTTP"));
   }
-  
+
 }
 
 
-Package("org.quickcorp.qcobjects.main.http.server",[
-BackendMicroservice, 
-HTTPServer,
-HTTPServerRequest,
-HTTPServerResponse
+Package("org.quickcorp.qcobjects.main.http.server", [
+  BackendMicroservice,
+  HTTPServer,
+  HTTPServerRequest,
+  HTTPServerResponse
 ]);
-})().catch(e => console.error(e));

@@ -1,7 +1,43 @@
 const esbuild = require("esbuild");
 const alias = require("esbuild-plugin-alias");
 const path = require("node:path");
+const { readFileSync, writeFileSync } = require("node:fs");
 const fs = require("node:fs").promises;
+const glob = require("glob");
+
+// Function to detect and add the extension
+const nameToExtension = (name, ext) => {
+    function isPackage(name) {
+      // Simple check to determine if the name is a package
+      // This can be enhanced based on your specific needs
+      return !name.startsWith(".") && !name.startsWith("/") && !name.includes("/");
+    }
+  
+    const hasExtension = /\.[^/\\]+$/.test(name);
+    if (!hasExtension && !isPackage(name)) {
+      name += ext;
+    }
+  
+    return name;
+  };
+  
+  // Function to add .cjs and .mjs extensions to import/export/require statements
+  const addExtensions = (filePath, toExt) => {
+    const content = readFileSync(filePath, 'utf8');
+    const updatedContent = content.replace(/(from\s+['"])(.*?)(['"])/g, (match, p1, p2, p3) => {
+      return `${p1}${nameToExtension(p2, toExt)}${p3}`;
+    }).replace(/(import\s+['"])(.*?)(['"])/g, (match, p1, p2, p3) => {
+      return `${p1}${nameToExtension(p2, toExt)}${p3}`;
+    }).replace(/(export\s+['"])(.*?)(['"])/g, (match, p1, p2, p3) => {
+      return `${p1}${nameToExtension(p2, toExt)}${p3}`;
+    }).replace(/(require\s*\(\s*['"])(.*?)(['"]\s*\))/g, (match, p1, p2, p3) => {
+      return `${p1}${nameToExtension(p2, toExt)}${p3}`;
+    });
+    writeFileSync(filePath, updatedContent, 'utf8');
+  };
+
+// Get all TypeScript entry points
+const entryPoints = glob.sync('src/**/*.ts');
 
 const logError = (e) => { console.error(e); process.exit(1); };
 const logDebug = (e) => { console.debug(e); }
@@ -63,7 +99,7 @@ const copyDir = async (source, dest, exclude) => {
 })();
 
 const baseSettings = {
-    entryPoints: ["src/**/*.ts"], // Your entry file
+    entryPoints: entryPoints, // Your entry file
     bundle: false,
     outdir: "public/cjs", // Output dir
     format: "cjs", // or "esm" depending on your module system    
@@ -89,7 +125,20 @@ const cjsSettings = {
     platform: "node", // or "browser" depending on your target environment
     outExtension: {
         ".js": ".cjs"
-    }
+    },
+    plugins: [
+        {
+            name: 'add-extensions',
+            setup(build) {
+                build.onEnd(() => {
+                    entryPoints.forEach(entry => {
+                        const outputFilePath = path.join('./public/cjs', entry.replace('src/', '').replace('.ts', '.cjs'));
+                        addExtensions(outputFilePath, '.cjs');
+                    });
+                });
+            }
+        }
+    ]
 };
 
 const esmSettings = {
@@ -99,7 +148,20 @@ const esmSettings = {
     platform: "browser", // or "browser" depending on your target environment
     outExtension: {
         ".js": ".mjs"
-    }
+    },
+    plugins: [
+        {
+            name: 'add-extensions',
+            setup(build) {
+                build.onEnd(() => {
+                    entryPoints.forEach(entry => {
+                        const outputFilePath = path.join('./public/esm', entry.replace('src/', '').replace('.ts', '.mjs'));
+                        addExtensions(outputFilePath, '.mjs');
+                    });
+                });
+            }
+        }
+    ]
 };
 
 const browserSettings = {

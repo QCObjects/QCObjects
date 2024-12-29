@@ -1,19 +1,20 @@
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-import * as EnterpriseCommands from "./enterprise-commands";
+import "qcobjects";
+import * as EnterpriseCommands from "./enterprise-commands.mjs";
 import { Component, CONFIG, findPackageNodePath, InheritClass, logger, New, Service, serviceLoader } from "qcobjects";
-import { QCObjectsEnterprise } from "./enterprise-commands";
-import * as QuickCorpServices from "./api-client_services";
-import { QuickCorpCloud } from "./api-client_services";
-import * as customCommands from "./cli-commands";
-import { __get_version__, __get_version_string__ } from "./defaultsettings";
+import { QCObjectsEnterprise } from "./enterprise-commands.mjs";
+import * as QuickCorpServices from "./api-client_services.mjs";
+import { QuickCorpCloud } from "./api-client_services.mjs";
+import * as customCommands from "./cli-commands.mjs";
+import { __get_version__, __get_version_string__ } from "./defaultsettings.mjs";
 import path from "node:path";
 import fs from "node:fs";
 import { exec, execSync } from "node:child_process";
 import commander from "commander";
 const templatePwaPath = path.resolve(__dirname, "./templates/pwa/") + "/";
 const getPluginCommandsList = /* @__PURE__ */ __name(() => {
-  return global.ClassesList.filter((c) => c.packageName.startsWith("com.qcobjects.cli.commands.")).filter((p) => p.classFactory.name.endsWith("CommandHandler"));
+  return global.ClassesList?.filter((c) => c.packageName.startsWith("com.qcobjects.cli.commands.")).filter((p) => p.classFactory.name.endsWith("CommandHandler"));
 }, "getPluginCommandsList");
 class SwitchCommander extends InheritClass {
   static {
@@ -124,7 +125,7 @@ class SwitchCommander extends InheritClass {
     },
     upgradeToEnterprise(_appName, _options) {
       const switchCommander = this;
-      QCObjectsEnterprise.upgrade(switchCommander);
+      void QCObjectsEnterprise.upgrade(switchCommander);
     }
   };
   program;
@@ -305,7 +306,7 @@ class SwitchCommander extends InheritClass {
       try {
         logger.debug("Loading Plugin Commands...");
         const importPluginCommands = /* @__PURE__ */ __name(function(switchCommander2) {
-          return getPluginCommandsList().map((pluginCommand) => {
+          return getPluginCommandsList()?.map((pluginCommand) => {
             try {
               logger.debug(`Loading plugin ${pluginCommand.packageName}`);
               const classFactory = pluginCommand.classFactory;
@@ -364,8 +365,6 @@ class SwitchCommander extends InheritClass {
   }
 }
 (async () => {
-  "use strict";
-  await import("qcobjects");
   const { CONFIG: CONFIG2, findPackageNodePath: findPackageNodePath2, logger: logger2, Package, InheritClass: InheritClass2, New: New2, serviceLoader: serviceLoader2, global: global2, Service: Service2, Component: Component2 } = await import("qcobjects");
   CONFIG2.set("node_modules_path", "./node_modules/");
   CONFIG2.set("qcobjectsnewapp_path", CONFIG2.get("node_modules_path") + "/qcobjectsnewapp");

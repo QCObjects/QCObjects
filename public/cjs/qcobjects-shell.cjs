@@ -26,7 +26,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 var import_path = __toESM(require("path"));
 var import_vm = __toESM(require("vm"));
 var import_qcobjects = require("qcobjects");
-var import_defaultsettings = require("./defaultsettings");
+var import_defaultsettings = require("./defaultsettings.cjs");
 var import_readline = __toESM(require("readline"));
 const welcometo = "Welcome to \n";
 const instructions = "Type:\n .exit to quit\n .help for see a quick guide\n And any other command to execute like pure javascript \n All the QCObjects stuff is already loaded for you";

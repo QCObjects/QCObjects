@@ -31,24 +31,21 @@ var global = (() => {
     "src/qcobjects-http-server.ts"() {
       var import_path = __toESM(require("path"));
       var import_qcobjects = require("qcobjects");
-      (async () => {
-        "use strict";
-        const absolutePath = import_path.default.resolve(__dirname, "./");
-        await import(absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
-        const { HTTPServer } = await import(absolutePath + "/org.quickcorp.qcobjects.main.http.server.js");
-        class Main extends import_qcobjects.InheritClass {
-          static {
-            __name(this, "Main");
-          }
-          constructor() {
-            super();
-            const app = (0, import_qcobjects.New)(HTTPServer);
-            app.start();
-            import_qcobjects.logger.debug("initialized");
-          }
+      var import_defaultsettings = require("./defaultsettings");
+      var import_main_http_server = require("./main-http-server");
+      const absolutePath = import_path.default.resolve(__dirname, "./");
+      class Main extends import_qcobjects.InheritClass {
+        static {
+          __name(this, "Main");
         }
-        const __main__ = new Main();
-      })().catch((e) => console.error(e));
+        constructor() {
+          super();
+          const app = (0, import_qcobjects.New)(import_main_http_server.HTTPServer);
+          app.start();
+          import_qcobjects.logger.debug("initialized");
+        }
+      }
+      const __main__ = new Main();
     }
   });
   return require_qcobjects_http_server();

@@ -5,6 +5,9 @@ var __name = (target, value) => __defProp(target, "name", { value, configurable:
 var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
+import "./defaultsettings.mjs";
+import { HTTPServer } from "./main-http-server.mjs";
+import { HTTP2Server } from "./main-http2-server.mjs";
 var require_qcobjects_http2_server = __commonJS({
   "src/qcobjects-http2-server.ts"() {
     (async () => {
@@ -13,9 +16,6 @@ var require_qcobjects_http2_server = __commonJS({
       const absolutePath = path.resolve(__dirname, "./");
       await import("qcobjects");
       const { CONFIG, InheritClass, New, logger } = await import("qcobjects");
-      await import(absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
-      const HTTPServer = await import(absolutePath + "/org.quickcorp.qcobjects.main.http.server.js");
-      const HTTP2Server = await import(absolutePath + "/org.quickcorp.qcobjects.main.http2.server.js");
       class Main extends InheritClass {
         static {
           __name(this, "Main");

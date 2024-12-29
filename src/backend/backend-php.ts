@@ -28,8 +28,10 @@
 /* eslint strict: "off" */
 /* eslint no-mixed-operators: "off" */
 /* eslint no-undef: "off" */
+"use strict";
+import { PipeLog } from "../common-pipelog";
+
 (async () => {
-  "use strict";
   const fs = await import("node:fs");
   const os = await import("node:os");
   const { exec, execSync } = await import("node:child_process");
@@ -38,7 +40,6 @@
   const { Package, BackendMicroservice, logger, CONFIG, Class } = await import("qcobjects");
   const path = await import("node:path");
   const absolutePath = path.resolve(__dirname, "./");
-  const { PipeLog } = await import(absolutePath + "/org.qcobjects.common.pipelog.js");
 
   const fixWinCmd = function (commandline: string) {
     if (!process.platform.toLowerCase().startsWith("win")) {

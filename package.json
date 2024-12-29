@@ -58,9 +58,14 @@
       "import": "./public/esm/defaultsettings.mjs"
     },
     "./com.qcobjects.cli.commands": {
-      "require": "./public/cjs/com.qcobjects.cli.commands.cjs",
-      "import": "./public/esm/com.qcobjects.cli.commands.mjs"
+      "require": "./public/cjs/cli-commands.cjs",
+      "import": "./public/esm/cli-commands.mjs"
+    },
+    "./cli-commands": {
+      "require": "./public/cjs/cli-commands.cjs",
+      "import": "./public/esm/cli-commands.mjs"
     }
+
   },
   "license": "LGPL-3.0",
   "scripts": {

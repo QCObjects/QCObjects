@@ -34,8 +34,8 @@ if (process.argv.length < 3 || process.argv[2] === "create") {
 logger.debugEnabled = false;
 logger.warnEnabled = false;
 logger.infoEnabled = false;
-import * as defaultSettings from "./defaultsettings";
-import { SwitchCommander } from "./cli-main";
+import * as defaultSettings from "./defaultsettings.mjs";
+import { SwitchCommander } from "./cli-main.mjs";
 class Main extends InheritClass {
   static {
     __name(this, "Main");

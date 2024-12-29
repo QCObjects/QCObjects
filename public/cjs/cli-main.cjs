@@ -36,22 +36,23 @@ __export(cli_main_exports, {
   getPluginCommandsList: () => getPluginCommandsList
 });
 module.exports = __toCommonJS(cli_main_exports);
-var EnterpriseCommands = __toESM(require("./enterprise-commands"));
 var import_qcobjects = require("qcobjects");
-var import_enterprise_commands = require("./enterprise-commands");
-var QuickCorpServices = __toESM(require("./api-client_services"));
-var import_api_client_services = require("./api-client_services");
-var customCommands = __toESM(require("./cli-commands"));
-var import_defaultsettings = require("./defaultsettings");
+var EnterpriseCommands = __toESM(require("./enterprise-commands.cjs"));
+var import_qcobjects2 = require("qcobjects");
+var import_enterprise_commands = require("./enterprise-commands.cjs");
+var QuickCorpServices = __toESM(require("./api-client_services.cjs"));
+var import_api_client_services = require("./api-client_services.cjs");
+var customCommands = __toESM(require("./cli-commands.cjs"));
+var import_defaultsettings = require("./defaultsettings.cjs");
 var import_node_path = __toESM(require("node:path"));
 var import_node_fs = __toESM(require("node:fs"));
 var import_node_child_process = require("node:child_process");
 var import_commander = __toESM(require("commander"));
 const templatePwaPath = import_node_path.default.resolve(__dirname, "./templates/pwa/") + "/";
 const getPluginCommandsList = /* @__PURE__ */ __name(() => {
-  return global.ClassesList.filter((c) => c.packageName.startsWith("com.qcobjects.cli.commands.")).filter((p) => p.classFactory.name.endsWith("CommandHandler"));
+  return global.ClassesList?.filter((c) => c.packageName.startsWith("com.qcobjects.cli.commands.")).filter((p) => p.classFactory.name.endsWith("CommandHandler"));
 }, "getPluginCommandsList");
-class SwitchCommander extends import_qcobjects.InheritClass {
+class SwitchCommander extends import_qcobjects2.InheritClass {
   static {
     __name(this, "SwitchCommander");
   }
@@ -61,7 +62,7 @@ class SwitchCommander extends import_qcobjects.InheritClass {
       const switchCommander = this;
       const appName = typeof _appName === "undefined" || _appName === true ? "MyAppName" : _appName;
       switchCommander.generateServiceWorker(appName, dirPrefix).catch((e) => {
-        import_qcobjects.logger.warn(`An error ocurred while creating service worker: ${e}`);
+        import_qcobjects2.logger.warn(`An error ocurred while creating service worker: ${e}`);
       });
     }, "generateSw"),
     create: /* @__PURE__ */ __name((_appName, options) => {
@@ -80,12 +81,12 @@ class SwitchCommander extends import_qcobjects.InheritClass {
       } else {
         appTemplateName = "qcobjectsnewapp";
       }
-      import_qcobjects.CONFIG.set("qcobjectsnewapp_path", import_qcobjects.CONFIG.get("node_modules_path") + "/" + appTemplateName);
-      const _package_json_template_fname = import_node_path.default.resolve(import_qcobjects.CONFIG.get("qcobjectsnewapp_path", "qcobjectsnewapp"), "./package.json");
+      import_qcobjects2.CONFIG.set("qcobjectsnewapp_path", import_qcobjects2.CONFIG.get("node_modules_path") + "/" + appTemplateName);
+      const _package_json_template_fname = import_node_path.default.resolve(import_qcobjects2.CONFIG.get("qcobjectsnewapp_path", "qcobjectsnewapp"), "./package.json");
       const createAppCommand = "npm init -y";
-      const _package_json_file = import_node_path.default.resolve(import_qcobjects.CONFIG.get("projectPath"), "./package.json");
-      import_qcobjects.logger.debug("_package_json_file: " + _package_json_file);
-      import_qcobjects.logger.debug(createAppCommand);
+      const _package_json_file = import_node_path.default.resolve(import_qcobjects2.CONFIG.get("projectPath"), "./package.json");
+      import_qcobjects2.logger.debug("_package_json_file: " + _package_json_file);
+      import_qcobjects2.logger.debug(createAppCommand);
       (0, import_node_child_process.exec)(createAppCommand, (err) => {
         if (err) {
           throw Error(err.message);
@@ -99,9 +100,9 @@ class SwitchCommander extends import_qcobjects.InheritClass {
             _package_json_template_file.version = "1.0.0";
             _package_json_template_file.repository = {};
             import_node_fs.default.writeFileSync(_package_json_file, JSON.stringify(_package_json_template_file, null, 4));
-            import_qcobjects.logger.info("Good! App Templates was installed!");
+            import_qcobjects2.logger.info("Good! App Templates was installed!");
             console.log(`Starting to copy files from app template ${appTemplateName} to your project...`);
-            switchCommander.copyTemplate(import_node_path.default.resolve((0, import_qcobjects.findPackageNodePath)(appTemplateName), appTemplateName), import_node_path.default.resolve(import_qcobjects.CONFIG.get("projectPath"), "./")).then(() => {
+            switchCommander.copyTemplate(import_node_path.default.resolve((0, import_qcobjects2.findPackageNodePath)(appTemplateName), appTemplateName), import_node_path.default.resolve(import_qcobjects2.CONFIG.get("projectPath"), "./")).then(() => {
               (0, import_node_child_process.exec)("npm uninstall " + appTemplateName + " --save && npm cache verify", (err2) => {
                 if (err2) {
                   throw Error(err2.message);
@@ -116,11 +117,11 @@ class SwitchCommander extends import_qcobjects.InheritClass {
                   process.exit(1);
                   return;
                 }
-                import_qcobjects.logger.info("Good! Your application is done. You can play with QCObjects now!");
-                import_qcobjects.logger.info("I will create the SSL certificates now. It may take some time...");
+                import_qcobjects2.logger.info("Good! Your application is done. You can play with QCObjects now!");
+                import_qcobjects2.logger.info("I will create the SSL certificates now. It may take some time...");
                 (0, import_node_child_process.exec)("qcobjects-createcert", () => {
-                  import_qcobjects.logger.info("Test certificates generated");
-                  const githubService = (0, import_qcobjects.New)(import_qcobjects.Service);
+                  import_qcobjects2.logger.info("Test certificates generated");
+                  const githubService = (0, import_qcobjects2.New)(import_qcobjects2.Service);
                   githubService.url = "https://raw.githubusercontent.com/QuickCorp/QCObjects/main/.gitignore";
                   githubService.headers = {
                     Accept: "application/vnd.github+json",
@@ -129,13 +130,13 @@ class SwitchCommander extends import_qcobjects.InheritClass {
                   };
                   githubService.done = () => {
                   };
-                  (0, import_qcobjects.serviceLoader)(githubService).then(({ service }) => {
-                    import_node_fs.default.writeFileSync(import_node_path.default.resolve(import_qcobjects.CONFIG.get("projectPath"), "./.gitignore"), service.template);
+                  (0, import_qcobjects2.serviceLoader)(githubService).then(({ service }) => {
+                    import_node_fs.default.writeFileSync(import_node_path.default.resolve(import_qcobjects2.CONFIG.get("projectPath"), "./.gitignore"), service.template);
                     try {
                       (0, import_node_child_process.execSync)("git init");
-                      import_qcobjects.logger.debug("Git initialized.");
+                      import_qcobjects2.logger.debug("Git initialized.");
                     } catch (e) {
-                      import_qcobjects.logger.debug("Could not initialize git.");
+                      import_qcobjects2.logger.debug("Could not initialize git.");
                     }
                   });
                 }).stdout?.on("data", function(data) {
@@ -156,11 +157,11 @@ class SwitchCommander extends import_qcobjects.InheritClass {
       });
     }, "create"),
     publish(_appName, _options) {
-      import_qcobjects.logger.debug("publish is not yet implemented");
+      import_qcobjects2.logger.debug("publish is not yet implemented");
     },
     upgradeToEnterprise(_appName, _options) {
       const switchCommander = this;
-      import_enterprise_commands.QCObjectsEnterprise.upgrade(switchCommander);
+      void import_enterprise_commands.QCObjectsEnterprise.upgrade(switchCommander);
     }
   };
   program;
@@ -174,17 +175,17 @@ class SwitchCommander extends import_qcobjects.InheritClass {
         function(shell_command) {
           return new Promise(
             function(resolve, reject) {
-              import_qcobjects.logger.debug(shell_command);
+              import_qcobjects2.logger.debug(shell_command);
               (0, import_node_child_process.exec)(shell_command, (err, stdout, stderr) => {
                 if (!err) {
                   resolve(stdout);
                 } else {
-                  import_qcobjects.logger.debug(`[FAILED]: ${shell_command}`);
-                  import_qcobjects.logger.debug(`${stderr}`);
+                  import_qcobjects2.logger.debug(`[FAILED]: ${shell_command}`);
+                  import_qcobjects2.logger.debug(`${stderr}`);
                   reject(stderr);
                 }
               }).stdout?.on("data", function(data) {
-                import_qcobjects.logger.info(data);
+                import_qcobjects2.logger.info(data);
               });
             }
           ).catch((e) => reject_all(e));
@@ -200,8 +201,8 @@ class SwitchCommander extends import_qcobjects.InheritClass {
   }
   register(email, phonenumber) {
     return new Promise(function(resolve, reject) {
-      import_qcobjects.logger.info("I'm going to register your profile on the cloud...");
-      const cloudClient = (0, import_qcobjects.New)(import_api_client_services.QuickCorpCloud, {
+      import_qcobjects2.logger.info("I'm going to register your profile on the cloud...");
+      const cloudClient = (0, import_qcobjects2.New)(import_api_client_services.QuickCorpCloud, {
         apiMethod: "register",
         data: { email, phonenumber }
       });
@@ -215,12 +216,12 @@ class SwitchCommander extends import_qcobjects.InheritClass {
   generateServiceWorker(appName, dirPrefix = "./") {
     const writeContent = /* @__PURE__ */ __name((component) => {
       const parsedText = component.parsedAssignmentText;
-      import_qcobjects.logger.debug("Starting to write the sw file...");
+      import_qcobjects2.logger.debug("Starting to write the sw file...");
       import_node_fs.default.writeFile(`${dirPrefix}/sw.js`, parsedText, (err) => {
         if (err) {
           throw Error(err);
         }
-        import_qcobjects.logger.info("Service Worker Generated");
+        import_qcobjects2.logger.info("Service Worker Generated");
         console.log("");
         console.log("Now simply put:");
         console.log("CONFIG.set('serviceWorkerURI','/sw.js');");
@@ -232,7 +233,7 @@ class SwitchCommander extends import_qcobjects.InheritClass {
         console.log("");
       });
     }, "writeContent");
-    class ServiceWorkerComponent extends import_qcobjects.Component {
+    class ServiceWorkerComponent extends import_qcobjects2.Component {
       static {
         __name(this, "ServiceWorkerComponent");
       }
@@ -302,9 +303,9 @@ class SwitchCommander extends import_qcobjects.InheritClass {
               const destFile = import_node_path.default.resolve(dest2, f.name);
               const fileExcluded = exclude2.includes(f.name);
               if (isFile(sourceFile) && !fileExcluded) {
-                import_qcobjects.logger.debug(`[publish:static] Copying files from ${sourceFile} to ${destFile} excluding ${exclude2.join(",")}...`);
+                import_qcobjects2.logger.debug(`[publish:static] Copying files from ${sourceFile} to ${destFile} excluding ${exclude2.join(",")}...`);
                 import_node_fs.default.copyFileSync(sourceFile, destFile);
-                import_qcobjects.logger.debug(`[publish:static] Copying files from ${sourceFile} to ${destFile} excluding ${exclude2.join(",")}...DONE!`);
+                import_qcobjects2.logger.debug(`[publish:static] Copying files from ${sourceFile} to ${destFile} excluding ${exclude2.join(",")}...DONE!`);
               }
             });
             dirs2.map((d) => {
@@ -321,11 +322,11 @@ class SwitchCommander extends import_qcobjects.InheritClass {
           "node_modules",
           ".DS_Store"
         ];
-        import_qcobjects.logger.info(`[create] Copying files from ${source} to ${dest} excluding ${exclude.join(",")}...`);
+        import_qcobjects2.logger.info(`[create] Copying files from ${source} to ${dest} excluding ${exclude.join(",")}...`);
         copyDir(source, dest, typeof exclude !== "undefined" ? exclude : []);
         resolve();
       } catch (e) {
-        import_qcobjects.logger.warn(`Something went wrong trying to publish static files: ${e.message}`);
+        import_qcobjects2.logger.warn(`Something went wrong trying to publish static files: ${e.message}`);
         reject(e);
       }
     });
@@ -333,17 +334,17 @@ class SwitchCommander extends import_qcobjects.InheritClass {
   initCommand() {
     const switchCommander = this;
     if (process.argv.length > 1) {
-      import_qcobjects.logger.debug("Installing Commands...");
+      import_qcobjects2.logger.debug("Installing Commands...");
       switchCommander.program.version((0, import_defaultsettings.__get_version_string__)());
       switchCommander.program.command("create <appname>").description("Creates an app with <appname>").option("--pwa, --create-pwa", "Creates the progressive web app assets").option("--amp, --create-amp", "Creates the accelerated mobile pages assets").option("--php, --create-php", "Creates the PWA PHP assets").option("--custom, --create-custom <templateappname>", "Creates an App from any NPM package template").option("--tests, --create-tests", "Creates the test suite").action(function(args, options) {
         switchCommander.choiceOption.create.call(switchCommander, args, options);
       });
       try {
-        import_qcobjects.logger.debug("Loading Plugin Commands...");
+        import_qcobjects2.logger.debug("Loading Plugin Commands...");
         const importPluginCommands = /* @__PURE__ */ __name(function(switchCommander2) {
-          return getPluginCommandsList().map((pluginCommand) => {
+          return getPluginCommandsList()?.map((pluginCommand) => {
             try {
-              import_qcobjects.logger.debug(`Loading plugin ${pluginCommand.packageName}`);
+              import_qcobjects2.logger.debug(`Loading plugin ${pluginCommand.packageName}`);
               const classFactory = pluginCommand.classFactory;
               pluginCommand.plugin = new classFactory({ switchCommander: switchCommander2 });
             } catch (e) {
@@ -366,10 +367,10 @@ class SwitchCommander extends import_qcobjects.InheritClass {
         switchCommander.choiceOption.generateSw.call(switchCommander, args, options);
       });
       switchCommander.program.command("launch <appname>").description("Launches the application").action(function() {
-        import_qcobjects.logger.info("Launching...");
+        import_qcobjects2.logger.info("Launching...");
         setTimeout(() => {
-          import_qcobjects.logger.info("Go to the browser and open https://localhost ");
-          import_qcobjects.logger.info("Press Ctrl-C to stop serving ");
+          import_qcobjects2.logger.info("Go to the browser and open https://localhost ");
+          import_qcobjects2.logger.info("Press Ctrl-C to stop serving ");
           (0, import_node_child_process.exec)("qcobjects-server", () => {
           }).stdout?.on("data", function(data) {
             console.log(data);
@@ -400,8 +401,6 @@ class SwitchCommander extends import_qcobjects.InheritClass {
   }
 }
 (async () => {
-  "use strict";
-  await import("qcobjects");
   const { CONFIG: CONFIG2, findPackageNodePath: findPackageNodePath2, logger: logger2, Package, InheritClass: InheritClass2, New: New2, serviceLoader: serviceLoader2, global: global2, Service: Service2, Component: Component2 } = await import("qcobjects");
   CONFIG2.set("node_modules_path", "./node_modules/");
   CONFIG2.set("qcobjectsnewapp_path", CONFIG2.get("node_modules_path") + "/qcobjectsnewapp");

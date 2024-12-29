@@ -34,7 +34,7 @@ import {Package, InheritClass} from "qcobjects";
 
 export class PipeLog extends InheritClass {
 
-    pipe(o:any) {
+    static pipe(o:any) {
         var _o = [];
         for (var k in o) {
             if (typeof o[k] !== "undefined" &&

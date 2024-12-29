@@ -4,17 +4,16 @@ var __name = (target, value) => __defProp(target, "name", { value, configurable:
 var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
+import { PipeLog } from "../common-pipelog.mjs";
 var require_backend_php = __commonJS({
   "src/backend/backend-php.ts"(exports) {
     (async () => {
-      "use strict";
       const fs = await import("node:fs");
       const os = await import("node:os");
       const { exec, execSync } = await import("node:child_process");
       const { Package, BackendMicroservice, logger, CONFIG, Class } = await import("qcobjects");
       const path = await import("node:path");
       const absolutePath = path.resolve(__dirname, "./");
-      const { PipeLog } = await import(absolutePath + "/org.qcobjects.common.pipelog.js");
       const fixWinCmd = /* @__PURE__ */ __name(function(commandline) {
         if (!process.platform.toLowerCase().startsWith("win")) {
           commandline = commandline.replace(/(")/g, String.fromCharCode(92) + '"');

@@ -25,6 +25,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 ));
 var import_node_path = __toESM(require("node:path"));
 var import_node_os = __toESM(require("node:os"));
+var import_defaultsettings = require("./defaultsettings.cjs");
 (async () => {
   "use strict";
   const absolutePath = import_node_path.default.resolve(__dirname, "./");
@@ -36,7 +37,6 @@ var import_node_os = __toESM(require("node:os"));
     return import_node_os.default.platform().toLowerCase().startsWith("darwin");
   }, "isMac");
   const { InheritClass, CONFIG } = await import("qcobjects");
-  await import(absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
   const { execSync } = await import("node:child_process");
   class Main extends InheritClass {
     static {

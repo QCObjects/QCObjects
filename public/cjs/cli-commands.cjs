@@ -32,8 +32,8 @@ __export(cli_commands_exports, {
   versionCommand: () => versionCommand
 });
 module.exports = __toCommonJS(cli_commands_exports);
-var versionCommand = __toESM(require("./cli-commands-version"));
-var jiraCommand = __toESM(require("./cli-commands-jira"));
+var versionCommand = __toESM(require("./cli-commands-version.cjs"));
+var jiraCommand = __toESM(require("./cli-commands-jira.cjs"));
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   jiraCommand,

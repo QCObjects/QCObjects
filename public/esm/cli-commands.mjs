@@ -1,5 +1,5 @@
-import * as versionCommand from "./cli-commands-version";
-import * as jiraCommand from "./cli-commands-jira";
+import * as versionCommand from "./cli-commands-version.mjs";
+import * as jiraCommand from "./cli-commands-jira.mjs";
 export {
   jiraCommand,
   versionCommand

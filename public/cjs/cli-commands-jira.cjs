@@ -33,7 +33,7 @@ __export(cli_commands_jira_exports, {
 });
 module.exports = __toCommonJS(cli_commands_jira_exports);
 var import_node_path = __toESM(require("node:path"));
-var import_client_services = require("./client_services");
+var import_client_services = require("./client_services.cjs");
 var import_qcobjects = require("qcobjects");
 const absolutePath = import_node_path.default.resolve(__dirname, "./");
 class CommandHandler extends import_qcobjects.InheritClass {

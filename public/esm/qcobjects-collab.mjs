@@ -6,8 +6,8 @@ var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
 import path from "path";
-import "./defaultsettings";
-import { CollabServer } from "./collab-server";
+import "./defaultsettings.mjs";
+import { CollabServer } from "./collab-server.mjs";
 import { InheritClass, logger } from "qcobjects";
 var require_qcobjects_collab = __commonJS({
   "src/qcobjects-collab.ts"() {

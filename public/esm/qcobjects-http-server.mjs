@@ -7,26 +7,23 @@ var __commonJS = (cb, mod) => function __require() {
 };
 import path from "path";
 import { InheritClass, New, logger } from "qcobjects";
+import "./defaultsettings.mjs";
+import { HTTPServer } from "./main-http-server.mjs";
 var require_qcobjects_http_server = __commonJS({
   "src/qcobjects-http-server.ts"() {
-    (async () => {
-      "use strict";
-      const absolutePath = path.resolve(__dirname, "./");
-      await import(absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
-      const { HTTPServer } = await import(absolutePath + "/org.quickcorp.qcobjects.main.http.server.js");
-      class Main extends InheritClass {
-        static {
-          __name(this, "Main");
-        }
-        constructor() {
-          super();
-          const app = New(HTTPServer);
-          app.start();
-          logger.debug("initialized");
-        }
+    const absolutePath = path.resolve(__dirname, "./");
+    class Main extends InheritClass {
+      static {
+        __name(this, "Main");
       }
-      const __main__ = new Main();
-    })().catch((e) => console.error(e));
+      constructor() {
+        super();
+        const app = New(HTTPServer);
+        app.start();
+        logger.debug("initialized");
+      }
+    }
+    const __main__ = new Main();
   }
 });
 export default require_qcobjects_http_server();

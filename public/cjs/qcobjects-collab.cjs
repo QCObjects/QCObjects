@@ -24,8 +24,8 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 var import_path = __toESM(require("path"));
-var import_defaultsettings = require("./defaultsettings");
-var import_collab_server = require("./collab-server");
+var import_defaultsettings = require("./defaultsettings.cjs");
+var import_collab_server = require("./collab-server.cjs");
 var import_qcobjects = require("qcobjects");
 const absolutePath = import_path.default.resolve(__dirname, "./");
 class Main extends import_qcobjects.InheritClass {

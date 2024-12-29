@@ -31,6 +31,8 @@
 /*eslint no-undef: "off"*/
 import path from "node:path";
 import os from "node:os";
+import "./defaultsettings";
+
 (async () => {
   "use strict";
   const absolutePath = path.resolve(__dirname, "./");
@@ -47,7 +49,6 @@ import os from "node:os";
 
   const { InheritClass, CONFIG } = await import("qcobjects");
 
-  await import(absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
 
   const { execSync } = await import("node:child_process");
 

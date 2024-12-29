@@ -32,27 +32,23 @@
 "use strict";
 import path from "path";
 import { InheritClass, New, logger } from "qcobjects";
-
-(async () => {
-
-  const absolutePath = path.resolve(__dirname, "./");
+import "./defaultsettings";
+import { HTTPServer } from "./main-http-gae-server";
 
 
-  await import(absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
+const absolutePath = path.resolve(__dirname, "./");
 
-  const { HTTPServer } = await import(absolutePath + "/org.quickcorp.qcobjects.main.http.gae.server.js");
 
-  class Main extends InheritClass {
+class Main extends InheritClass {
 
-    constructor() {
-      super();
-      const app = New(HTTPServer);
-      app.start();
+  constructor() {
+    super();
+    const app = New(HTTPServer);
+    app.start();
 
-      logger.debug("initialized");
+    logger.debug("initialized");
 
-    }
   }
+}
 
-  const __main__ = new Main();
-})().catch(e => console.error(e));
+const __main__ = new Main();

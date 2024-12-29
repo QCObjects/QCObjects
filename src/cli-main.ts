@@ -28,6 +28,8 @@
 /*eslint strict: "off"*/
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
+"use strict";
+import "qcobjects";
 
 export * as EnterpriseCommands from "./enterprise-commands";
 import { Component, CONFIG, findPackageNodePath, InheritClass, logger, New, Service, serviceLoader } from "qcobjects";
@@ -44,8 +46,7 @@ import commander from "commander";
 const templatePwaPath = path.resolve(__dirname, "./templates/pwa/") + "/";
 
 export const getPluginCommandsList = () => {
-  return (global as any).ClassesList
-    .filter((c: { packageName: string; }) => c.packageName.startsWith("com.qcobjects.cli.commands."))
+  return (global as any).ClassesList?.filter((c: { packageName: string; }) => c.packageName.startsWith("com.qcobjects.cli.commands."))
     .filter((p: { classFactory: { name: string; }; }) => p.classFactory.name.endsWith("CommandHandler"));
 };
 
@@ -110,12 +111,12 @@ export class SwitchCommander extends InheritClass {
             _package_json_template_file.repository = {};
             fs.writeFileSync(_package_json_file, JSON.stringify(_package_json_template_file, null, 4));
             logger.info("Good! App Templates was installed!");
-  
+
             console.log(`Starting to copy files from app template ${appTemplateName} to your project...`);
-  
+
             switchCommander.copyTemplate(path.resolve(findPackageNodePath(appTemplateName), appTemplateName), path.resolve(CONFIG.get("projectPath"), "./"))
               .then(() => {
-  
+
                 exec("npm uninstall " + appTemplateName + " --save && npm cache verify", err => {
                   if (err) {
                     throw Error(err.message);
@@ -123,7 +124,7 @@ export class SwitchCommander extends InheritClass {
                     process.exit(1);
                     return;
                   }
-  
+
                   /*
                   switchCommander.generateServiceWorker(appName)
                   .then(()=>{
@@ -132,7 +133,7 @@ export class SwitchCommander extends InheritClass {
                   */
                   execSync("npm install --save-dev qcobjects-cli ");
                 });
-  
+
                 exec("npm cache verify && npm i ", (err) => {
                   if (err) {
                     throw Error(err.message);
@@ -140,13 +141,13 @@ export class SwitchCommander extends InheritClass {
                     process.exit(1);
                     return;
                   }
-  
+
                   logger.info("Good! Your application is done. You can play with QCObjects now!");
-  
+
                   logger.info("I will create the SSL certificates now. It may take some time...");
                   exec("qcobjects-createcert", () => {
                     logger.info("Test certificates generated");
-  
+
                     const githubService = New(Service);
                     githubService.url = "https://raw.githubusercontent.com/QuickCorp/QCObjects/main/.gitignore";
                     githubService.headers = {
@@ -165,21 +166,21 @@ export class SwitchCommander extends InheritClass {
                           logger.debug("Could not initialize git.");
                         }
                       });
-  
+
                   }).stdout?.on("data", function (data: any) {
                     console.log(data);
                   });
-  
+
                 }).stdout?.on("data", function (data: any) {
                   console.log(data);
                 });
-  
+
               })
               .catch((e: any) => {
                 console.log(e);
               });
-  
-          })().catch (e => console.error(e));
+
+          })().catch(e => console.error(e));
 
 
         }).stdout?.on("data", function (data: any) {
@@ -196,7 +197,7 @@ export class SwitchCommander extends InheritClass {
     },
     upgradeToEnterprise(_appName: any, _options: any) {
       const switchCommander = this;
-      QCObjectsEnterprise.upgrade(switchCommander);
+      void QCObjectsEnterprise.upgrade(switchCommander);
     }
   };
   program: any;
@@ -230,7 +231,7 @@ export class SwitchCommander extends InheritClass {
     }).catch(e => console.log(e));
   }
 
-  fileListRecursive(dir: string):string | string[] {
+  fileListRecursive(dir: string): string | string[] {
     var instance = this;
     return (fs.statSync(dir).isDirectory())
       ? (Array.prototype.concat(...fs.readdirSync(dir).map((f: any) => instance.fileListRecursive(path.join(dir, f))))
@@ -414,7 +415,7 @@ export class SwitchCommander extends InheritClass {
       try {
         logger.debug("Loading Plugin Commands...");
         const importPluginCommands = function (switchCommander: any) {
-          return getPluginCommandsList().map((pluginCommand: { packageName: any; classFactory: any; plugin: any; }) => {
+          return getPluginCommandsList()?.map((pluginCommand: { packageName: any; classFactory: any; plugin: any; }) => {
             try {
               logger.debug(`Loading plugin ${pluginCommand.packageName}`);
               const classFactory = pluginCommand.classFactory;
@@ -461,9 +462,9 @@ export class SwitchCommander extends InheritClass {
             logger.info("Press Ctrl-C to stop serving ");
             exec("qcobjects-server", () => {
             })
-            .stdout?.on("data", function (data: any) {
-              console.log(data);
-            });
+              .stdout?.on("data", function (data: any) {
+                console.log(data);
+              });
           }, 5000);
           //          setTimeout(()=>{
           //            execSync("open -a \"google chrome\" https://localhost");
@@ -501,9 +502,6 @@ export class SwitchCommander extends InheritClass {
 
 
 (async () => {
-  "use strict";
-
-  await import("qcobjects");
 
   const { CONFIG, findPackageNodePath, logger, Package, InheritClass, New, serviceLoader, global, Service, Component } = await import("qcobjects");
 

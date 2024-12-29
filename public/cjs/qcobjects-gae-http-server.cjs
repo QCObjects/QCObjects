@@ -25,21 +25,19 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 ));
 var import_path = __toESM(require("path"));
 var import_qcobjects = require("qcobjects");
-(async () => {
-  const absolutePath = import_path.default.resolve(__dirname, "./");
-  await import(absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
-  const { HTTPServer } = await import(absolutePath + "/org.quickcorp.qcobjects.main.http.gae.server.js");
-  class Main extends import_qcobjects.InheritClass {
-    static {
-      __name(this, "Main");
-    }
-    constructor() {
-      super();
-      const app = (0, import_qcobjects.New)(HTTPServer);
-      app.start();
-      import_qcobjects.logger.debug("initialized");
-    }
+var import_defaultsettings = require("./defaultsettings.cjs");
+var import_main_http_gae_server = require("./main-http-gae-server.cjs");
+const absolutePath = import_path.default.resolve(__dirname, "./");
+class Main extends import_qcobjects.InheritClass {
+  static {
+    __name(this, "Main");
   }
-  const __main__ = new Main();
-})().catch((e) => console.error(e));
+  constructor() {
+    super();
+    const app = (0, import_qcobjects.New)(import_main_http_gae_server.HTTPServer);
+    app.start();
+    import_qcobjects.logger.debug("initialized");
+  }
+}
+const __main__ = new Main();
 //# sourceMappingURL=qcobjects-gae-http-server.cjs.map

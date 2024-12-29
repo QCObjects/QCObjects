@@ -132,30 +132,7 @@ declare module "defaultsettings" {
     export const __get_version_string__: () => string;
 }
 declare module "cli-main" {
-    /**
-     * QCObjects CLI 2.4.x
-     * ________________
-     *
-     * Author: Jean Machuca <correojean@gmail.com>
-     *
-     * Cross Browser Javascript Framework for MVC Patterns
-     * QuickCorp/QCObjects is licensed under the
-     * GNU Lesser General Public License v3.0
-     * [LICENSE] (https://github.com/QuickCorp/QCObjects/blob/master/LICENSE.txt)
-     *
-     * Permissions of this copyleft license are conditioned on making available
-     * complete source code of licensed works and modifications under the same
-     * license or the GNU GPLv3. Copyright and license notices must be preserved.
-     * Contributors provide an express grant of patent rights. However, a larger
-     * work using the licensed work through interfaces provided by the licensed
-     * work may be distributed under different terms and without source code for
-     * the larger work.
-     *
-     * Copyright (C) 2015 Jean Machuca,<correojean@gmail.com>
-     *
-     * Everyone is permitted to copy and distribute verbatim copies of this
-     * license document, but changing it is not allowed.
-    */
+    import "qcobjects";
     export * as EnterpriseCommands from "enterprise-commands";
     import { InheritClass } from "qcobjects";
     export * as QuickCorpServices from "api-client_services";
@@ -244,7 +221,7 @@ declare module "collab-server" {
 declare module "common-pipelog" {
     import { InheritClass } from "qcobjects";
     export class PipeLog extends InheritClass {
-        pipe(o: any): string;
+        static pipe(o: any): string;
     }
 }
 declare module "qcobjects-cli" {
@@ -260,17 +237,130 @@ declare module "index" {
     import * as cli from "qcobjects-cli";
     export default cli;
 }
-declare module "main-file" { }
-declare module "main-http-gae-server" { }
-declare module "main-http-server" { }
-declare module "main-http2-server" { }
+declare module "main-file" {
+    import { InheritClass } from "qcobjects";
+    export class FileDispatcher extends InheritClass {
+        scriptname: any;
+        filename: any;
+        pathname: string;
+        headers: any;
+        templateURI: string;
+        template: any;
+        body: any;
+        constructor({ name, template, templateURI, headers, body, filename, done }: {
+            name: string;
+            template: string;
+            templateURI: string;
+            headers: any;
+            body: string;
+            filename: string;
+            done: (headers: any, body: any, templateURI?: string, isTemplate?: boolean) => any;
+        });
+        file_extension(): any;
+        isTemplate(): any;
+        _done(): void;
+        done(headers: any, body: any, templateURI?: string, isTemplate?: boolean): void;
+    }
+}
+declare module "main-http-gae-server" {
+    import { InheritClass } from "qcobjects";
+    export class HTTPServer extends InheritClass {
+        interceptorInstances: any[];
+        server: any;
+        request: any;
+        response: any;
+        constructor({ request, response, server, scriptname, interceptorInstances }: {
+            request: any;
+            response: any;
+            server?: any;
+            scriptname: string;
+            interceptorInstances: any[];
+        });
+        showIPAddress(): string;
+        showPossibleURL(): string;
+        start(): void;
+    }
+}
+declare module "main-http-server" {
+    import { InheritClass } from "qcobjects";
+    export class HTTPServer extends InheritClass {
+        interceptorInstances: never[];
+        server: any;
+        request: any;
+        response: any;
+        constructor({ request, response, server, scriptname, interceptorInstances }: {
+            request?: null | undefined;
+            response?: string | undefined;
+            server?: null | undefined;
+            scriptname?: string | undefined;
+            interceptorInstances?: never[] | undefined;
+        });
+        showIPAddress(): string;
+        showPossibleURL(): string;
+        start(): void;
+    }
+}
+declare module "main-http2-server" {
+    import { InheritClass } from "qcobjects";
+    import http2 from "node:http2";
+    export class HTTP2Server extends InheritClass {
+        server: http2.Http2SecureServer<typeof import("http").IncomingMessage, typeof import("http").ServerResponse, typeof http2.Http2ServerRequest, typeof http2.Http2ServerResponse>;
+        interceptorInstances: any;
+        request: any;
+        response: any;
+        constructor({ request, response, server, scriptname, interceptorInstances }: {
+            request: any;
+            response: any;
+            server?: any;
+            scriptname: string;
+            interceptorInstances: any[];
+        });
+        showIPAddress(): string;
+        showPossibleURL(): string;
+        start(): void;
+    }
+}
 declare module "qcobjects-collab" {
     import "defaultsettings";
 }
-declare module "qcobjects-createcert" { }
-declare module "qcobjects-gae-http-server" { }
-declare module "qcobjects-http-server" { }
+declare module "qcobjects-createcert" {
+    import "defaultsettings";
+}
+declare module "qcobjects-gae-http-server" {
+    import "defaultsettings";
+}
+declare module "qcobjects-http-server" {
+    import "defaultsettings";
+}
+declare module "qcobjects-http2-server" {
+    /**
+     * QCObjects CLI 2.4.x
+     * ________________
+     *
+     * Author: Jean Machuca <correojean@gmail.com>
+     *
+     * Cross Browser Javascript Framework for MVC Patterns
+     * QuickCorp/QCObjects is licensed under the
+     * GNU Lesser General Public License v3.0
+     * [LICENSE] (https://github.com/QuickCorp/QCObjects/blob/master/LICENSE.txt)
+     *
+     * Permissions of this copyleft license are conditioned on making available
+     * complete source code of licensed works and modifications under the same
+     * license or the GNU GPLv3. Copyright and license notices must be preserved.
+     * Contributors provide an express grant of patent rights. However, a larger
+     * work using the licensed work through interfaces provided by the licensed
+     * work may be distributed under different terms and without source code for
+     * the larger work.
+     *
+     * Copyright (C) 2015 Jean Machuca,<correojean@gmail.com>
+     *
+     * Everyone is permitted to copy and distribute verbatim copies of this
+     * license document, but changing it is not allowed.
+    */
+    import "defaultsettings";
+}
 declare module "qcobjects-shell" {
     import "defaultsettings";
 }
 declare module "backend/backend-microservice-static" { }
+declare module "backend/backend-php" { }

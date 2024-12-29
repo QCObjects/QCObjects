@@ -36,8 +36,8 @@ __export(qcobjects_cli_exports, {
 });
 module.exports = __toCommonJS(qcobjects_cli_exports);
 var import_qcobjects = require("qcobjects");
-var defaultSettings = __toESM(require("./defaultsettings"));
-var import_cli_main = require("./cli-main");
+var defaultSettings = __toESM(require("./defaultsettings.cjs"));
+var import_cli_main = require("./cli-main.cjs");
 import_qcobjects.logger.debugEnabled = false;
 const welcometo = "Welcome to \n";
 const instructions = `

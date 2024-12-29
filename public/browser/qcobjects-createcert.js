@@ -31,6 +31,7 @@ var global = (() => {
     "src/qcobjects-createcert.ts"() {
       var import_node_path = __toESM(require("node:path"));
       var import_node_os = __toESM(require("node:os"));
+      var import_defaultsettings = require("./defaultsettings");
       (async () => {
         "use strict";
         const absolutePath = import_node_path.default.resolve(__dirname, "./");
@@ -42,7 +43,6 @@ var global = (() => {
           return import_node_os.default.platform().toLowerCase().startsWith("darwin");
         }, "isMac");
         const { InheritClass, CONFIG } = await import("qcobjects");
-        await import(absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
         const { execSync } = await import("node:child_process");
         class Main extends InheritClass {
           static {

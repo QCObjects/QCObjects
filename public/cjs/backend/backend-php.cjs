@@ -22,15 +22,14 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
   mod
 ));
+var import_common_pipelog = require("../common-pipelog.cjs");
 (async () => {
-  "use strict";
   const fs = await import("node:fs");
   const os = await import("node:os");
   const { exec, execSync } = await import("node:child_process");
   const { Package, BackendMicroservice, logger, CONFIG, Class } = await import("qcobjects");
   const path = await import("node:path");
   const absolutePath = path.resolve(__dirname, "./");
-  const { PipeLog } = await import(absolutePath + "/org.qcobjects.common.pipelog.js");
   const fixWinCmd = /* @__PURE__ */ __name(function(commandline) {
     if (!process.platform.toLowerCase().startsWith("win")) {
       commandline = commandline.replace(/(")/g, String.fromCharCode(92) + '"');
@@ -108,7 +107,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
           phpheaders["HTTP_" + phpheadername] = fixedEncodeURIComponent(headervalue);
         }
       }
-      return PipeLog.pipe(phpheaders);
+      return import_common_pipelog.PipeLog.pipe(phpheaders);
     }
     saveTempData(data, done) {
       const filename = os.tmpdir() + this.tempFileName;

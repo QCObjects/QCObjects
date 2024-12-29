@@ -27,7 +27,7 @@ var global = (() => {
     static {
       __name(this, "PipeLog");
     }
-    pipe(o) {
+    static pipe(o) {
       var _o = [];
       for (var k in o) {
         if (typeof o[k] !== "undefined" && o[k] !== null && typeof o[k] !== "function") {

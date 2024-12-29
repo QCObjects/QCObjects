@@ -1,7 +1,7 @@
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 import path from "node:path";
-import { JiraCloud } from "./client_services";
+import { JiraCloud } from "./client_services.mjs";
 import { Package, InheritClass, _DataStringify, New, CONFIG, logger } from "qcobjects";
 const absolutePath = path.resolve(__dirname, "./");
 class CommandHandler extends InheritClass {

@@ -29,6 +29,11 @@
 /*eslint strict: "off"*/
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
+
+import "./defaultsettings";
+import {HTTPServer} from "./main-http-server";
+import {HTTP2Server} from "./main-http2-server";
+
 (async () => {
   "use strict";
   const path = await import("path");
@@ -37,9 +42,6 @@
   await import("qcobjects");
   const { CONFIG, InheritClass, New, logger } = await import("qcobjects");
 
-  await import(absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
-  const HTTPServer: any = await import(absolutePath + "/org.quickcorp.qcobjects.main.http.server.js");
-  const HTTP2Server = await import(absolutePath + "/org.quickcorp.qcobjects.main.http2.server.js");
 
   class Main extends InheritClass {
     constructor() {
