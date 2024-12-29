@@ -32,7 +32,7 @@
 import "qcobjects";
 
 export * as EnterpriseCommands from "./enterprise-commands";
-import { Component, CONFIG, findPackageNodePath, InheritClass, logger, New, Service, serviceLoader } from "qcobjects";
+import { Component, CONFIG, findPackageNodePath, InheritClass, logger, New, Service, serviceLoader, global, Package, Export } from "qcobjects";
 import { QCObjectsEnterprise } from "./enterprise-commands";
 export * as QuickCorpServices from "./api-client_services";
 import { QuickCorpCloud } from "./api-client_services";
@@ -46,7 +46,7 @@ import commander from "commander";
 const templatePwaPath = path.resolve(__dirname, "./templates/pwa/") + "/";
 
 export const getPluginCommandsList = () => {
-  return (global as any).ClassesList?.filter((c: { packageName: string; }) => c.packageName.startsWith("com.qcobjects.cli.commands."))
+  return global.ClassesList?.filter((c: { packageName: string; }) => c.packageName.startsWith("com.qcobjects.cli.commands."))
     .filter((p: { classFactory: { name: string; }; }) => p.classFactory.name.endsWith("CommandHandler"));
 };
 
@@ -501,9 +501,7 @@ export class SwitchCommander extends InheritClass {
 }
 
 
-(async () => {
 
-  const { CONFIG, findPackageNodePath, logger, Package, InheritClass, New, serviceLoader, global, Service, Component } = await import("qcobjects");
 
   CONFIG.set("node_modules_path", "./node_modules/");
   CONFIG.set("qcobjectsnewapp_path", CONFIG.get("node_modules_path") + "/qcobjectsnewapp");
@@ -513,6 +511,4 @@ export class SwitchCommander extends InheritClass {
 
     SwitchCommander
   ]);
-  global.SwitchCommander = SwitchCommander;
-})()
-  .catch(e => console.error(e));
+  Export(SwitchCommander);

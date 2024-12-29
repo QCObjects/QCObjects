@@ -29,14 +29,14 @@
 /* eslint no-mixed-operators: "off" */
 /* eslint no-undef: "off" */
 /* eslint no-useless-escape: "off" */
+"use strict";
 import mime from "mime";
-(async () => {
-  "use strict";
-  const fs = await import("fs");
-  const path = await import("path");
+import fs from "node:fs";
+import path from "node:path";
+import { Package, BackendMicroservice, CONFIG, logger } from "qcobjects";
+
   const absolutePath = path.resolve(__dirname, "./");
 
-  const { Package, BackendMicroservice, CONFIG, logger } = await import("qcobjects");
 
   Package("com.qcobjects.backend.microservice.static", [
     class Microservice extends BackendMicroservice {
@@ -280,5 +280,3 @@ import mime from "mime";
     }
 
   ]);
-})()
-.catch(e => console.error(e));

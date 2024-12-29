@@ -50,7 +50,7 @@ var global = (() => {
   var import_commander = __toESM(require("commander"));
   const templatePwaPath = import_node_path.default.resolve(__dirname, "./templates/pwa/") + "/";
   const getPluginCommandsList = /* @__PURE__ */ __name(() => {
-    return global.ClassesList?.filter((c) => c.packageName.startsWith("com.qcobjects.cli.commands.")).filter((p) => p.classFactory.name.endsWith("CommandHandler"));
+    return import_qcobjects2.global.ClassesList?.filter((c) => c.packageName.startsWith("com.qcobjects.cli.commands.")).filter((p) => p.classFactory.name.endsWith("CommandHandler"));
   }, "getPluginCommandsList");
   class SwitchCommander extends import_qcobjects2.InheritClass {
     static {
@@ -400,15 +400,12 @@ var global = (() => {
       }
     }
   }
-  (async () => {
-    const { CONFIG: CONFIG2, findPackageNodePath: findPackageNodePath2, logger: logger2, Package, InheritClass: InheritClass2, New: New2, serviceLoader: serviceLoader2, global: global2, Service: Service2, Component: Component2 } = await import("qcobjects");
-    CONFIG2.set("node_modules_path", "./node_modules/");
-    CONFIG2.set("qcobjectsnewapp_path", CONFIG2.get("node_modules_path") + "/qcobjectsnewapp");
-    Package("org.quickcorp.qcobjects.cli", [
-      SwitchCommander
-    ]);
-    global2.SwitchCommander = SwitchCommander;
-  })().catch((e) => console.error(e));
+  import_qcobjects2.CONFIG.set("node_modules_path", "./node_modules/");
+  import_qcobjects2.CONFIG.set("qcobjectsnewapp_path", import_qcobjects2.CONFIG.get("node_modules_path") + "/qcobjectsnewapp");
+  (0, import_qcobjects2.Package)("org.quickcorp.qcobjects.cli", [
+    SwitchCommander
+  ]);
+  (0, import_qcobjects2.Export)(SwitchCommander);
   return __toCommonJS(cli_main_exports);
 })();
 //# sourceMappingURL=cli-main.js.map

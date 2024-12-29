@@ -2,7 +2,7 @@ var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 import "qcobjects";
 import * as EnterpriseCommands from "./enterprise-commands.mjs";
-import { Component, CONFIG, findPackageNodePath, InheritClass, logger, New, Service, serviceLoader } from "qcobjects";
+import { Component, CONFIG, findPackageNodePath, InheritClass, logger, New, Service, serviceLoader, global, Package, Export } from "qcobjects";
 import { QCObjectsEnterprise } from "./enterprise-commands.mjs";
 import * as QuickCorpServices from "./api-client_services.mjs";
 import { QuickCorpCloud } from "./api-client_services.mjs";
@@ -364,15 +364,12 @@ class SwitchCommander extends InheritClass {
     }
   }
 }
-(async () => {
-  const { CONFIG: CONFIG2, findPackageNodePath: findPackageNodePath2, logger: logger2, Package, InheritClass: InheritClass2, New: New2, serviceLoader: serviceLoader2, global: global2, Service: Service2, Component: Component2 } = await import("qcobjects");
-  CONFIG2.set("node_modules_path", "./node_modules/");
-  CONFIG2.set("qcobjectsnewapp_path", CONFIG2.get("node_modules_path") + "/qcobjectsnewapp");
-  Package("org.quickcorp.qcobjects.cli", [
-    SwitchCommander
-  ]);
-  global2.SwitchCommander = SwitchCommander;
-})().catch((e) => console.error(e));
+CONFIG.set("node_modules_path", "./node_modules/");
+CONFIG.set("qcobjectsnewapp_path", CONFIG.get("node_modules_path") + "/qcobjectsnewapp");
+Package("org.quickcorp.qcobjects.cli", [
+  SwitchCommander
+]);
+Export(SwitchCommander);
 export {
   EnterpriseCommands,
   QuickCorpServices,
