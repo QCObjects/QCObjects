@@ -68,52 +68,6 @@ declare module "cli-commands-jira" {
         getIssueList(): Promise<void>;
     }
 }
-declare module "cli-commands-version" {
-    import { InheritClass } from "qcobjects";
-    export class CommandHandler extends InheritClass {
-        choiceOption: {
-            getVersionStringFromFile(filename: string): string;
-            parseVersionSuffix(versionString: any): string;
-            parseVersionString(versionString: any): string;
-            buildNewVersionString(arg0: {
-                major: number;
-                minor: number;
-                patch: number;
-            }, versionSuffix: any): string;
-            saveNewVersionFile(filename: string, newVersion: any): string;
-            syncGit(newVersion: any, commitMsg: any, syncNpm: any): string;
-            switchCommander: any;
-            v_major(filename: string, options: any): void;
-            v_minor(filename: string, options: any): void;
-            v_patch(filename: string, options: any): void;
-            v_sync(filename: string, options: any): void;
-            v_changelog(): void;
-        };
-        switchCommander: any;
-        constructor({ switchCommander }: {
-            switchCommander: any;
-        });
-        syncGit(versionString: any, commitMsg: any, syncNpm?: boolean): void;
-        parseVersionString(versionString: string): {
-            major: string;
-            minor: string;
-            patch: string;
-        };
-        getVersionStringFromFile(filename: any): string;
-        buildNewSemVersionString({ major, minor, patch }: {
-            major: string;
-            minor: string;
-            patch: string;
-        }): string;
-        parseVersionSuffix(versionString: string): string;
-        buildNewVersionString({ major, minor, patch }: any, suffix: any): string;
-        saveNewVersionFile(filename: any, versionString: any): void;
-    }
-}
-declare module "cli-commands" {
-    export * as versionCommand from "cli-commands-version";
-    export * as jiraCommand from "cli-commands-jira";
-}
 declare module "enterprise-commands" {
     import { InheritClass } from "qcobjects";
     export class QCObjectsEnterprise extends InheritClass {
@@ -121,6 +75,10 @@ declare module "enterprise-commands" {
         static upgrade(switchCommander: any): Promise<void>;
         installEnterprise(license: string, email: string): void;
     }
+}
+declare module "cli-commands" {
+    export * as versionCommand from "cli-commands-version";
+    export * as jiraCommand from "cli-commands-jira";
 }
 declare module "defaultsettings" {
     import "qcobjects";
@@ -160,6 +118,49 @@ declare module "cli-main" {
         generateServiceWorker(appName: any, dirPrefix?: string): Promise<unknown>;
         copyTemplate(source: any, dest: any): Promise<void>;
         initCommand(): void;
+    }
+}
+declare module "cli-commands-version" {
+    import { InheritClass } from "qcobjects";
+    import { SwitchCommander } from "cli-main";
+    export class CommandHandler extends InheritClass {
+        choiceOption: {
+            getVersionStringFromFile(filename: string): string;
+            parseVersionSuffix(versionString: any): string;
+            parseVersionString(versionString: any): string;
+            buildNewVersionString(arg0: {
+                major: number;
+                minor: number;
+                patch: number;
+            }, versionSuffix: any): string;
+            saveNewVersionFile(filename: string, newVersion: any): string;
+            syncGit(newVersion: any, commitMsg: any, syncNpm: any): string;
+            switchCommander: any;
+            v_major(filename: string, options: any): void;
+            v_minor(filename: string, options: any): void;
+            v_patch(filename: string, options: any): void;
+            v_sync(filename: string, options: any): void;
+            v_changelog(): void;
+        };
+        switchCommander: SwitchCommander;
+        constructor({ switchCommander }: {
+            switchCommander: SwitchCommander;
+        });
+        syncGit(versionString: any, commitMsg: any, syncNpm?: boolean): void;
+        parseVersionString(versionString: string): {
+            major: string;
+            minor: string;
+            patch: string;
+        };
+        getVersionStringFromFile(filename: any): string;
+        buildNewSemVersionString({ major, minor, patch }: {
+            major: string;
+            minor: string;
+            patch: string;
+        }): string;
+        parseVersionSuffix(versionString: string): string;
+        buildNewVersionString({ major, minor, patch }: any, suffix: any): string;
+        saveNewVersionFile(filename: any, versionString: any): void;
     }
 }
 declare module "collab-server" {

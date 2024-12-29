@@ -305,7 +305,7 @@ class SwitchCommander extends InheritClass {
       });
       try {
         logger.debug("Loading Plugin Commands...");
-        const importPluginCommands = /* @__PURE__ */ __name(function(switchCommander2) {
+        const importPluginCommands = /* @__PURE__ */ __name((switchCommander2) => {
           return getPluginCommandsList()?.map((pluginCommand) => {
             try {
               logger.debug(`Loading plugin ${pluginCommand.packageName}`);

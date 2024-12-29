@@ -264,8 +264,8 @@ const __load_default_settings__ = /* @__PURE__ */ __name(() => {
         setBackendValue("libs", libs);
         if (libs.length > 0) {
           import_qcobjects2.logger.debug(`Plugin Libs found: ${libs.join(",")}`);
-          _ret_ = Promise.all(libs.map((p) => {
-            return require(findPath(p));
+          _ret_ = Promise.all(libs.map(async (p) => {
+            return await import(findPath(p));
           })).then(() => import_qcobjects2.logger.info("Libs loaded"));
         } else {
           import_qcobjects2.logger.debug("No Plugin Libs found.");
@@ -284,8 +284,8 @@ const __load_default_settings__ = /* @__PURE__ */ __name(() => {
         setBackendValue("handlers", handlers);
         if (handlers.length > 0) {
           import_qcobjects2.logger.debug(`Plugin Handlers found: ${handlers.join(",")}`);
-          _ret_ = Promise.all(handlers.map((p) => {
-            return require(findPath(p));
+          _ret_ = Promise.all(handlers.map(async (p) => {
+            return await import(findPath(p));
           })).then(() => import_qcobjects2.logger.info("Handlers loaded"));
         } else {
           import_qcobjects2.logger.debug("No Plugin Handlers found.");
@@ -305,8 +305,8 @@ const __load_default_settings__ = /* @__PURE__ */ __name(() => {
         setBackendValue("commands", commands);
         if (commands.length > 0) {
           import_qcobjects2.logger.debug(`Plugin Commands found: ${commands.join(",")}`);
-          _ret_ = Promise.all(commands.map((p) => {
-            return require(findPath(p));
+          _ret_ = Promise.all(commands.map(async (p) => {
+            return await import(findPath(p));
           })).then(() => import_qcobjects2.logger.info("Commands loaded"));
         } else {
           import_qcobjects2.logger.debug("No Plugin Commands found.");
@@ -326,8 +326,8 @@ const __load_default_settings__ = /* @__PURE__ */ __name(() => {
         setBackendValue("devCommands", commands);
         if (commands.length > 0) {
           import_qcobjects2.logger.debug(`Dev Plugin Commands found: ${commands.join(",")}`);
-          _ret_ = Promise.all(commands.map((p) => {
-            return require(findPath(p));
+          _ret_ = Promise.all(commands.map(async (p) => {
+            return await import(findPath(p));
           })).then(() => import_qcobjects2.logger.info("Commands loaded"));
         } else {
           import_qcobjects2.logger.debug("No Plugin Commands found in dev dependencies.");

@@ -42,6 +42,7 @@ class CommandHandler extends import_qcobjects.InheritClass {
   switchCommander;
   constructor({ switchCommander }) {
     super({ switchCommander });
+    this.switchCommander = switchCommander;
     const commandHandler = this;
     this.choiceOption = {
       v_major(filename, options) {

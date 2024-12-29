@@ -414,7 +414,7 @@ export class SwitchCommander extends InheritClass {
 
       try {
         logger.debug("Loading Plugin Commands...");
-        const importPluginCommands = function (switchCommander: any) {
+        const importPluginCommands =  (switchCommander: any) => {
           return getPluginCommandsList()?.map((pluginCommand: { packageName: any; classFactory: any; plugin: any; }) => {
             try {
               logger.debug(`Loading plugin ${pluginCommand.packageName}`);

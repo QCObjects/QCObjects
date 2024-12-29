@@ -341,7 +341,7 @@ class SwitchCommander extends import_qcobjects2.InheritClass {
       });
       try {
         import_qcobjects2.logger.debug("Loading Plugin Commands...");
-        const importPluginCommands = /* @__PURE__ */ __name(function(switchCommander2) {
+        const importPluginCommands = /* @__PURE__ */ __name((switchCommander2) => {
           return getPluginCommandsList()?.map((pluginCommand) => {
             try {
               import_qcobjects2.logger.debug(`Loading plugin ${pluginCommand.packageName}`);

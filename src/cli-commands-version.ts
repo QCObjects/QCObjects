@@ -34,6 +34,7 @@ import path from "node:path";
 import { exec, execSync } from "node:child_process";
 
 import { Package, InheritClass, logger } from "qcobjects";
+import { SwitchCommander } from "./cli-main";
 
 export class CommandHandler extends InheritClass {
   choiceOption: {
@@ -45,10 +46,11 @@ export class CommandHandler extends InheritClass {
     syncGit(newVersion: any, commitMsg: any, syncNpm: any): string;
     switchCommander: any; v_major(filename: string, options: any): void; v_minor(filename: string, options: any): void; v_patch(filename: string, options: any): void; v_sync(filename: string, options: any): void; v_changelog(): void;
   };
-  switchCommander: any;
+  switchCommander: SwitchCommander;
 
-  constructor({ switchCommander }: { switchCommander: any }) {
+  constructor({ switchCommander }:{switchCommander:SwitchCommander}) {
     super({ switchCommander });
+    this.switchCommander = switchCommander;
 
     const commandHandler = this;
 
