@@ -31,7 +31,7 @@
 "use strict";
 import path from "node:path";
 
-import { JiraCloud } from "./com.qcobjects.cli.commands.jira.client_services";
+import { JiraCloud } from "./client_services";
 import { Package, InheritClass, _DataStringify, New, CONFIG, logger } from "qcobjects";
 const absolutePath = path.resolve(__dirname, "./");
 

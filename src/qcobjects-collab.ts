@@ -29,16 +29,13 @@
 /*eslint strict: "off"*/
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
+"use strict";
 import path from "path";
+import "./defaultsettings";
+import {CollabServer} from "./collab-server";
 
 import { InheritClass, logger } from "qcobjects";
-(async () => {
-  "use strict";
   const absolutePath = path.resolve(__dirname, "./");
-
-  await import(absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
-
-  const { CollabServer } = await import(absolutePath + "/org.quickcorp.qcobjects.collab.server.js");
 
   class Main extends InheritClass {
     constructor() {
@@ -52,4 +49,3 @@ import { InheritClass, logger } from "qcobjects";
   }
 
   const __main__ = new Main();
-})().catch(e => console.error (e));

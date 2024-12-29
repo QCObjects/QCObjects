@@ -32,5 +32,5 @@
 
 // plugin commands here
 
-export * as versionCommand from "./com.qcobjects.cli.commands.version";
-export * as jiraCommand from "./com.qcobjects.cli.commands.jira";
+export * as versionCommand from "./cli-commands-version";
+export * as jiraCommand from "./cli-commands-jira";

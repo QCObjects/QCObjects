@@ -29,12 +29,12 @@
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
 
-export * as EnterpriseCommands from "./org.qcobjects.enterprise.commands";
+export * as EnterpriseCommands from "./enterprise-commands";
 import { Component, CONFIG, findPackageNodePath, InheritClass, logger, New, Service, serviceLoader } from "qcobjects";
-import { QCObjectsEnterprise } from "./org.qcobjects.enterprise.commands";
-export * as QuickCorpServices from "./org.quickcorp.qcobjects.api.client_services";
-import { QuickCorpCloud } from "./org.quickcorp.qcobjects.api.client_services";
-export * as customCommands from "./com.qcobjects.cli.commands";
+import { QCObjectsEnterprise } from "./enterprise-commands";
+export * as QuickCorpServices from "./api-client_services";
+import { QuickCorpCloud } from "./api-client_services";
+export * as customCommands from "./cli-commands";
 import { __get_version__, __get_version_string__ } from "./defaultsettings";
 import path from "node:path";
 import fs from "node:fs";

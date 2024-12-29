@@ -37,7 +37,7 @@ var global = (() => {
   });
   var import_qcobjects = require("qcobjects");
   var defaultSettings = __toESM(require("./defaultsettings"));
-  var import_org_quickcorp_qcobjects = require("./org.quickcorp.qcobjects.cli");
+  var import_cli_main = require("./cli-main");
   import_qcobjects.logger.debugEnabled = false;
   const welcometo = "Welcome to \n";
   const instructions = `
@@ -77,7 +77,7 @@ Y88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r
     constructor() {
       super();
       const main = this;
-      const switchCommander = new import_org_quickcorp_qcobjects.SwitchCommander();
+      const switchCommander = new import_cli_main.SwitchCommander();
       switchCommander.initCommand();
       import_qcobjects.logger.debug("initialized");
     }

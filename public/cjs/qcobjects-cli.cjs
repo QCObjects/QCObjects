@@ -37,7 +37,7 @@ __export(qcobjects_cli_exports, {
 module.exports = __toCommonJS(qcobjects_cli_exports);
 var import_qcobjects = require("qcobjects");
 var defaultSettings = __toESM(require("./defaultsettings"));
-var import_org_quickcorp_qcobjects = require("./org.quickcorp.qcobjects.cli");
+var import_cli_main = require("./cli-main");
 import_qcobjects.logger.debugEnabled = false;
 const welcometo = "Welcome to \n";
 const instructions = `
@@ -77,7 +77,7 @@ class Main extends import_qcobjects.InheritClass {
   constructor() {
     super();
     const main = this;
-    const switchCommander = new import_org_quickcorp_qcobjects.SwitchCommander();
+    const switchCommander = new import_cli_main.SwitchCommander();
     switchCommander.initCommand();
     import_qcobjects.logger.debug("initialized");
   }

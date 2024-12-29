@@ -30,25 +30,22 @@ var global = (() => {
   var require_qcobjects_collab = __commonJS({
     "src/qcobjects-collab.ts"() {
       var import_path = __toESM(require("path"));
+      var import_defaultsettings = require("./defaultsettings");
+      var import_collab_server = require("./collab-server");
       var import_qcobjects = require("qcobjects");
-      (async () => {
-        "use strict";
-        const absolutePath = import_path.default.resolve(__dirname, "./");
-        await import(absolutePath + "/org.quickcorp.qcobjects.defaultsettings.js");
-        const { CollabServer } = await import(absolutePath + "/org.quickcorp.qcobjects.collab.server.js");
-        class Main extends import_qcobjects.InheritClass {
-          static {
-            __name(this, "Main");
-          }
-          constructor() {
-            super();
-            const app = new CollabServer();
-            app.start();
-            import_qcobjects.logger.debug("initialized");
-          }
+      const absolutePath = import_path.default.resolve(__dirname, "./");
+      class Main extends import_qcobjects.InheritClass {
+        static {
+          __name(this, "Main");
         }
-        const __main__ = new Main();
-      })().catch((e) => console.error(e));
+        constructor() {
+          super();
+          const app = new import_collab_server.CollabServer();
+          app.start();
+          import_qcobjects.logger.debug("initialized");
+        }
+      }
+      const __main__ = new Main();
     }
   });
   return require_qcobjects_collab();

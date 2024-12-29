@@ -57,7 +57,7 @@ logger.warnEnabled = false;
 logger.infoEnabled = false;
 
 export * as defaultSettings from "./defaultsettings";
-import {SwitchCommander} from "./org.quickcorp.qcobjects.cli";
+import {SwitchCommander} from "./cli-main";
 
 export class Main extends InheritClass {
   constructor (){

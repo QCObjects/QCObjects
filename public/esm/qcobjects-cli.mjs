@@ -35,7 +35,7 @@ logger.debugEnabled = false;
 logger.warnEnabled = false;
 logger.infoEnabled = false;
 import * as defaultSettings from "./defaultsettings";
-import { SwitchCommander } from "./org.quickcorp.qcobjects.cli";
+import { SwitchCommander } from "./cli-main";
 class Main extends InheritClass {
   static {
     __name(this, "Main");
