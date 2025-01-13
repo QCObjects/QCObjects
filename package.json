@@ -98,7 +98,7 @@
   },
   "peerDependencies": {
     "qcobjects": "^2.5.136-beta",
-    "qcobjects-sdk": ">=2.4.66"
+    "qcobjects-sdk": ">=2.5.101-beta"
   },
   "repository": {
     "type": "file",
@@ -160,7 +160,7 @@
     "install": "^0.13.0",
     "jasmine": "^3.7.0",
     "qcobjects": "^2.5.136-beta",
-    "qcobjects-sdk": "file:../qcobjects-sdk-v2.5-beta",
+    "qcobjects-sdk": "2.5.101-beta",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.18.1"
