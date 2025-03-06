@@ -29,7 +29,6 @@
 /*eslint no-mixed-operators: "off"*/
 /*eslint no-undef: "off"*/
 "use strict";
-
 import "qcobjects";
 import {readFileSync} from "node:fs";
 import path from "node:path";
@@ -254,6 +253,7 @@ const __load_default_settings__ = () => {
           keywords = {};
         }
         try {
+          console.log("getting keywords for: ", p);
           if (typeof keywords[p] === "undefined") {
             keywords[p] = getPackageJSON(p).keywords;
           }

@@ -30,10 +30,12 @@ var global = (() => {
   var cli_commands_exports = {};
   __export(cli_commands_exports, {
     jiraCommand: () => jiraCommand,
+    publishStatic: () => publishStatic,
     versionCommand: () => versionCommand
   });
   var versionCommand = __toESM(require("./cli-commands-version"));
   var jiraCommand = __toESM(require("./cli-commands-jira"));
+  var publishStatic = __toESM(require("./cli-commands-publish-static"));
   return __toCommonJS(cli_commands_exports);
 })();
 //# sourceMappingURL=cli-commands.js.map

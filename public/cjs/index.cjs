@@ -31,6 +31,6 @@ __export(index_exports, {
   default: () => index_default
 });
 module.exports = __toCommonJS(index_exports);
-var cli = __toESM(require("./qcobjects-cli.js"));
+var cli = __toESM(require("./qcobjects-cli.cjs"));
 var index_default = cli;
 //# sourceMappingURL=index.cjs.map

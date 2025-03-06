@@ -34,3 +34,4 @@
 
 export * as versionCommand from "./cli-commands-version";
 export * as jiraCommand from "./cli-commands-jira";
+export * as publishStatic from "./cli-commands-publish-static";

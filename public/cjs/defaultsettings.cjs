@@ -229,6 +229,7 @@ const __load_default_settings__ = /* @__PURE__ */ __name(() => {
           keywords = {};
         }
         try {
+          console.log("getting keywords for: ", p);
           if (typeof keywords[p] === "undefined") {
             keywords[p] = getPackageJSON(p).keywords;
           }

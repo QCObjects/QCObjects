@@ -1,4 +1,4 @@
-import * as cli from "./qcobjects-cli.js";
+import * as cli from "./qcobjects-cli.mjs";
 var index_default = cli;
 export {
   index_default as default

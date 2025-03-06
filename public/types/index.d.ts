@@ -68,6 +68,18 @@ declare module "cli-commands-jira" {
         getIssueList(): Promise<void>;
     }
 }
+declare module "cli-commands-publish-static" {
+    import { InheritClass } from "qcobjects";
+    export class CommandHandler extends InheritClass {
+        choiceOption: {
+            [x: string]: any;
+            publish_static: (source: string, dest: string, options: any) => void;
+        };
+        constructor({ switchCommander }: {
+            switchCommander: any;
+        });
+    }
+}
 declare module "enterprise-commands" {
     import { InheritClass } from "qcobjects";
     export class QCObjectsEnterprise extends InheritClass {
@@ -79,6 +91,7 @@ declare module "enterprise-commands" {
 declare module "cli-commands" {
     export * as versionCommand from "cli-commands-version";
     export * as jiraCommand from "cli-commands-jira";
+    export * as publishStatic from "cli-commands-publish-static";
 }
 declare module "defaultsettings" {
     import "qcobjects";

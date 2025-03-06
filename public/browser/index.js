@@ -31,7 +31,7 @@ var global = (() => {
   __export(index_exports, {
     default: () => index_default
   });
-  var cli = __toESM(require("./qcobjects-cli.js"));
+  var cli = __toESM(require("./qcobjects-cli"));
   var index_default = cli;
   return __toCommonJS(index_exports);
 })();

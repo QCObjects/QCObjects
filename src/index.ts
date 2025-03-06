@@ -1,2 +1,2 @@
-import * as cli from "./qcobjects-cli.js";
+import * as cli from "./qcobjects-cli";
 export default cli;
