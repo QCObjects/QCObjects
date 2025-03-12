@@ -378,3 +378,4 @@ declare module "qcobjects-shell" {
 }
 declare module "backend/backend-microservice-static" { }
 declare module "backend/backend-php" { }
+//# sourceMappingURL=index.d.ts.map
