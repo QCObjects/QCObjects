@@ -4,7 +4,7 @@
     "traceResolution":false,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "nodenext",
-    "moduleDetection": "auto",
+    "moduleDetection": "force",
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -24,6 +24,9 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "baseUrl": ".",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
     "typeRoots": [
       "./node_modules/@types"
     ],
@@ -38,7 +41,7 @@
     "src/types/**/*"
   ],
   "exclude": [
-    "**/*.js",
+    "src/templates/**/*",
     "src/index.mts",
     "src/index.cts",
     "node_modules",
