@@ -252,11 +252,16 @@ var global = (() => {
         stream
       });
       var self = this;
-      self.request = request;
+      self.request = request || {};
       self.stream = stream;
       self.headers = headers;
       self.body = body;
       self.fileDispatcher = fileDispatcher;
+      if (!self.request.scriptname || !self.request.pathname) {
+        const defaultPath = "/";
+        self.request.pathname = self.request.pathname || defaultPath;
+        self.request.scriptname = self.request.scriptname || import_qcobjects.CONFIG.get("documentRootFileIndex", "index.html");
+      }
       self._generateResponse();
     }
     sendFile(stream, fileName) {

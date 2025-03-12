@@ -383,10 +383,15 @@ Y88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r
       super(o);
       var self = this;
       self.body = "";
-      self.request = o.request;
+      self.request = o.request || {};
       self.stream = o.stream;
       self.headers = o.headers;
       self.fileDispatcher = o.fileDispatcher;
+      if (!self.request.scriptname || !self.request.pathname) {
+        const defaultPath = "/";
+        self.request.pathname = self.request.pathname || defaultPath;
+        self.request.scriptname = self.request.scriptname || import_qcobjects.CONFIG.get("documentRootFileIndex", "index.html");
+      }
       self._generateResponse();
       this.headers = {
         ":status": 200,
