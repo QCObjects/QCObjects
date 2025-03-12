@@ -64,7 +64,7 @@ const ImportMicroservice = function (microservicePackage: string) {
 class HTTP2ServerResponse extends InheritClass {
   fileDispatcher: any;
   request: any;
-  headers!: { [x: string]: number; };
+  headers!: { [x: string]: string | number };
   stream: any;
   body: any;
   constructor({
@@ -80,8 +80,12 @@ class HTTP2ServerResponse extends InheritClass {
   }) {
     super();
     var self = this;
+    self.request = request;
+    self.stream = stream;
+    self.headers = headers;
+    self.body = body;
+    self.fileDispatcher = fileDispatcher;
     self._generateResponse();
-
   }
 
   sendFile(stream: { respondWithFD: (arg0: any, arg1: { "content-length": any; "last-modified": any; "content-type": any; "cache-control": any; }) => void; on: (arg0: string, arg1: { (): void; (): void; }) => void; end: () => void; respond: (arg0: { ":status": number; "content-type": any; }) => void; write: (arg0: string) => void; }, fileName: string) {

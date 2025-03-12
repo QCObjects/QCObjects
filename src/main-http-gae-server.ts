@@ -402,11 +402,14 @@ class HTTPServerResponse extends InheritClass {
   headers: { ":status": number; "content-type": string; };
   fileDispatcher: any;
   request: any;
-  constructor(o: { stream: any; }) {
+  constructor(o: { stream: any; request: any; headers: any; fileDispatcher: any; }) {
     super(o);
     var self = this;
     self.body = "";
+    self.request = o.request;
     self.stream = o.stream;
+    self.headers = o.headers;
+    self.fileDispatcher = o.fileDispatcher;
     self._generateResponse();
     this.headers = {
       ":status": 200,
