@@ -281,9 +281,19 @@ const __load_default_settings__ = /* @__PURE__ */ __name(() => {
         setBackendValue("commands", commands);
         if (commands.length > 0) {
           logger.debug(`Plugin Commands found: ${commands.join(",")}`);
-          _ret_ = Promise.all(commands.map(async (p) => {
-            return await import(findPath(p));
-          })).then(() => logger.info("Commands loaded"));
+          _ret_ = Promise.all(
+            commands.map(async (p) => {
+              try {
+                return await import(findPath(p));
+              } catch (error) {
+                logger.error(`Failed to load command ${p}: ${error}`);
+                throw error;
+              }
+            })
+          ).then(() => logger.info("Commands loaded")).catch((error) => {
+            logger.error("Failed to load commands:", error);
+            throw error;
+          });
         } else {
           logger.debug("No Plugin Commands found.");
           _ret_ = Promise.resolve();

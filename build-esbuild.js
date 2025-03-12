@@ -99,17 +99,23 @@ const copyDir = async (source, dest, exclude) => {
 })();
 
 const ignorePlugin = {
-  name: 'ignore-packages',
+  name: 'transform-qcobjects-imports',
   setup(build) {
-    // Handle known external packages (qcobjects)
-    build.onResolve({ filter: /^(qcobjects-sdk|qcobjects)$/ }, args => {
-      return { 
+    // Handle qcobjects and qcobjects-sdk dynamic imports
+    build.onResolve({ filter: /^(qcobjects|qcobjects-sdk)$/ }, args => {
+      if (args.kind === 'dynamic-import') {
+        return { 
+          path: args.path,
+          namespace: 'qcobjects-transform'
+        }
+      }
+      return {
         external: true,
         path: args.path
       }
     });
 
-    // Handle all dynamic imports (handlers, commands, dev commands, libs)
+    // Handle all other dynamic imports (handlers, commands, dev commands, libs)
     build.onResolve({ filter: /.*/, namespace: 'file' }, args => {
       if (args.kind === 'dynamic-import') {
         return {
@@ -118,6 +124,15 @@ const ignorePlugin = {
         }
       }
       return null;
+    });
+
+    build.onLoad({ filter: /.*/, namespace: 'qcobjects-transform' }, args => {
+      return {
+        contents: `
+          module.exports = __toESM(require("${args.path}"), true);
+        `,
+        loader: 'js'
+      }
     });
   }
 }

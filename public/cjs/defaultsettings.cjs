@@ -314,9 +314,19 @@ const __load_default_settings__ = /* @__PURE__ */ __name(() => {
         setBackendValue("commands", commands);
         if (commands.length > 0) {
           import_qcobjects2.logger.debug(`Plugin Commands found: ${commands.join(",")}`);
-          _ret_ = Promise.all(commands.map(async (p) => {
-            return await import(findPath(p));
-          })).then(() => import_qcobjects2.logger.info("Commands loaded"));
+          _ret_ = Promise.all(
+            commands.map(async (p) => {
+              try {
+                return await import(findPath(p));
+              } catch (error) {
+                import_qcobjects2.logger.error(`Failed to load command ${p}: ${error}`);
+                throw error;
+              }
+            })
+          ).then(() => import_qcobjects2.logger.info("Commands loaded")).catch((error) => {
+            import_qcobjects2.logger.error("Failed to load commands:", error);
+            throw error;
+          });
         } else {
           import_qcobjects2.logger.debug("No Plugin Commands found.");
           _ret_ = Promise.resolve();
