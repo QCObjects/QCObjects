@@ -101,9 +101,13 @@ const copyDir = async (source, dest, exclude) => {
 const ignorePlugin = {
   name: 'ignore-packages',
   setup(build) {
-    // Tell esbuild to ignore these packages
+    // Handle both static and dynamic imports of these packages
     build.onResolve({ filter: /^(qcobjects-sdk|qcobjects)$/ }, args => {
-      return { external: true }
+      return { 
+        external: true,
+        // Preserve the path for dynamic imports
+        path: args.path
+      }
     })
   }
 }
