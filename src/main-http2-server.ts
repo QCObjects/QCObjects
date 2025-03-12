@@ -80,11 +80,19 @@ class HTTP2ServerResponse extends InheritClass {
   }) {
     super();
     var self = this;
-    self.request = request;
+    self.request = request || {};
     self.stream = stream;
     self.headers = headers;
     self.body = body;
     self.fileDispatcher = fileDispatcher;
+    
+    // Initialize request properties if not set
+    if (!self.request.scriptname || !self.request.pathname) {
+      const defaultPath = "/";
+      self.request.pathname = self.request.pathname || defaultPath;
+      self.request.scriptname = self.request.scriptname || CONFIG.get("documentRootFileIndex", "index.html");
+    }
+    
     self._generateResponse();
   }
 
@@ -309,13 +317,20 @@ export class HTTP2Server extends InheritClass {
       http2ServerInstance.request.method = headers[":method"];
       http2ServerInstance.request.path = headers[":path"];
 
-
-      if (http2ServerInstance.request.pathname.indexOf(".") < 0) {
-        http2ServerInstance.request.scriptname = CONFIG.get("documentRootFileIndex");
+      // Fix pathname and scriptname initialization
+      const pathParts = http2ServerInstance.request.pathname.split("/");
+      if (pathParts.length > 0) {
+        if (http2ServerInstance.request.pathname.indexOf(".") < 0) {
+          http2ServerInstance.request.scriptname = CONFIG.get("documentRootFileIndex", "index.html");
+          // Keep the original pathname as is, no need to reassign
+        } else {
+          http2ServerInstance.request.scriptname = pathParts[pathParts.length - 1];
+          http2ServerInstance.request.pathname = http2ServerInstance.request.pathname.substr(0, http2ServerInstance.request.pathname.lastIndexOf("/"));
+        }
       } else {
-        http2ServerInstance.request.scriptname = http2ServerInstance.request.pathname.split("/").reverse()[0];
+        http2ServerInstance.request.scriptname = CONFIG.get("documentRootFileIndex", "index.html");
+        http2ServerInstance.request.pathname = "/";
       }
-      http2ServerInstance.request.pathname = this.request.pathname.substr(0, http2ServerInstance.request.pathname.lastIndexOf("/"));
 
       logger.debug(PipeLog.pipe(this.request));
 
