@@ -32,6 +32,7 @@
 import path from "node:path";
 import os from "node:os";
 import "./defaultsettings";
+import { InheritClass, CONFIG } from "qcobjects";
 
 (async () => {
   "use strict";
@@ -45,10 +46,6 @@ import "./defaultsettings";
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return os.platform().toLowerCase().startsWith("darwin");
   };
-
-
-  const { InheritClass, CONFIG } = await import("qcobjects");
-
 
   const { execSync } = await import("node:child_process");
 

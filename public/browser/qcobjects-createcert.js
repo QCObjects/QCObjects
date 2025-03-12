@@ -32,6 +32,7 @@ var global = (() => {
       var import_node_path = __toESM(require("node:path"));
       var import_node_os = __toESM(require("node:os"));
       var import_defaultsettings = require("./defaultsettings");
+      var import_qcobjects = require("qcobjects");
       (async () => {
         "use strict";
         const absolutePath = import_node_path.default.resolve(__dirname, "./");
@@ -42,9 +43,8 @@ var global = (() => {
         const isMac = /* @__PURE__ */ __name(() => {
           return import_node_os.default.platform().toLowerCase().startsWith("darwin");
         }, "isMac");
-        const { InheritClass, CONFIG } = await import("qcobjects");
         const { execSync } = await import("node:child_process");
-        class Main extends InheritClass {
+        class Main extends import_qcobjects.InheritClass {
           static {
             __name(this, "Main");
           }
@@ -53,14 +53,14 @@ var global = (() => {
             this.start();
           }
           start() {
-            const certificate_provider = CONFIG.get("certificate_provider", "self_signed");
+            const certificate_provider = import_qcobjects.CONFIG.get("certificate_provider", "self_signed");
             let stdout;
             switch (certificate_provider) {
               case "self_signed":
                 if (isWindows()) {
-                  stdout = execSync('openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj "/CN=' + CONFIG.get("domain") + '"  -keyout ' + CONFIG.get("private-key-pem") + " -out " + CONFIG.get("private-cert-pem"));
+                  stdout = execSync('openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj "/CN=' + import_qcobjects.CONFIG.get("domain") + '"  -keyout ' + import_qcobjects.CONFIG.get("private-key-pem") + " -out " + import_qcobjects.CONFIG.get("private-cert-pem"));
                 } else {
-                  stdout = execSync("openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=" + CONFIG.get("domain") + "'  -keyout " + CONFIG.get("private-key-pem") + " -out " + CONFIG.get("private-cert-pem"));
+                  stdout = execSync("openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=" + import_qcobjects.CONFIG.get("domain") + "'  -keyout " + import_qcobjects.CONFIG.get("private-key-pem") + " -out " + import_qcobjects.CONFIG.get("private-cert-pem"));
                 }
                 break;
               case "letsencrypt":
@@ -68,7 +68,7 @@ var global = (() => {
                   throw Error("Letsencrypt certificate is not supported in Windows");
                 } else {
                   var prehook_posthook = '--pre-hook "service qcobjects stop" --post-hook="service qcobjects start"';
-                  stdout = execSync(`certbot -n -d ${CONFIG.get("domain")} certonly --standalone ${prehook_posthook}`);
+                  stdout = execSync(`certbot -n -d ${import_qcobjects.CONFIG.get("domain")} certonly --standalone ${prehook_posthook}`);
                 }
                 break;
               default:

@@ -42,6 +42,10 @@
       "require": "./public/cjs/qcobjects-createcert.cjs",
       "import": "./public/mjs/qcobjects-createcert.mjs"
     },
+    "./createcert": {
+      "require": "./public/cjs/qcobjects-createcert.cjs",
+      "import": "./public/mjs/qcobjects-createcert.mjs"
+    },    
     "./qcobjects-gae-http-server": {
       "require": "./public/cjs/qcobjects-gae-http-server.cjs",
       "import": "./public/mjs/qcobjects-gae-http-server.mjs"

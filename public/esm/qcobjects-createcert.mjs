@@ -8,6 +8,7 @@ var __commonJS = (cb, mod) => function __require() {
 import path from "node:path";
 import os from "node:os";
 import "./defaultsettings.mjs";
+import { InheritClass, CONFIG } from "qcobjects";
 var require_qcobjects_createcert = __commonJS({
   "src/qcobjects-createcert.ts"() {
     (async () => {
@@ -20,7 +21,6 @@ var require_qcobjects_createcert = __commonJS({
       const isMac = /* @__PURE__ */ __name(() => {
         return os.platform().toLowerCase().startsWith("darwin");
       }, "isMac");
-      const { InheritClass, CONFIG } = await import("qcobjects");
       const { execSync } = await import("node:child_process");
       class Main extends InheritClass {
         static {

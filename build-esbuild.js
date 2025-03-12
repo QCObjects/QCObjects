@@ -98,13 +98,23 @@ const copyDir = async (source, dest, exclude) => {
     await copyDir("./src/templates", "./public/browser/templates", []);
 })();
 
+const ignorePlugin = {
+  name: 'ignore-packages',
+  setup(build) {
+    // Tell esbuild to ignore these packages
+    build.onResolve({ filter: /^(qcobjects-sdk|qcobjects)$/ }, args => {
+      return { external: true }
+    })
+  }
+}
+
 const baseSettings = {
-    entryPoints: entryPoints, // Your entry file
+    entryPoints: entryPoints,
     bundle: false,
-    outdir: "public/cjs", // Output dir
-    format: "cjs", // or "esm" depending on your module system    
-    target: ["node22"], // Adjust based on your target environment
-    tsconfig: "tsconfig.json", // Path to your tsconfig.json,
+    outdir: "public/cjs",
+    format: "cjs",    
+    target: ["node22"],
+    tsconfig: "tsconfig.json",
     globalName: "global",
     minify: false,
     keepNames: true,
@@ -112,6 +122,7 @@ const baseSettings = {
     splitting: false,
     chunkNames: "chunks/[name]-[hash]",
     plugins: [
+        ignorePlugin,
         alias({
             "types": path.join(__dirname, "src/types/global/index.d.ts")
         })
