@@ -101,14 +101,31 @@ const copyDir = async (source, dest, exclude) => {
 const ignorePlugin = {
   name: 'ignore-packages',
   setup(build) {
-    // Handle both static and dynamic imports of these packages
-    build.onResolve({ filter: /^(qcobjects-sdk|qcobjects)$/ }, args => {
+    // More specific handling of qcobjects imports
+    build.onResolve({ filter: /^qcobjects$/ }, args => {
+      // Log for debugging
+      console.log('Resolving qcobjects import:', args);
+      
       return { 
         external: true,
-        // Preserve the path for dynamic imports
-        path: args.path
+        path: args.path,
+        namespace: 'external-module'
       }
-    })
+    });
+
+    // Handle qcobjects-sdk similarly
+    build.onResolve({ filter: /^qcobjects-sdk$/ }, args => {
+      return { 
+        external: true,
+        path: args.path,
+        namespace: 'external-module'
+      }
+    });
+
+    // Optional: Add load handler for better control
+    build.onLoad({ filter: /.*/, namespace: 'external-module' }, args => {
+      return { contents: `export * from '${args.path}'` }
+    });
   }
 }
 
