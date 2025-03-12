@@ -351,7 +351,10 @@ class HTTPServerResponse extends InheritClass {
     super(o);
     var self = this;
     self.body = "";
+    self.request = o.request;
     self.stream = o.stream;
+    self.headers = o.headers;
+    self.fileDispatcher = o.fileDispatcher;
     self._generateResponse();
     this.headers = {
       ":status": 200,

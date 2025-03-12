@@ -80,6 +80,11 @@ class HTTP2ServerResponse extends import_qcobjects.InheritClass {
   }) {
     super();
     var self = this;
+    self.request = request;
+    self.stream = stream;
+    self.headers = headers;
+    self.body = body;
+    self.fileDispatcher = fileDispatcher;
     self._generateResponse();
   }
   sendFile(stream, fileName) {

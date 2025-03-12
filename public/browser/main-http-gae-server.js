@@ -383,7 +383,10 @@ Y88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r
       super(o);
       var self = this;
       self.body = "";
+      self.request = o.request;
       self.stream = o.stream;
+      self.headers = o.headers;
+      self.fileDispatcher = o.fileDispatcher;
       self._generateResponse();
       this.headers = {
         ":status": 200,
