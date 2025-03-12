@@ -24,11 +24,11 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 ));
 var import_common_pipelog = require("../common-pipelog.cjs");
 (async () => {
-  const fs = await import("node:fs");
-  const os = await import("node:os");
-  const { exec, execSync } = await import("node:child_process");
-  const { Package, BackendMicroservice, logger, CONFIG, Class } = await import("qcobjects");
-  const path = await import("node:path");
+  const fs = __toESM(require("node:fs"), true);
+  const os = __toESM(require("node:os"), true);
+  const { exec, execSync } = __toESM(require("node:child_process"), true);
+  const { Package, BackendMicroservice, logger, CONFIG, Class } = __toESM(require("qcobjects"), true);
+  const path = __toESM(require("node:path"), true);
   const absolutePath = path.resolve(__dirname, "./");
   const fixWinCmd = /* @__PURE__ */ __name(function(commandline) {
     if (!process.platform.toLowerCase().startsWith("win")) {

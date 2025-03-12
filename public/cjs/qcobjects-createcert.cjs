@@ -37,7 +37,7 @@ var import_qcobjects = require("qcobjects");
   const isMac = /* @__PURE__ */ __name(() => {
     return import_node_os.default.platform().toLowerCase().startsWith("darwin");
   }, "isMac");
-  const { execSync } = await import("node:child_process");
+  const { execSync } = __toESM(require("node:child_process"), true);
   class Main extends import_qcobjects.InheritClass {
     static {
       __name(this, "Main");

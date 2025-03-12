@@ -28,10 +28,10 @@ var import_main_http_server = require("./main-http-server.cjs");
 var import_main_http2_server = require("./main-http2-server.cjs");
 (async () => {
   "use strict";
-  const path = await import("path");
+  const path = __toESM(require("path"), true);
   const absolutePath = path.resolve(__dirname, "./");
-  await import("qcobjects");
-  const { CONFIG, InheritClass, New, logger } = await import("qcobjects");
+  __toESM(require("qcobjects"), true);
+  const { CONFIG, InheritClass, New, logger } = __toESM(require("qcobjects"), true);
   class Main extends InheritClass {
     static {
       __name(this, "Main");

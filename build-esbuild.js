@@ -160,13 +160,34 @@ const baseSettings = {
 
 const cjsSettings = {
     ...baseSettings,
-    outdir: "public/cjs", // Output dir
-    format: "cjs", // or "esm" depending on your module system    
-    platform: "node", // or "browser" depending on your target environment
+    outdir: "public/cjs",
+    format: "cjs",
+    platform: "node",
     outExtension: {
         ".js": ".cjs"
     },
     plugins: [
+        ignorePlugin,
+        {
+            name: 'transform-dynamic-imports',
+            setup(build) {
+                // Transform dynamic imports in the final output
+                build.onEnd(() => {
+                    const files = glob.sync('public/cjs/**/*.cjs');
+                    for (const file of files) {
+                        let content = readFileSync(file, 'utf8');
+                        
+                        // Transform dynamic imports to requires
+                        content = content.replace(
+                            /await\s+import\(['"]([^'"]+)['"]\)/g,
+                            '__toESM(require("$1"), true)'
+                        );
+                        
+                        writeFileSync(file, content, 'utf8');
+                    }
+                });
+            }
+        },
         {
             name: 'add-extensions',
             setup(build) {
