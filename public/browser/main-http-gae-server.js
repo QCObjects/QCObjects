@@ -392,6 +392,9 @@ Y88b.Y8b88PY88b  d88PY88b. .d88P888 d88P  888Y8b.    Y88b.   Y88b.      X88 \r
         self.request.pathname = self.request.pathname || defaultPath;
         self.request.scriptname = self.request.scriptname || import_qcobjects.CONFIG.get("documentRootFileIndex", "index.html");
       }
+      if (!import_qcobjects.CONFIG.get("documentRoot")) {
+        import_qcobjects.CONFIG.set("documentRoot", import_node_path.default.join(process.cwd(), "public"));
+      }
       self._generateResponse();
       this.headers = {
         ":status": 200,

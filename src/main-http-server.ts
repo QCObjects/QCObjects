@@ -260,6 +260,11 @@ class HTTPServerResponse extends InheritClass {
       self.request.scriptname = self.request.scriptname || CONFIG.get("documentRootFileIndex", "index.html");
     }
 
+    // Ensure documentRoot is set
+    if (!CONFIG.get("documentRoot")) {
+      CONFIG.set("documentRoot", path.join(process.cwd(), "public"));
+    }
+
     self._generateResponse();
   }
 

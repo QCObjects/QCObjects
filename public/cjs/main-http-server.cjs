@@ -262,6 +262,9 @@ class HTTPServerResponse extends import_qcobjects.InheritClass {
       self.request.pathname = self.request.pathname || defaultPath;
       self.request.scriptname = self.request.scriptname || import_qcobjects.CONFIG.get("documentRootFileIndex", "index.html");
     }
+    if (!import_qcobjects.CONFIG.get("documentRoot")) {
+      import_qcobjects.CONFIG.set("documentRoot", import_node_path.default.join(process.cwd(), "public"));
+    }
     self._generateResponse();
   }
   sendFile(stream, fileName) {
