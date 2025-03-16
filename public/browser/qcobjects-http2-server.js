@@ -32,22 +32,21 @@ var global = (() => {
       var import_defaultsettings = require("./defaultsettings");
       var import_main_http_server = require("./main-http-server");
       var import_main_http2_server = require("./main-http2-server");
+      var import_qcobjects = require("qcobjects");
       (async () => {
         "use strict";
         const path = await import("path");
         const absolutePath = path.resolve(__dirname, "./");
-        await import("qcobjects");
-        const { CONFIG, InheritClass, New, logger } = await import("qcobjects");
-        class Main extends InheritClass {
+        class Main extends import_qcobjects.InheritClass {
           static {
             __name(this, "Main");
           }
           constructor() {
             super();
-            const _ServerClass_ = CONFIG.get("useLegacyHTTP", false) ? import_main_http_server.HTTPServer : import_main_http2_server.HTTP2Server;
-            const app = New(_ServerClass_);
+            const _ServerClass_ = import_qcobjects.CONFIG.get("useLegacyHTTP", false) ? import_main_http_server.HTTPServer : import_main_http2_server.HTTP2Server;
+            const app = (0, import_qcobjects.New)(_ServerClass_);
             app.start();
-            logger.debug("initialized");
+            import_qcobjects.logger.debug("initialized");
           }
         }
         const __main__ = new Main();

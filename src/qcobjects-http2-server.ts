@@ -33,15 +33,14 @@
 import "./defaultsettings";
 import {HTTPServer} from "./main-http-server";
 import {HTTP2Server} from "./main-http2-server";
+import {getProjectPath} from "./defaultsettings";
+import { CONFIG, InheritClass, New, logger } from "qcobjects";
+
 
 (async () => {
   "use strict";
   const path = await import("path");
   const absolutePath = path.resolve(__dirname, "./");
-
-  await import("qcobjects");
-  const { CONFIG, InheritClass, New, logger } = await import("qcobjects");
-
 
   class Main extends InheritClass {
     constructor() {

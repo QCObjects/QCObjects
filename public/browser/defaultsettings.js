@@ -31,7 +31,8 @@ var global = (() => {
   var defaultsettings_exports = {};
   __export(defaultsettings_exports, {
     __get_version__: () => __get_version__,
-    __get_version_string__: () => __get_version_string__
+    __get_version_string__: () => __get_version_string__,
+    getProjectPath: () => getProjectPath
   });
   var import_qcobjects = require("qcobjects");
   var import_node_fs = require("node:fs");
@@ -67,20 +68,60 @@ var global = (() => {
     const version = __get_version__();
     return "QCObjects: v" + version.qcobjects + ", SDK: v" + version.sdk + ", CLI: v" + version.cli;
   }, "__get_version_string__");
+  const getProjectPath = /* @__PURE__ */ __name(() => {
+    return import_qcobjects2.CONFIG.get("projectPath", `${process.cwd()}/`);
+  }, "getProjectPath");
   (0, import_qcobjects2.Export)(__get_version__);
   (0, import_qcobjects2.Export)(__get_version_string__);
+  (0, import_qcobjects2.Export)(getProjectPath);
   const __load_default_settings__ = /* @__PURE__ */ __name(() => {
+    import_qcobjects2.CONFIG.set("domain", "$ENV(DOMAIN)");
+    import_qcobjects2.CONFIG.set("certificate_provider", "$ENV(CERTIFICATE_PROVIDER)");
+    import_qcobjects2.CONFIG.set("devmode", "$ENV(DEVMODE)");
+    import_qcobjects2.CONFIG.set("autodiscover", true);
+    import_qcobjects2.CONFIG.set("autodiscover_commands", true);
+    import_qcobjects2.CONFIG.set("autodiscover_handlers", true);
+    import_qcobjects2.CONFIG.set("documentRoot", "$config(projectPath)public/");
     import_qcobjects2.CONFIG.set("documentRootFileIndex", "index.html");
-    import_qcobjects2.CONFIG.set("projectPath", `${process.cwd()}/`);
+    import_qcobjects2.CONFIG.set("cacheControl", "max-age=31536000");
+    import_qcobjects2.CONFIG.set("relativeImportPath", "js/packages/");
+    import_qcobjects2.CONFIG.set("serverPortHTTP", "8080");
+    import_qcobjects2.CONFIG.set("serverPortHTTPS", "8443");
+    import_qcobjects2.CONFIG.set("useLocalSDK", true);
+    import_qcobjects2.CONFIG.set("useLegacyHTTP", false);
+    import_qcobjects2.CONFIG.set("private-key-pem", "$config(domain)-privkey.pem");
+    import_qcobjects2.CONFIG.set("private-cert-pem", "$config(domain)-cert.pem");
+    import_qcobjects2.CONFIG.set("enableShellCommands", true);
+    import_qcobjects2.CONFIG.set("OPENAI_API_KEY", "$ENV(OPENAI_API_KEY)");
+    const backend = {
+      db_engine: {
+        name: "$ENV(ENGINE_NAME)",
+        databaseName: "$ENV(DATABASE_NAME)"
+      },
+      auth: {
+        enabled: true,
+        defaultUser: "$ENV(DEFAULT_USER)",
+        defaultPasswd: "$ENV(DEFAULT_PASSWORD)",
+        microsoftapikey: "$ENV(MICROSOFT_API_KEY)",
+        googleapikey: "$ENV(GOOGLE_API_KEY)"
+      },
+      routes: []
+    };
+    import_qcobjects2.CONFIG.set("backend", backend);
+    const packageConfig = {
+      source: {
+        backend: "backend",
+        frontend: "src"
+      },
+      build: "build",
+      dist: "dist"
+    };
+    import_qcobjects2.CONFIG.set("package", packageConfig);
     import_qcobjects2.CONFIG.set("useConfigService", false);
-    import_qcobjects2.CONFIG.set("documentRoot", "./");
-    import_qcobjects2.CONFIG.set("serverPortHTTP", 80);
-    import_qcobjects2.CONFIG.set("serverPortHTTPS", 443);
-    import_qcobjects2.CONFIG.set("private-key-pem", "localhost-privkey.pem");
-    import_qcobjects2.CONFIG.set("private-cert-pem", "localhost-cert.pem");
+    import_qcobjects2.CONFIG.set("projectPath", `${process.cwd()}/`);
     import_qcobjects2.CONFIG.set("allowHTTP1", true);
     import_qcobjects2.CONFIG.set("useTemplate", false);
-    import_qcobjects2.CONFIG.set("domain", "localhost");
+    import_qcobjects2.CONFIG.set("useLegacyHTTP", false);
     const setDevMode = /* @__PURE__ */ __name((devmode) => {
       if (typeof devmode !== "undefined") {
         switch (true) {
@@ -130,14 +171,14 @@ var global = (() => {
       setDevMode(import_qcobjects2.CONFIG.get("devmode", ""));
       if (typeof import_qcobjects2.CONFIG.get("backend") !== "undefined") {
         import_qcobjects2.global.set("backendAvailable", true);
-        if (typeof import_qcobjects2.CONFIG.get("basePath") !== "undefined") {
-          import_qcobjects2.logger.debug(`Changing the current directory: ${process.cwd()}`);
-          try {
-            process.chdir(import_qcobjects2.CONFIG.get("basePath"));
-            import_qcobjects2.logger.debug(`New directory: ${process.cwd()}`);
-          } catch (err) {
-            import_qcobjects2.logger.warn(`It was impossible to change the current chdir: ${err}`);
-          }
+      }
+      if (typeof import_qcobjects2.CONFIG.get("basePath") !== "undefined") {
+        import_qcobjects2.logger.debug(`Changing the current directory: ${process.cwd()}`);
+        try {
+          process.chdir(import_qcobjects2.CONFIG.get("basePath"));
+          import_qcobjects2.logger.debug(`New directory: ${process.cwd()}`);
+        } catch (err) {
+          import_qcobjects2.logger.warn(`It was impossible to change the current chdir: ${err}`);
         }
       }
     } catch (e) {
@@ -145,19 +186,19 @@ var global = (() => {
       import_qcobjects2.logger.debug("Something went wrong trying to load config.json file in your project");
     }
     (async function() {
-      const projectPath = import_qcobjects2.CONFIG.get("projectPath", `${process.cwd()}/`);
+      const projectPath = getProjectPath();
       const loadDefaultRoutes = /* @__PURE__ */ __name(async () => {
         return await new Promise((resolve, reject) => {
           const sdkPath = import_node_path.default.resolve((0, import_qcobjects2.findPackageNodePath)("qcobjects-sdk"), "qcobjects-sdk");
           const qcobjectsPath = import_node_path.default.resolve((0, import_qcobjects2.findPackageNodePath)("qcobjects"), "qcobjects");
-          let backend = import_qcobjects2.CONFIG.get("backend");
-          if (typeof backend === "undefined") {
-            backend = {};
+          let backend2 = import_qcobjects2.CONFIG.get("backend");
+          if (typeof backend2 === "undefined") {
+            backend2 = {};
           }
-          if (typeof backend.routes === "undefined") {
-            backend.routes = [];
+          if (typeof backend2.routes === "undefined") {
+            backend2.routes = [];
           }
-          backend.routes = backend.routes.concat([
+          backend2.routes = backend2.routes.concat([
             {
               "name": "QCObjects.js",
               "description": "Redirection of QCObjects.js",
@@ -192,7 +233,7 @@ var global = (() => {
               }
             }
           ]);
-          import_qcobjects2.CONFIG.set("backend", backend);
+          import_qcobjects2.CONFIG.set("backend", backend2);
           resolve();
         });
       }, "loadDefaultRoutes");
@@ -240,11 +281,11 @@ var global = (() => {
         };
       })();
       const setBackendValue = /* @__PURE__ */ __name((name, value) => {
-        const backend = import_qcobjects2.CONFIG.get("backend", {});
+        const backend2 = import_qcobjects2.CONFIG.get("backend", {});
         if (typeof value !== "undefined") {
-          backend[name] = value;
+          backend2[name] = value;
         }
-        import_qcobjects2.CONFIG.set("backend", backend);
+        import_qcobjects2.CONFIG.set("backend", backend2);
       }, "setBackendValue");
       const dependencies = /* @__PURE__ */ (() => {
         let deps = [];

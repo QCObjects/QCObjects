@@ -26,22 +26,21 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 var import_defaultsettings = require("./defaultsettings.cjs");
 var import_main_http_server = require("./main-http-server.cjs");
 var import_main_http2_server = require("./main-http2-server.cjs");
+var import_qcobjects = require("qcobjects");
 (async () => {
   "use strict";
   const path = __toESM(require("path"), true);
   const absolutePath = path.resolve(__dirname, "./");
-  __toESM(require("qcobjects"), true);
-  const { CONFIG, InheritClass, New, logger } = __toESM(require("qcobjects"), true);
-  class Main extends InheritClass {
+  class Main extends import_qcobjects.InheritClass {
     static {
       __name(this, "Main");
     }
     constructor() {
       super();
-      const _ServerClass_ = CONFIG.get("useLegacyHTTP", false) ? import_main_http_server.HTTPServer : import_main_http2_server.HTTP2Server;
-      const app = New(_ServerClass_);
+      const _ServerClass_ = import_qcobjects.CONFIG.get("useLegacyHTTP", false) ? import_main_http_server.HTTPServer : import_main_http2_server.HTTP2Server;
+      const app = (0, import_qcobjects.New)(_ServerClass_);
       app.start();
-      logger.debug("initialized");
+      import_qcobjects.logger.debug("initialized");
     }
   }
   const __main__ = new Main();

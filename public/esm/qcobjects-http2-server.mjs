@@ -8,14 +8,13 @@ var __commonJS = (cb, mod) => function __require() {
 import "./defaultsettings.mjs";
 import { HTTPServer } from "./main-http-server.mjs";
 import { HTTP2Server } from "./main-http2-server.mjs";
+import { CONFIG, InheritClass, New, logger } from "qcobjects";
 var require_qcobjects_http2_server = __commonJS({
   "src/qcobjects-http2-server.ts"() {
     (async () => {
       "use strict";
       const path = await import("path");
       const absolutePath = path.resolve(__dirname, "./");
-      await import("qcobjects");
-      const { CONFIG, InheritClass, New, logger } = await import("qcobjects");
       class Main extends InheritClass {
         static {
           __name(this, "Main");

@@ -101,6 +101,7 @@ declare module "defaultsettings" {
         cli: any;
     };
     export const __get_version_string__: () => string;
+    export const getProjectPath: () => any;
 }
 declare module "cli-main" {
     import "qcobjects";
