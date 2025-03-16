@@ -178,7 +178,7 @@ declare module "cli-commands-version" {
 }
 declare module "collab-server" {
     /**
-     * QCObjects CLI 2.4.x
+     * QCObjects CLI 2.5
      * ________________
      *
      * Author: Jean Machuca <correojean@gmail.com>
@@ -348,7 +348,7 @@ declare module "qcobjects-http-server" {
 }
 declare module "qcobjects-http2-server" {
     /**
-     * QCObjects CLI 2.4.x
+     * QCObjects CLI 2.5
      * ________________
      *
      * Author: Jean Machuca <correojean@gmail.com>
