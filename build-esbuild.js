@@ -2,11 +2,13 @@ const esbuild = require("esbuild");
 const alias = require("esbuild-plugin-alias");
 const path = require("node:path");
 const { readFileSync, writeFileSync } = require("node:fs");
-const fs = require("node:fs").promises;
+const fs = require("node:fs/promises");
 const glob = require("glob");
 
+const externalPackages = ["node:fs", "node:path", "node:os", "node:util", "node:events", "node:stream", "node:http", "node:https", "node:crypto", "node:zlib", "node:buffer", "node:url", "node:querystring", "node:child_process", "node:cluster", "node:dgram", "node:dns", "node:net", "node:readline", "node:repl", "node:tls", "node:tty", "node:vm", "node:worker_threads"];
+
 // Function to detect and add the extension
-const nameToExtension = (name, ext) => {
+const nameToExtension = (name, ext, settings) => {
     function isPackage(name) {
       // Simple check to determine if the name is a package
       // This can be enhanced based on your specific needs
@@ -14,7 +16,36 @@ const nameToExtension = (name, ext) => {
     }
   
     const hasExtension = /\.[^/\\]+$/.test(name);
-    if (!hasExtension && !isPackage(name)) {
+    const isExternalPackage = name.startsWith("qcobjects") || 
+                            name.startsWith("qcobjects-sdk") ||
+                            name.startsWith("node:") ||
+                            name.startsWith("fs") ||
+                            name.startsWith("path") ||
+                            name.startsWith("os") ||
+                            name.startsWith("util") ||
+                            name.startsWith("events") ||
+                            name.startsWith("stream") ||
+                            name.startsWith("http") ||
+                            name.startsWith("https") ||
+                            name.startsWith("crypto") ||
+                            name.startsWith("zlib") ||
+                            name.startsWith("buffer") ||
+                            name.startsWith("url") ||
+                            name.startsWith("querystring") ||
+                            name.startsWith("child_process") ||
+                            name.startsWith("cluster") ||
+                            name.startsWith("dgram") ||
+                            name.startsWith("dns") ||
+                            name.startsWith("net") ||
+                            name.startsWith("readline") ||
+                            name.startsWith("repl") ||
+                            name.startsWith("tls") ||
+                            name.startsWith("tty") ||
+                            name.startsWith("vm") ||
+                            name.startsWith("worker_threads")
+                            || externalPackages.includes(name);
+    
+    if (!hasExtension && !isPackage(name) && !isExternalPackage) {
       name += ext;
     }
   
@@ -22,16 +53,16 @@ const nameToExtension = (name, ext) => {
   };
   
   // Function to add .cjs and .mjs extensions to import/export/require statements
-  const addExtensions = (filePath, toExt) => {
+  const addExtensions = (filePath, toExt, settings) => {
     const content = readFileSync(filePath, 'utf8');
     const updatedContent = content.replace(/(from\s+['"])(.*?)(['"])/g, (match, p1, p2, p3) => {
-      return `${p1}${nameToExtension(p2, toExt)}${p3}`;
+      return `${p1}${nameToExtension(p2, toExt, settings)}${p3}`;
     }).replace(/(import\s+['"])(.*?)(['"])/g, (match, p1, p2, p3) => {
-      return `${p1}${nameToExtension(p2, toExt)}${p3}`;
+      return `${p1}${nameToExtension(p2, toExt, settings)}${p3}`;
     }).replace(/(export\s+['"])(.*?)(['"])/g, (match, p1, p2, p3) => {
-      return `${p1}${nameToExtension(p2, toExt)}${p3}`;
+      return `${p1}${nameToExtension(p2, toExt, settings)}${p3}`;
     }).replace(/(require\s*\(\s*['"])(.*?)(['"]\s*\))/g, (match, p1, p2, p3) => {
-      return `${p1}${nameToExtension(p2, toExt)}${p3}`;
+      return `${p1}${nameToExtension(p2, toExt, settings)}${p3}`;
     });
     writeFileSync(filePath, updatedContent, 'utf8');
   };
@@ -194,7 +225,7 @@ const cjsSettings = {
                 build.onEnd(() => {
                     entryPoints.forEach(entry => {
                         const outputFilePath = path.join('./public/cjs', entry.replace('src/', '').replace('.ts', '.cjs'));
-                        addExtensions(outputFilePath, '.cjs');
+                        addExtensions(outputFilePath, '.cjs', cjsSettings);
                     });
                 });
             }
@@ -212,12 +243,33 @@ const esmSettings = {
     },
     plugins: [
         {
+            name: 'transform-requires',
+            setup(build) {
+                build.onEnd(() => {
+                    const files = glob.sync('public/esm/**/*.mjs');
+                    for (const file of files) {
+                        let content = readFileSync(file, 'utf8');
+                        // Transform require statements to dynamic imports
+                        content = content.replace(
+                            /const\s+{([^}]+)}\s*=\s*require\(['"]([^'"]+)['"]\)/g,
+                            'import { $1 } from "$2"'
+                        );
+                        content = content.replace(
+                            /const\s+([^=]+)\s*=\s*require\(['"]([^'"]+)['"]\)/g,
+                            'import $1 from "$2"'
+                        );
+                        writeFileSync(file, content, 'utf8');
+                    }
+                });
+            }
+        },
+        {
             name: 'add-extensions',
             setup(build) {
                 build.onEnd(() => {
                     entryPoints.forEach(entry => {
                         const outputFilePath = path.join('./public/esm', entry.replace('src/', '').replace('.ts', '.mjs'));
-                        addExtensions(outputFilePath, '.mjs');
+                        addExtensions(outputFilePath, '.mjs', esmSettings);
                     });
                 });
             }

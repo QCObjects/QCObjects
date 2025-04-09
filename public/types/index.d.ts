@@ -25,6 +25,18 @@ declare module "api-client_services" {
         fail(e: any): void;
     }
 }
+declare module "cli-commands-build-esbuild" {
+    import { InheritClass } from "qcobjects";
+    export class CommandHandler extends InheritClass {
+        choiceOption: {
+            [x: string]: any;
+            build_esbuild: () => Promise<void>;
+        };
+        constructor({ switchCommander }: {
+            switchCommander: any;
+        });
+    }
+}
 declare module "cli-commands-build-typescript" {
     import { InheritClass } from "qcobjects";
     export class CommandHandler extends InheritClass {
@@ -105,6 +117,7 @@ declare module "cli-commands" {
     export * as jiraCommand from "cli-commands-jira";
     export * as publishStatic from "cli-commands-publish-static";
     export * as buildTypescript from "cli-commands-build-typescript";
+    export * as buildEsbuild from "cli-commands-build-esbuild";
 }
 declare module "defaultsettings" {
     import "qcobjects";

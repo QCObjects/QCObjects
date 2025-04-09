@@ -29,6 +29,7 @@ var global = (() => {
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
   var cli_commands_exports = {};
   __export(cli_commands_exports, {
+    buildEsbuild: () => buildEsbuild,
     buildTypescript: () => buildTypescript,
     jiraCommand: () => jiraCommand,
     publishStatic: () => publishStatic,
@@ -38,6 +39,7 @@ var global = (() => {
   var jiraCommand = __toESM(require("./cli-commands-jira"));
   var publishStatic = __toESM(require("./cli-commands-publish-static"));
   var buildTypescript = __toESM(require("./cli-commands-build-typescript"));
+  var buildEsbuild = __toESM(require("./cli-commands-build-esbuild"));
   return __toCommonJS(cli_commands_exports);
 })();
 //# sourceMappingURL=cli-commands.js.map

@@ -28,6 +28,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var cli_commands_exports = {};
 __export(cli_commands_exports, {
+  buildEsbuild: () => buildEsbuild,
   buildTypescript: () => buildTypescript,
   jiraCommand: () => jiraCommand,
   publishStatic: () => publishStatic,
@@ -38,8 +39,10 @@ var versionCommand = __toESM(require("./cli-commands-version.cjs"));
 var jiraCommand = __toESM(require("./cli-commands-jira.cjs"));
 var publishStatic = __toESM(require("./cli-commands-publish-static.cjs"));
 var buildTypescript = __toESM(require("./cli-commands-build-typescript.cjs"));
+var buildEsbuild = __toESM(require("./cli-commands-build-esbuild.cjs"));
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  buildEsbuild,
   buildTypescript,
   jiraCommand,
   publishStatic,
