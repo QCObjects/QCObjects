@@ -24,7 +24,7 @@
     "./*.cjs": "./public/cjs/*.cjs",
     "./*.mjs": "./public/esm/*.mjs",
     "./*": {
-      "types": "./public/types/*.d.ts",
+      "types": "./public/types/index.d.ts",
       "deno": "./mod.ts",
       "require": "./public/cjs/*.cjs",
       "import": "./public/esm/*.mjs",

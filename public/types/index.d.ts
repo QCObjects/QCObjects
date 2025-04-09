@@ -25,6 +25,18 @@ declare module "api-client_services" {
         fail(e: any): void;
     }
 }
+declare module "cli-commands-build-typescript" {
+    import { InheritClass } from "qcobjects";
+    export class CommandHandler extends InheritClass {
+        choiceOption: {
+            [x: string]: any;
+            build_typescript: (configFile: string) => void;
+        };
+        constructor({ switchCommander }: {
+            switchCommander: any;
+        });
+    }
+}
 declare module "client_services" {
     import { Service } from "qcobjects";
     export class JiraCloud extends Service {
@@ -92,6 +104,7 @@ declare module "cli-commands" {
     export * as versionCommand from "cli-commands-version";
     export * as jiraCommand from "cli-commands-jira";
     export * as publishStatic from "cli-commands-publish-static";
+    export * as buildTypescript from "cli-commands-build-typescript";
 }
 declare module "defaultsettings" {
     import "qcobjects";
@@ -379,4 +392,3 @@ declare module "qcobjects-shell" {
 }
 declare module "backend/backend-microservice-static" { }
 declare module "backend/backend-php" { }
-//# sourceMappingURL=index.d.ts.map
