@@ -56,7 +56,7 @@ const addExtensions = (filePath, toExt, settings) => {
 
 // Common build settings
 const baseSettings = {
-  entryPoints: glob.sync('src/**/*.ts'),
+  entryPoints: glob.sync('src/**/*.ts').map(file => path.resolve(file)),
   bundle: false,
   target: ["node22"],
   tsconfig: "tsconfig.json",
@@ -71,24 +71,24 @@ const baseSettings = {
       name: 'transform-qcobjects-imports',
       setup(build) {
         build.onResolve({ filter: /^(qcobjects|qcobjects-sdk)$/ }, args => ({
-          path: args.path,
+          path: path.resolve(args.path),
           namespace: args.kind === 'dynamic-import' ? 'qcobjects-transform' : undefined,
           external: args.kind !== 'dynamic-import'
         }));
 
         build.onResolve({ filter: /.*/, namespace: 'file' }, args => ({
           external: args.kind === 'dynamic-import',
-          path: args.path
+          path: path.resolve(args.path)
         }));
 
         build.onLoad({ filter: /.*/, namespace: 'qcobjects-transform' }, args => ({
-          contents: `module.exports = __toESM(require("${args.path}"), true);`,
+          contents: `module.exports = __toESM(require("${path.resolve(args.path)}"), true);`,
           loader: 'js'
         }));
       }
     },
     alias({
-      "types": path.join(__dirname, "src/types/global/index.d.ts")
+      "types": path.resolve(__dirname, "src/types/global/index.d.ts")
     })
   ]
 };

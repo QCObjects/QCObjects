@@ -1,0 +1,25 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Collaboration Features
+
+## Overview
+The project includes real-time collaboration features implemented through:
+- Core collab functionality: [src/qcobjects-collab.ts](mdc:src/qcobjects-collab.ts)
+- Collab server implementation: [src/collab-server.ts](mdc:src/collab-server.ts)
+
+## Client Services
+Client-side services are managed through:
+- Main services: [src/client_services.ts](mdc:src/client_services.ts)
+- API client services: [src/api-client_services.ts](mdc:src/api-client_services.ts)
+
+## Enterprise Features
+Enterprise-specific commands and features:
+- Enterprise commands: [src/enterprise-commands.ts](mdc:src/enterprise-commands.ts)
+- JIRA integration: [src/cli-commands-jira.ts](mdc:src/cli-commands-jira.ts)
+
+## Security
+- Certificate creation utilities: [src/qcobjects-createcert.ts](mdc:src/qcobjects-createcert.ts)
+- Key generation script: [generatekeys.sh](mdc:generatekeys.sh)
