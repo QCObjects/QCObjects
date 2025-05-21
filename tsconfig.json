@@ -20,7 +20,7 @@
     "module": "NodeNext",
     "rootDir": "./src",
     "allowJs": true,
-    "outDir": "build",
+    "outDir": "public/cjs",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "baseUrl": ".",

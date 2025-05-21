@@ -204,7 +204,7 @@ const copyDir = async (source, dest, exclude = []) => {
 
     // Run builds in parallel
     await Promise.all([
-      esbuild.build(buildConfigs.cjs),
+//      esbuild.build(buildConfigs.cjs),
       esbuild.build(buildConfigs.esm),
       esbuild.build(buildConfigs.browser)
     ]);
