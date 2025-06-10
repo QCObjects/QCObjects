@@ -13,7 +13,7 @@
       "deno": "./mod.ts",
       "require": "./public/cjs/index.cjs",
       "import": "./public/esm/index.mjs",
-      "default": "./public/esm/index.mjs"
+      "default": "./public/cjs/index.cjs"
     },
     "./types/*": "./types/*",
     "./package.json": "./package.json",
