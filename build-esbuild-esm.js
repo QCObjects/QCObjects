@@ -95,31 +95,6 @@ const baseSettings = {
 
 // Build settings for different formats
 const buildConfigs = {
-  cjs: {
-    ...baseSettings,
-    outdir: "public/cjs",
-    format: "cjs",
-    platform: "node",
-    outExtension: { ".js": ".cjs" },
-    plugins: [
-      ...baseSettings.plugins,
-      {
-        name: 'transform-dynamic-imports',
-        setup(build) {
-          build.onEnd(() => {
-            glob.sync('public/cjs/**/*.cjs').forEach(file => {
-              let content = readFileSync(file, 'utf8');
-              content = content.replace(
-                /await\s+import\(['"]([^'"]+)['"]\)/g,
-                '__toESM(require("$1"), true)'
-              );
-              writeFileSync(file, content, 'utf8');
-            });
-          });
-        }
-      }
-    ]
-  },
   esm: {
     ...baseSettings,
     outdir: "public/esm",
@@ -143,13 +118,6 @@ const buildConfigs = {
         }
       }
     ]
-  },
-  browser: {
-    ...baseSettings,
-    outdir: "public/browser",
-    format: "iife",
-    platform: "browser",
-    outExtension: { ".js": ".js" }
   }
 };
 
@@ -204,9 +172,7 @@ const copyDir = async (source, dest, exclude = []) => {
 
     // Run builds in parallel
     await Promise.all([
-//      esbuild.build(buildConfigs.cjs),
-      esbuild.build(buildConfigs.esm),
-      esbuild.build(buildConfigs.browser)
+      esbuild.build(buildConfigs.esm)
     ]);
   } catch (error) {
     logError(error);

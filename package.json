@@ -2,7 +2,7 @@
   "name": "qcobjects-cli",
   "version": "2.5.143-beta",
   "description": "qcobjects cli command line tool",
-  "main": "public/cjs/index.cjs",
+  "main": "public/cjs/index.js",
   "module": "public/esm/index.mjs",
   "browser": "public/browser/index.js",
   "type": "commonjs",
@@ -11,9 +11,9 @@
     ".": {
       "types": "./public/types/index.d.ts",
       "deno": "./mod.ts",
-      "require": "./public/cjs/index.cjs",
+      "require": "./public/cjs/index.js",
       "import": "./public/esm/index.mjs",
-      "default": "./public/cjs/index.cjs"
+      "default": "./public/cjs/index.js"
     },
     "./types/*": "./types/*",
     "./package.json": "./package.json",
@@ -21,67 +21,67 @@
     "./tsconfig.d.json": "./tsconfig.d.json",
     "./tsconfig.jasmine.json": "./tsconfig.jasmine.json",
     "./*.js": "./public/*.js",
-    "./*.cjs": "./public/cjs/*.cjs",
+    "./*.cjs": "./public/cjs/*.js",
     "./*.mjs": "./public/esm/*.mjs",
     "./*": {
       "types": "./public/types/index.d.ts",
       "deno": "./mod.ts",
-      "require": "./public/cjs/*.cjs",
+      "require": "./public/cjs/*.js",
       "import": "./public/esm/*.mjs",
-      "default": "./public/esm/*.mjs"
+      "default": "./public/cjs/*.js"
     },
     "./qcobjects-collab": {
-      "require": "./public/cjs/qcobjects-collab.cjs",
+      "require": "./public/cjs/qcobjects-collab.js",
       "import": "./public/esm/qcobjects-collab.mjs"
     },
     "./qcobjects-cli": {
-      "require": "./public/cjs/qcobjects-cli.cjs",
+      "require": "./public/cjs/qcobjects-cli.js",
       "import": "./public/mjs/qcobjects-cli.mjs"
     },
     "./qcobjects-createcert": {
-      "require": "./public/cjs/qcobjects-createcert.cjs",
+      "require": "./public/cjs/qcobjects-createcert.js",
       "import": "./public/mjs/qcobjects-createcert.mjs"
     },
     "./createcert": {
-      "require": "./public/cjs/qcobjects-createcert.cjs",
+      "require": "./public/cjs/qcobjects-createcert.js",
       "import": "./public/mjs/qcobjects-createcert.mjs"
     },
     "./qcobjects-gae-http-server": {
-      "require": "./public/cjs/qcobjects-gae-http-server.cjs",
+      "require": "./public/cjs/qcobjects-gae-http-server.js",
       "import": "./public/mjs/qcobjects-gae-http-server.mjs"
     },
     "./qcobjects-http-server": {
-      "require": "./public/cjs/qcobjects-http-server.cjs",
+      "require": "./public/cjs/qcobjects-http-server.js",
       "import": "./public/mjs/qcobjects-http-server.mjs"
     },
     "./qcobjects-http2-server": {
-      "require": "./public/cjs/qcobjects-http2-server.cjs",
+      "require": "./public/cjs/qcobjects-http2-server.js",
       "import": "./public/mjs/qcobjects-http2-server.mjs"
     },
     "./qcobjects-shell": {
-      "require": "./public/cjs/qcobjects-shell.cjs",
+      "require": "./public/cjs/qcobjects-shell.js",
       "import": "./public/mjs/qcobjects-shell.mjs"
     },
     "./defaultsettings": {
-      "require": "./public/cjs/defaultsettings.cjs",
+      "require": "./public/cjs/defaultsettings.js",
       "import": "./public/esm/defaultsettings.mjs"
     },
     "./com.qcobjects.cli.commands": {
-      "require": "./public/cjs/cli-commands.cjs",
+      "require": "./public/cjs/cli-commands.js",
       "import": "./public/esm/cli-commands.mjs"
     },
     "./cli-commands": {
-      "require": "./public/cjs/cli-commands.cjs",
+      "require": "./public/cjs/cli-commands.js",
       "import": "./public/esm/cli-commands.mjs"
     }
   },
   "license": "LGPL-3.0",
   "scripts": {
-    "build": "npm run build:ts-types && npm run build:ts && npm run build:browser",
+    "build": "npm run build:ts-types && npm run build:ts && npm run build:esbuild",
     "build:ts": "npm test && node ./transpile.js tsconfig.json",
     "build:ts-types": "node ./transpile.js tsconfig.d.json",
     "build:browser": "npm run build:esbuild",
-    "build:esbuild": "node ./build-esbuild.js",
+    "build:esbuild": "node ./build-esbuild-esm.js",
     "start": "qcobjects-shell",
     "test:ts-types": "node ./transpile.js ./tsconfig.jasmine.json",
     "test:jasmine": "npm run test:ts-types && npx ts-node --project ./tsconfig.jasmine.json ./node_modules/jasmine/bin/jasmine",
@@ -136,16 +136,16 @@
   },
   "homepage": "https://qcobjects.dev",
   "bin": {
-    "qco": "./public/cjs/qcobjects-cli.cjs",
-    "qcobjects": "./public/cjs/qcobjects-cli.cjs",
-    "qcobjects-cli": "./public/cjs/qcobjects-cli.cjs",
-    "qcobjects-server": "./public/cjs/qcobjects-http2-server.cjs",
-    "qcobjects-http2-server": "./public/cjs/qcobjects-http2-server.cjs",
-    "qcobjects-shell": "./public/cjs/qcobjects-shell.cjs",
-    "qcobjects-createcert": "./public/cjs/qcobjects-createcert.cjs",
-    "qcobjects-gae-server": "./public/cjs/qcobjects-gae-http-server.cjs",
-    "qcobjects-http-server": "./public/cjs/qcobjects-http-server.cjs",
-    "qcobjects-collab": "./public/cjs/qcobjects-collab.cjs"
+    "qco": "./public/cjs/qcobjects-cli.js",
+    "qcobjects": "./public/cjs/qcobjects-cli.js",
+    "qcobjects-cli": "./public/cjs/qcobjects-cli.js",
+    "qcobjects-server": "./public/cjs/qcobjects-http2-server.js",
+    "qcobjects-http2-server": "./public/cjs/qcobjects-http2-server.js",
+    "qcobjects-shell": "./public/cjs/qcobjects-shell.js",
+    "qcobjects-createcert": "./public/cjs/qcobjects-createcert.js",
+    "qcobjects-gae-server": "./public/cjs/qcobjects-gae-http-server.js",
+    "qcobjects-http-server": "./public/cjs/qcobjects-http-server.js",
+    "qcobjects-collab": "./public/cjs/qcobjects-collab.js"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^2.1.4",
