@@ -35,6 +35,81 @@ To start|stop|prestart the service:
 > service qcobjects restart
 ```
 
+## Synced Semantic Versioning
+
+Version management is handled through the `VERSION` file at the project root. Commands read from and write to this file, and can optionally sync changes to `package.json` and git.
+
+### `v-patch [filename]`
+
+Bumps the patch number (e.g., `1.2.3` → `1.2.4`). Default filename is `VERSION`.
+
+| Option | Alias | Description |
+|--------|-------|-------------|
+| `--sync-git` | `--git` | Commit changes, tag, and push to git |
+| `--sync-npm` | `--npm` | Also update `package.json` via `npm version` (implies `--git`) |
+| `--commit-msg [message]` | `-m` | Custom commit message |
+
+```shell
+# Just bump the VERSION file
+qcobjects v-patch
+
+# Bump, commit, tag, and push
+qcobjects v-patch --git -m "fix: resolve timeout issue"
+
+# Bump VERSION + package.json, commit, tag, push
+qcobjects v-patch --git --npm
+```
+
+### `v-minor [filename]`
+
+Bumps the minor number (e.g., `1.2.3` → `1.3.0`). Supports the same options as `v-patch`.
+
+```shell
+qcobjects v-minor --git -m "feat: add collaboration endpoints"
+```
+
+### `v-major [filename]`
+
+Bumps the major number (e.g., `1.2.3` → `2.0.0`). Supports the same options as `v-patch`.
+
+```shell
+qcobjects v-major --git --npm -m "breaking: migrate to new API"
+```
+
+### `v-sync [filename]`
+
+Reads the current version from `git describe` (latest tag), writes it to the `VERSION` file, updates `package.json` with `npm version`, commits, tags, and pushes.
+
+| Option | Description |
+|--------|-------------|
+| `-m, --commit-msg [message]` | Commit message (default: `Synced Version v<version>`) |
+
+```shell
+qcobjects v-sync -m "sync after release merge"
+```
+
+### `v-changelog`
+
+Generates a changelog from annotated git tags, grouped by minor version, printed to stdout.
+
+```shell
+qcobjects v-changelog > CHANGELOG.md
+```
+
+### Typical workflow
+
+```shell
+# 1. Bump the patch version and push everything
+qcobjects v-patch --git --npm -m "your message"
+
+# 2. CI publishes the new version to npm
+
+# 3. Generate changelog for release notes
+qcobjects v-changelog > CHANGELOG.md
+```
+
+---
+
 ```shell
    .d88888b.  .d8888b.  .d88888b. 888       d8b                888
   d88P" "Y88bd88P  Y88bd88P" "Y88b888       Y8P                888
