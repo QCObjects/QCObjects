@@ -36,10 +36,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          registry-url: https://registry.npmjs.org/
       - name: Upgrade npm for OIDC support (requires >=11.5.1)
         run: npm install -g npm@latest
-      - name: Clear auth token so npm falls back to OIDC
-        run: npm config delete "//registry.npmjs.org/:_authToken"
       - run: npm i --legacy-peer-deps
       - run: npm publish
