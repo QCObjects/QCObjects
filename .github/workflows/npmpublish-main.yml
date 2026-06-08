@@ -10,6 +10,7 @@ on:
 
 jobs:
   build:
+    if: ${{ !contains(github.ref, '-') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,6 +25,7 @@ jobs:
 
   publish-npm:
     needs: build
+    if: ${{ !contains(github.ref, '-') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
