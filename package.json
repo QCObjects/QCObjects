@@ -100,15 +100,6 @@
     "tree": "tree -d --gitignore",
     "generate-readme-pdf": "(npx -y markdown-pdf --paper-format \"Letter\" -o README.pdf README.md && npx markdown-pdf --paper-format \"Letter\" -o README-es.pdf README-es.md) && npm uninstall markdown-pdf"
   },
-  "dependencies": {
-    "commander": "^10.0.1",
-    "mime": "^2.6.0",
-    "yaml": "^2.6.0"
-  },
-  "peerDependencies": {
-    "qcobjects": "^2.5.142-beta",
-    "qcobjects-sdk": ">=2.5.101-beta"
-  },
   "repository": {
     "type": "file",
     "url": "https://gitlab.com/api/v4/projects/12435344/repository/archive?private_token=Wys-MPRmB1sSFn3eeX84"
@@ -146,6 +137,15 @@
     "qcobjects-gae-server": "./public/cjs/qcobjects-gae-http-server.js",
     "qcobjects-http-server": "./public/cjs/qcobjects-http-server.js",
     "qcobjects-collab": "./public/cjs/qcobjects-collab.js"
+  },
+  "dependencies": {
+    "commander": "^10.0.1",
+    "mime": "^2.6.0",
+    "yaml": "^2.6.0"
+  },
+  "peerDependencies": {
+    "qcobjects": "^2.5.142-beta",
+    "qcobjects-sdk": ">=2.5.101-beta"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^2.1.4",
