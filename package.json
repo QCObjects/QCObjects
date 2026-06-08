@@ -89,7 +89,7 @@
     "lint": "(npx -y eslint src/**/*.ts --fix )",
     "preversion": "npm cache verify && npm test",
     "sync": "git add . && git commit -am ",
-    "postversion": "git push && git push --tags",
+    "postversion": "git push",
     "v-patch": "qcobjects v-patch",
     "v-minor": "qcobjects v-minor",
     "v-major": "qcobjects v-major",

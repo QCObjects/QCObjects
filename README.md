@@ -108,6 +108,37 @@ qcobjects v-patch --git --npm -m "your message"
 qcobjects v-changelog > CHANGELOG.md
 ```
 
+### CI Pipeline Considerations
+
+When using `v-patch --git --npm`, the command calls `npm version` internally. This triggers the `preversion` and `postversion` scripts in your `package.json`:
+
+- **`preversion`** — runs before the version bump (e.g., tests)
+- **`postversion`** — runs after the bump (e.g., `git push && git push --tags`)
+
+After `npm version` finishes, `syncGit` creates a second commit for the `VERSION` file and calls `git push && git push --tags` again. This means the version tag is pushed **twice**, which can trigger duplicate CI pipeline runs.
+
+#### Recommendations by setup
+
+| Setup | Recommendation |
+|-------|---------------|
+| **GitHub Actions** (tag-triggered publish) | Set `postversion` to only push the branch: `"postversion": "git push"` |
+| **GitLab CI / other CI** | Keep `"postversion": "git push && git push --tags"` — duplicate triggers are harmless |
+| **Manual publish only** | Use `--git` without `--npm` to skip `npm version` entirely (no lifecycle scripts run) |
+
+#### Avoid duplicates with `v-patch --git` (no `--npm`)
+
+Without `--npm`, `npm version` is never called. Only the `VERSION` file is committed, a single tag is created, and a single `git push && git push --tags` runs. No duplicate tag push, no duplicate CI.
+
+#### Example: qcobjects-cli
+
+This repo uses GitHub Actions and configures `postversion` to push the branch only:
+
+```json
+"postversion": "git push"
+```
+
+The tag is still pushed once by `syncGit` after the `VERSION` file is committed.
+
 ---
 
 ```shell
