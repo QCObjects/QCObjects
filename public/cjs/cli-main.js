@@ -217,26 +217,28 @@ class SwitchCommander extends qcobjects_1.InheritClass {
         super();
         this.program = commander_1.default;
     }
-    shellCommands(_shell_commands) {
-        return new Promise(function (resolve_all, reject_all) {
-            var _promises_set = _shell_commands.map(function (shell_command) {
-                return (new Promise(function (resolve, reject) {
-                    qcobjects_1.logger.debug(shell_command);
-                    (0, node_child_process_1.exec)(shell_command, (err, stdout, stderr) => {
-                        if (!err) {
-                            resolve(stdout);
-                        }
-                        else {
-                            qcobjects_1.logger.debug(`[FAILED]: ${shell_command}`);
-                            qcobjects_1.logger.debug(`${stderr}`);
-                            reject(stderr);
-                        }
-                    }).stdout?.on("data", function (data) {
-                        qcobjects_1.logger.info(data);
-                    });
-                })).catch(e => reject_all(e));
+    async shellCommands(_shell_commands) {
+        const results = [];
+        for (const shell_command of _shell_commands) {
+            const result = await new Promise((resolve, reject) => {
+                qcobjects_1.logger.debug(shell_command);
+                const child = (0, node_child_process_1.exec)(shell_command, (err, stdout, stderr) => {
+                    if (!err) {
+                        resolve(stdout);
+                    }
+                    else {
+                        qcobjects_1.logger.debug(`[FAILED]: ${shell_command}`);
+                        qcobjects_1.logger.debug(`${stderr}`);
+                        reject(stderr);
+                    }
+                });
+                child.stdout?.on("data", function (data) {
+                    qcobjects_1.logger.info(data);
+                });
             });
-        }).catch(e => console.log(e));
+            results.push(result);
+        }
+        return results;
     }
     fileListRecursive(dir) {
         var instance = this;

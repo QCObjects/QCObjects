@@ -163,7 +163,7 @@ const absolutePath = node_path_1.default.resolve(__dirname, "./");
                         }
                         catch (e) {
                             qcobjects_1.logger.warn("\u{1F926} Something went wrong \u{1F926} when trying to deliver a static path: " + microservice.fileName);
-                            reject(e);
+                            reject(e instanceof Error ? e : new Error(String(e)));
                         }
                     }
                     else {

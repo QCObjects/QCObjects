@@ -182,26 +182,22 @@ class CommandHandler extends qcobjects_1.InheritClass {
         });
     }
     syncGit(versionString, commitMsg, syncNpm = false) {
-        let _commands_ = [];
+        let _commands_ = ["git fetch --tags -f"];
+        // Commit VERSION file first so working directory is clean
+        // (v_patch/v_minor/v_major write to VERSION before calling syncGit)
+        _commands_.push(`git add . && git commit -am "${commitMsg}"`);
         if (syncNpm) {
-            _commands_ = _commands_.concat([
-                "git fetch --tags -f",
-                `npm version "${versionString}" -m "${commitMsg}"`
-            ]);
+            // npm version requires a clean working directory
+            _commands_.push(`npm version "${versionString}" -m "${commitMsg}"`);
         }
         _commands_ = _commands_.concat([
-            `git add . && git commit -am "${commitMsg}"`,
             "git fetch origin --tags",
-            "git tag -ln"
+            "git tag -ln",
         ]);
         if (!syncNpm) {
-            _commands_ = _commands_.concat([
-                `git tag -a "v${versionString}" -m "${commitMsg}"`,
-            ]);
+            _commands_.push(`git tag -a "v${versionString}" -m "${commitMsg}"`);
         }
-        _commands_ = _commands_.concat([
-            "git push && git push --tags"
-        ]);
+        _commands_.push("git push && git push --tags");
         this.switchCommander.shellCommands(_commands_).then(function (response) {
             qcobjects_1.logger.info("Synced to Git");
             qcobjects_1.logger.debug(response);
