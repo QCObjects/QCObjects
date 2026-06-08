@@ -24,16 +24,14 @@ jobs:
   publish-npm:
     needs: build
     runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
     steps:
       - uses: actions/checkout@v3.3.0
       - uses: actions/setup-node@v3.6.0
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org/
-      - name: Set up NPM authentication
-        run: echo "//registry.npmjs.org/:_authToken=${{secrets.NPM_TOKEN}}" >> ~/.npmrc
       - run: npm i --legacy-peer-deps && npm ci --legacy-peer-deps --install-strategy=nested
       - run: npm test
       - run: npm publish --tag ${GITHUB_REF##*/}
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
