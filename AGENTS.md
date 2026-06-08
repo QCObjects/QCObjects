@@ -6,6 +6,25 @@ Node >=22, npm >=10.
 ## Git workflow
 
 See `.opencode/instructions/git-workflow.md` — topic branches from `development`, no rebase, SemVer tags.
+See `docs/release-pipeline.md` — branch model, release channels, archive info.
+
+## Release pipeline
+
+- **Branches:** only `main` (release digest) and `development` (active dev)
+- **Version branches removed** (v2.3, v2.4-beta, v2.4-ts, v2.5-beta) — archived as
+  `archive/v2.4-beta`, `archive/v2.4-ts` tags (v2.3 captured by v2.3.x tags)
+- **Release channels encoded in tag suffix**, not branch name:
+
+  | Tag pattern | npm dist-tag | Workflow |
+  |-------------|-------------|----------|
+  | `vX.Y.Z`        | `latest` | `npmpublish-main.yml` |
+  | `vX.Y.Z-lts`    | `lts`    | `npmpublish-lts.yml`  |
+  | `vX.Y.Z-beta`   | `beta`   | `npmpublish-beta.yml` |
+
+- **Promotion:**
+  1. `development` → `v-patch --git --npm` → tag `vX.Y.Z-beta` (beta publish)
+  2. Edit VERSION suffix → `v-patch --git --npm` → tag `vX.Y.Z-lts` (LTS publish)
+  3. PR `development` → `main` → merge → tag `vX.Y.Z` on `main` (latest publish)
 
 ## Commands
 
