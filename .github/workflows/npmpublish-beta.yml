@@ -39,4 +39,4 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - run: npm i --legacy-peer-deps
       - run: npm test
-      - run: npm publish --tag ${GITHUB_REF##*/}
+      - run: npm publish --tag beta
