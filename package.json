@@ -102,7 +102,7 @@
   },
   "repository": {
     "type": "file",
-    "url": "https://gitlab.com/api/v4/projects/12435344/repository/archive?private_token=Wys-MPRmB1sSFn3eeX84"
+    "url": "git+https://gitlab.com/api/v4/projects/12435344/repository/archive.git"
   },
   "keywords": [
     "node",
@@ -127,16 +127,16 @@
   },
   "homepage": "https://qcobjects.dev",
   "bin": {
-    "qco": "./public/cjs/qcobjects-cli.js",
-    "qcobjects": "./public/cjs/qcobjects-cli.js",
-    "qcobjects-cli": "./public/cjs/qcobjects-cli.js",
-    "qcobjects-server": "./public/cjs/qcobjects-http2-server.js",
-    "qcobjects-http2-server": "./public/cjs/qcobjects-http2-server.js",
-    "qcobjects-shell": "./public/cjs/qcobjects-shell.js",
-    "qcobjects-createcert": "./public/cjs/qcobjects-createcert.js",
-    "qcobjects-gae-server": "./public/cjs/qcobjects-gae-http-server.js",
-    "qcobjects-http-server": "./public/cjs/qcobjects-http-server.js",
-    "qcobjects-collab": "./public/cjs/qcobjects-collab.js"
+    "qco": "public/cjs/qcobjects-cli.js",
+    "qcobjects": "public/cjs/qcobjects-cli.js",
+    "qcobjects-cli": "public/cjs/qcobjects-cli.js",
+    "qcobjects-server": "public/cjs/qcobjects-http2-server.js",
+    "qcobjects-http2-server": "public/cjs/qcobjects-http2-server.js",
+    "qcobjects-shell": "public/cjs/qcobjects-shell.js",
+    "qcobjects-createcert": "public/cjs/qcobjects-createcert.js",
+    "qcobjects-gae-server": "public/cjs/qcobjects-gae-http-server.js",
+    "qcobjects-http-server": "public/cjs/qcobjects-http-server.js",
+    "qcobjects-collab": "public/cjs/qcobjects-collab.js"
   },
   "dependencies": {
     "commander": "^10.0.1",
