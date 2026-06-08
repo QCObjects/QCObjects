@@ -35,6 +35,112 @@ To start|stop|prestart the service:
 > service qcobjects restart
 ```
 
+## Synced Semantic Versioning
+
+Version management is handled through the `VERSION` file at the project root. Commands read from and write to this file, and can optionally sync changes to `package.json` and git.
+
+### `v-patch [filename]`
+
+Bumps the patch number (e.g., `1.2.3` → `1.2.4`). Default filename is `VERSION`.
+
+| Option | Alias | Description |
+|--------|-------|-------------|
+| `--sync-git` | `--git` | Commit changes, tag, and push to git |
+| `--sync-npm` | `--npm` | Also update `package.json` via `npm version` (implies `--git`) |
+| `--commit-msg [message]` | `-m` | Custom commit message |
+
+```shell
+# Just bump the VERSION file
+qcobjects v-patch
+
+# Bump, commit, tag, and push
+qcobjects v-patch --git -m "fix: resolve timeout issue"
+
+# Bump VERSION + package.json, commit, tag, push
+qcobjects v-patch --git --npm
+```
+
+### `v-minor [filename]`
+
+Bumps the minor number (e.g., `1.2.3` → `1.3.0`). Supports the same options as `v-patch`.
+
+```shell
+qcobjects v-minor --git -m "feat: add collaboration endpoints"
+```
+
+### `v-major [filename]`
+
+Bumps the major number (e.g., `1.2.3` → `2.0.0`). Supports the same options as `v-patch`.
+
+```shell
+qcobjects v-major --git --npm -m "breaking: migrate to new API"
+```
+
+### `v-sync [filename]`
+
+Reads the current version from `git describe` (latest tag), writes it to the `VERSION` file, updates `package.json` with `npm version`, commits, tags, and pushes.
+
+| Option | Description |
+|--------|-------------|
+| `-m, --commit-msg [message]` | Commit message (default: `Synced Version v<version>`) |
+
+```shell
+qcobjects v-sync -m "sync after release merge"
+```
+
+### `v-changelog`
+
+Generates a changelog from annotated git tags, grouped by minor version, printed to stdout.
+
+```shell
+qcobjects v-changelog > CHANGELOG.md
+```
+
+### Typical workflow
+
+```shell
+# 1. Bump the patch version and push everything
+qcobjects v-patch --git --npm -m "your message"
+
+# 2. CI publishes the new version to npm
+
+# 3. Generate changelog for release notes
+qcobjects v-changelog > CHANGELOG.md
+```
+
+### CI Pipeline Considerations
+
+When using `v-patch --git --npm`, the command calls `npm version` internally. This triggers the `preversion` and `postversion` scripts in your `package.json`:
+
+- **`preversion`** — runs before the version bump (e.g., tests)
+- **`postversion`** — runs after the bump (e.g., `git push && git push --tags`)
+
+After `npm version` finishes, `syncGit` creates a second commit for the `VERSION` file and calls `git push && git push --tags` again. This means the version tag is pushed **twice**, which can trigger duplicate CI pipeline runs.
+
+#### Recommendations by setup
+
+| Setup | Recommendation |
+|-------|---------------|
+| **GitHub Actions** (tag-triggered publish) | Set `postversion` to only push the branch: `"postversion": "git push"` |
+| **GitLab CI / other CI** | Keep `"postversion": "git push && git push --tags"` — duplicate triggers are harmless |
+| **Manual publish only** | Use `--git` without `--npm` to skip `npm version` entirely (no lifecycle scripts run) |
+
+#### Avoid duplicates with `v-patch --git` (no `--npm`)
+
+Without `--npm`, `npm version` is never called. Only the `VERSION` file is committed, a single tag is created, and a single `git push && git push --tags` runs. No duplicate tag push, no duplicate CI.
+
+#### Example: qcobjects-cli
+
+This repo uses GitHub Actions and configures `postversion` to push the branch only:
+
+```json
+"postversion": "git push"
+```
+
+The tag is still pushed once by `syncGit` after the `VERSION` file is committed.
+
+---
+
 ```shell
    .d88888b.  .d8888b.  .d88888b. 888       d8b                888
   d88P" "Y88bd88P  Y88bd88P" "Y88b888       Y8P                888

@@ -1,10 +1,69 @@
 {
-  "extends": "qcobjects-tsconfig/tsconfig.json",
   "compilerOptions": {
-    "rootDir": "src",                                    /* Specify the root folder within your source files. */
-    "allowJs": true,                                     /* Allow JavaScript files to be a part of your program. Use the 'checkJS' option to get errors from these files. */
-    "outDir": "build",                                  /* Specify an output folder for all emitted files. */  
+    "skipLibCheck": true,
+    "traceResolution":false,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "nodenext",
+    "moduleDetection": "force",
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "target": "ESNext",
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
+    "module": "NodeNext",
+    "rootDir": "./src",
+    "allowJs": true,
+    "outDir": "public/cjs",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": true,
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+    "paths": {
+      "types": [
+        "src/types/global/index.d.ts"
+      ]
+    }
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["src/**/*.spec.js", "src/*.js"]
+  "include": [
+    "src/**/*",
+    "src/types/**/*"
+  ],
+  "exclude": [
+    "src/templates/**/*",
+    "src/index.mts",
+    "src/index.cts",
+    "node_modules",
+    "node_modules/**/*",
+    "**/node_modules/*",
+    "public/types"
+  ],
+  "ts-node": {
+    // It is faster to skip typechecking.
+    // Remove if you want ts-node to do typechecking.
+    "transpileOnly": true,
+    "files": true,
+    "compilerOptions": {
+      "skipLibCheck": true,
+      "rootDir": "./src",
+      "baseUrl": ".",
+      "paths": {
+        "types": [
+          "types/global"
+        ]
+      }
+    },
+    "exclude": ["node_modules/**/*", "**/node_modules/*", "node_modules",     "public/types"  ]
+  }
 }

@@ -5,34 +5,40 @@ name: Node.js Publish Package
 
 on:
   push:
-    branches:
-      - main
     tags:
       - 'v*.*.*'
 
 jobs:
   build:
+    if: ${{ !contains(github.ref, '-') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3.3.0
-      - uses: actions/setup-node@v3.6.0
+      - uses: actions/checkout@v4
         with:
-          node-version: 16
-      - run: npm ci
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm i --legacy-peer-deps
       - run: npm test
 
   publish-npm:
     needs: build
+    if: ${{ !contains(github.ref, '-') }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
-      - uses: actions/checkout@v3.3.0
-      - uses: actions/setup-node@v3.6.0
+      - uses: actions/checkout@v4
         with:
-          node-version: 16
-          registry-url: https://registry.npmjs.org/
-      - name: Set up NPM authentication
-        run: echo "registry=https://registry.npmjs.org/:_authToken=${{secrets.NPM_TOKEN}}" >> ~/.npmrc
-      - run: npm ci
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Upgrade npm for OIDC support (requires >=11.5.1)
+        run: npm install -g npm@latest
+      - run: npm i --legacy-peer-deps
       - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

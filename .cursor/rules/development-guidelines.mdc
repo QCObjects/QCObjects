@@ -1,0 +1,37 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Development Guidelines
+
+## TypeScript Configuration
+The project uses TypeScript with strict type checking. Configuration is split across multiple files:
+- Main config: [tsconfig.json](mdc:tsconfig.json)
+- Declaration config: [tsconfig.d.json](mdc:tsconfig.d.json)
+- Test config: [tsconfig.jasmine.json](mdc:tsconfig.jasmine.json)
+
+## Code Style
+ESLint is used for code style enforcement:
+- ESLint config: [eslint.config.mjs](mdc:eslint.config.mjs)
+
+## Testing
+- Test specifications are located in the [spec/](mdc:spec) directory
+- Use Jasmine for writing tests
+
+## Build Process
+The build process uses ESBuild for bundling:
+- Build script: [build-esbuild.js](mdc:build-esbuild.js)
+- Build command implementation: [src/cli-commands-build-esbuild.ts](mdc:src/cli-commands-build-esbuild.ts)
+
+## Adding New CLI Commands
+When adding new CLI commands:
+1. Create a new file in `src/` with pattern `cli-commands-*.ts`
+2. Register the command in [src/cli-commands.ts](mdc:src/cli-commands.ts)
+3. Implement the command following existing patterns in other command files
+
+## Server Implementation
+When working with server components:
+- Base HTTP server: [src/qcobjects-http-server.ts](mdc:qcobjects-http-server.ts)
+- Main server implementation: [src/main-http-server.ts](mdc:src/main-http-server.ts)
+- Follow existing patterns for error handling and logging

@@ -1,0 +1,36 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# QCObjects CLI Project Structure
+
+This is a TypeScript-based CLI tool for QCObjects framework. Here's the key structure:
+
+## Entry Points
+- Main CLI entry: [src/cli-main.ts](mdc:src/cli-main.ts)
+- Core CLI implementation: [src/qcobjects-cli.ts](mdc:src/qcobjects-cli.ts)
+
+## Core Components
+- Server implementations:
+  - HTTP: [src/qcobjects-http-server.ts](mdc:src/qcobjects-http-server.ts)
+  - HTTP2: [src/qcobjects-http2-server.ts](mdc:src/qcobjects-http2-server.ts)
+  - GAE: [src/qcobjects-gae-http-server.ts](mdc:src/qcobjects-gae-http-server.ts)
+
+## CLI Commands
+The CLI commands are modularized in separate files:
+- Build commands:
+  - ESBuild: [src/cli-commands-build-esbuild.ts](mdc:src/cli-commands-build-esbuild.ts)
+  - TypeScript: [src/cli-commands-build-typescript.ts](mdc:src/cli-commands-build-typescript.ts)
+- Version management: [src/cli-commands-version.ts](mdc:src/cli-commands-version.ts)
+- Static publishing: [src/cli-commands-publish-static.ts](mdc:src/cli-commands-publish-static.ts)
+- JIRA integration: [src/cli-commands-jira.ts](mdc:src/cli-commands-jira.ts)
+
+## Configuration
+- Default settings: [src/defaultsettings.ts](mdc:src/defaultsettings.ts)
+- Project config: [config.json](mdc:config.json)
+- TypeScript config: [tsconfig.json](mdc:tsconfig.json)
+
+## Build System
+- ESBuild configuration: [build-esbuild.js](mdc:build-esbuild.js)
+- Transpilation setup: [transpile.js](mdc:transpile.js)
