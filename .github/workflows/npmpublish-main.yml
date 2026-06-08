@@ -12,11 +12,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ github.ref }}
-      - uses: actions/setup-node@v3.6.0
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
       - run: npm i --legacy-peer-deps
@@ -28,11 +28,11 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ github.ref }}
-      - uses: actions/setup-node@v3.6.0
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org/
