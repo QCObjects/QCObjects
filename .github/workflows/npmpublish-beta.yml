@@ -13,6 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3.3.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.ref }}
       - uses: actions/setup-node@v3.6.0
         with:
           node-version: 22
@@ -26,6 +29,9 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v3.3.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.ref }}
       - uses: actions/setup-node@v3.6.0
         with:
           node-version: 22
