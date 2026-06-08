@@ -207,28 +207,27 @@ export class SwitchCommander extends InheritClass {
     this.program = commander;
   }
 
-  shellCommands(_shell_commands: any[]) {
-    return new Promise(function (resolve_all, reject_all) {
-      var _promises_set = _shell_commands.map(
-        function (shell_command: any) {
-          return (new Promise(
-            function (resolve, reject) {
-              logger.debug(shell_command);
-              exec(shell_command, (err: any, stdout: unknown, stderr: any) => {
-                if (!err) {
-                  resolve(stdout);
-                } else {
-                  logger.debug(`[FAILED]: ${shell_command}`);
-                  logger.debug(`${stderr}`);
-                  reject(stderr as Error);
-                }
-              }).stdout?.on("data", function (data: any) {
-                logger.info(data);
-              });
-            })).catch(e => reject_all(e as Error));
-        }
-      );
-    }).catch(e => console.log(e));
+  async shellCommands(_shell_commands: any[]) {
+    const results: any[] = [];
+    for (const shell_command of _shell_commands) {
+      const result = await new Promise((resolve, reject) => {
+        logger.debug(shell_command);
+        const child = exec(shell_command, (err: any, stdout: unknown, stderr: any) => {
+          if (!err) {
+            resolve(stdout);
+          } else {
+            logger.debug(`[FAILED]: ${shell_command}`);
+            logger.debug(`${stderr}`);
+            reject(stderr as Error);
+          }
+        });
+        child.stdout?.on("data", function (data: any) {
+          logger.info(data);
+        });
+      });
+      results.push(result);
+    }
+    return results;
   }
 
   fileListRecursive(dir: string): string | string[] {
