@@ -174,7 +174,7 @@ Package("com.qcobjects.backend.microservice.static", [
               resolve();
             } catch (e) {
               logger.warn("\u{1F926} Something went wrong \u{1F926} when trying to deliver a static path: " + microservice.fileName);
-              reject(e as Error);
+              reject(e instanceof Error ? e : new Error(String(e)));
             }
           } else {
             logger.info("There is no redirect_to setting declared in route properties. \n Skipping static delivery...");
