@@ -101,3 +101,9 @@ typings/
 # DynamoDB Local files
 .dynamodb/
 opencode.json
+session*.md
+.sessions/*
+
+# Duplicate files (* 2.* variants)
+* 2
+* 2.*

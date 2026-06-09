@@ -29,11 +29,11 @@ No more version-specific branches. Every release is a tag on `main`.
 
 | Tag pattern | npm dist-tag | Triggered by |
 |-------------|-------------|--------------|
-| `vX.Y.Z`        | `latest` | `npmpublish-main.yml` |
-| `vX.Y.Z-lts`    | `lts`    | `npmpublish-lts.yml`  |
-| `vX.Y.Z-beta`   | `beta`   | `npmpublish-beta.yml` |
-| (future) `-dev` | `dev`    | (future workflow)     |
-| (future) `-alpha` | `alpha` | (future workflow)    |
+| `vX.Y.Z`        | `latest` | `npmpublish.yml` (suffix detection) |
+| `vX.Y.Z-lts`    | `lts`    | `npmpublish.yml` (suffix detection) |
+| `vX.Y.Z-beta`   | `beta`   | `npmpublish.yml` (suffix detection) |
+| (future) `-dev` | `dev`    | (add pattern to `npmpublish.yml`) |
+| (future) `-alpha` | `alpha` | (add pattern to `npmpublish.yml`) |
 
 ## Promotion workflow
 
@@ -109,7 +109,7 @@ separate archive tag needed. Its commits are ancestors of `main`.
 | File | Change |
 |------|--------|
 | `.github/workflows/codeql-analysis.yml` | branch targets from `[v2.3, v2.4]` to `[main, development]` |
-| `.github/workflows/npmpublish-*.yml` | already tag-driven, no changes needed |
+| `.github/workflows/npmpublish.yml` | consolidated single workflow (was 3 separate) |
 | `.github/workflows/open-pr-to-development.yml` | already targets `development`, no changes needed |
 | `.github/workflows/main-pr-source.yml` | already enforces `development` → `main`, no changes needed |
 | `.github/workflows/ci.yml` | already targets `main`/`development`, no changes needed |
