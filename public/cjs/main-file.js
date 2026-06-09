@@ -46,7 +46,7 @@ class FileDispatcher extends qcobjects_1.InheritClass {
     templateURI;
     template;
     body;
-    constructor({ name = qcobjects_1.CONFIG.get("documentRootFileIndex"), template = "", templateURI = qcobjects_1.CONFIG.get("documentRootFileIndex"), headers = {}, body = "", filename = "", done }) {
+    constructor({ name = qcobjects_1.CONFIG.get("documentRootFileIndex"), template = "", templateURI = qcobjects_1.CONFIG.get("documentRootFileIndex"), headers = {}, body = "", filename = "", scriptname, pathname, done }) {
         super({
             name,
             template,
@@ -54,12 +54,14 @@ class FileDispatcher extends qcobjects_1.InheritClass {
             headers,
             body,
             filename,
+            scriptname,
+            pathname,
             done
         });
         var o = this;
-        var scriptname = o.scriptname;
+        scriptname = o.scriptname;
         this.filename = scriptname;
-        var pathname = (o.pathname !== "") ? (o.pathname + "/") : ("");
+        pathname = (o.pathname !== "") ? (o.pathname + "/") : ("");
         var appTemplateInstance = this;
         if (typeof appTemplateInstance.headers === "undefined") {
             appTemplateInstance.headers = {

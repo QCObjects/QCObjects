@@ -1,6 +1,6 @@
 {
   "name": "qcobjects-cli",
-  "version": "2.5.149-lts",
+  "version": "2.5.154",
   "description": "qcobjects cli command line tool",
   "main": "public/cjs/index.js",
   "module": "public/esm/index.mjs",
@@ -156,7 +156,7 @@
     "@types/node": "^22.10.2",
     "@typescript-eslint/eslint-plugin": "^5.58.0",
     "@typescript-eslint/parser": "^5.58.0",
-    "esbuild": "^0.24.0",
+    "esbuild": "^0.28.0",
     "esbuild-plugin-alias": "^0.2.1",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^8.10.0",

@@ -112,6 +112,28 @@ const buildConfigs = {
               content = content
                 .replace(/const\s+{([^}]+)}\s*=\s*require\(['"]([^'"]+)['"]\)/g, 'import { $1 } from "$2"')
                 .replace(/const\s+([^=]+)\s*=\s*require\(['"]([^'"]+)['"]\)/g, 'import $1 from "$2"');
+
+              // Convert await import(var) → JSON.parse(fs.readFileSync(var, "utf8"))
+              // for variables referencing paths ending in .json/.jsonp/.md/.mdc/.text/.txt
+              const extensionsToConvert = ['json', 'jsonp', 'md', 'mdc', 'text', 'txt'];
+              const extPattern = extensionsToConvert.join('|');
+              const varDeclRegex = new RegExp(
+                `(?:const|let|var)\\s+(\\w+)\\s*=[^;]*?\\.(?:${extPattern})["'\`][^;]*;`,
+                'g'
+              );
+              const jsonVars = new Set();
+              let match;
+              while ((match = varDeclRegex.exec(content)) !== null) {
+                jsonVars.add(match[1]);
+              }
+              if (jsonVars.size > 0) {
+                const importRegex = new RegExp(
+                  `await import\\((${[...jsonVars].join('|')})\\)`,
+                  'g'
+                );
+                content = content.replace(importRegex, 'JSON.parse(fs.readFileSync($1, "utf8"))');
+              }
+
               writeFileSync(file, content, 'utf8');
             });
           });

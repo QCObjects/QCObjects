@@ -13,7 +13,7 @@ class CommandHandler extends InheritClass {
     this.switchCommander = switchCommander;
     const commandHandler = this;
     this.choiceOption = {
-      v_major(filename, options) {
+      async v_major(filename, options) {
         filename = typeof filename === "undefined" ? "VERSION" : filename;
         const versionString = this.getVersionStringFromFile(filename);
         const versionSuffix = this.parseVersionSuffix(versionString);
@@ -25,10 +25,10 @@ class CommandHandler extends InheritClass {
         this.saveNewVersionFile(filename, newVersion);
         if (options.syncGit) {
           var commitMsg = options.commitMsg || `New Version v${newVersion}`;
-          this.syncGit(newVersion, commitMsg, options.syncNpm);
+          await this.syncGit(newVersion, commitMsg, options.syncNpm);
         }
       },
-      v_minor(filename, options) {
+      async v_minor(filename, options) {
         filename = typeof filename === "undefined" ? "VERSION" : filename;
         const versionString = this.getVersionStringFromFile(filename);
         const versionSuffix = this.parseVersionSuffix(versionString);
@@ -40,10 +40,10 @@ class CommandHandler extends InheritClass {
         this.saveNewVersionFile(filename, newVersion);
         if (options.syncGit) {
           var commitMsg = options.commitMsg || `New Version v${newVersion}`;
-          this.syncGit(newVersion, commitMsg, options.syncNpm);
+          await this.syncGit(newVersion, commitMsg, options.syncNpm);
         }
       },
-      v_patch(filename, options) {
+      async v_patch(filename, options) {
         filename = typeof filename === "undefined" ? "VERSION" : filename;
         const versionString = this.getVersionStringFromFile(filename);
         const versionSuffix = this.parseVersionSuffix(versionString);
@@ -55,7 +55,7 @@ class CommandHandler extends InheritClass {
         this.saveNewVersionFile(filename, newVersion);
         if (options.syncGit) {
           var commitMsg = options.commitMsg || `New Version v${newVersion}`;
-          this.syncGit(newVersion, commitMsg, options.syncNpm);
+          await this.syncGit(newVersion, commitMsg, options.syncNpm);
         }
       },
       v_sync(filename, options) {
@@ -126,13 +126,13 @@ class CommandHandler extends InheritClass {
       }
     };
     switchCommander.program.command("v-major [filename]").option("--git, --sync-git", "Sync with Git").option("--npm, --sync-npm", "Sync with NPM").option("-m, --commit-msg [message]", "Commit Message").description("Semantic Versioning: Upgrade to a new major version").action(function(args, options) {
-      commandHandler.choiceOption.v_major.call(commandHandler, args, options);
+      return commandHandler.choiceOption.v_major.call(commandHandler, args, options);
     });
     switchCommander.program.command("v-minor [filename]").option("--git, --sync-git", "Sync with Git").option("--npm, --sync-npm", "Sync with NPM").option("-m, --commit-msg [message]", "Commit Message").description("Semantic Versioning: Upgrade to a new minor version").action(function(args, options) {
-      commandHandler.choiceOption.v_minor.call(commandHandler, args, options);
+      return commandHandler.choiceOption.v_minor.call(commandHandler, args, options);
     });
     switchCommander.program.command("v-patch [filename]").option("--git, --sync-git", "Sync with Git").option("--npm, --sync-npm", "Sync with NPM").option("-m, --commit-msg [message]", "Commit Message").description("Semantic Versioning: Upgrade to a new patch version").action(function(args, options) {
-      commandHandler.choiceOption.v_patch.call(commandHandler, args, options);
+      return commandHandler.choiceOption.v_patch.call(commandHandler, args, options);
     });
     switchCommander.program.command("v-sync [filename]").option("-m, --commit-msg [message]", "Commit Message").description("Semantic Versioning: Sync the version of NPM with version of GIT").action(function(args, options) {
       commandHandler.choiceOption.v_sync.call(commandHandler, args, options);
@@ -142,35 +142,20 @@ class CommandHandler extends InheritClass {
     });
   }
   syncGit(versionString, commitMsg, syncNpm = false) {
-    let _commands_ = [];
+    let _commands_ = ["git fetch --tags -f"];
+    _commands_.push(`git add . && git commit -am "${commitMsg}"`);
     if (syncNpm) {
-      _commands_ = _commands_.concat(
-        [
-          "git fetch --tags -f",
-          `npm version "${versionString}" -m "${commitMsg}"`
-        ]
-      );
+      _commands_.push(`npm version "${versionString}" -m "${commitMsg}"`);
     }
-    _commands_ = _commands_.concat(
-      [
-        `git add . && git commit -am "${commitMsg}"`,
-        "git fetch origin --tags",
-        "git tag -ln"
-      ]
-    );
+    _commands_ = _commands_.concat([
+      "git fetch origin --tags",
+      "git tag -ln"
+    ]);
     if (!syncNpm) {
-      _commands_ = _commands_.concat(
-        [
-          `git tag -a "v${versionString}" -m "${commitMsg}"`
-        ]
-      );
+      _commands_.push(`git tag -a "v${versionString}" -m "${commitMsg}"`);
     }
-    _commands_ = _commands_.concat(
-      [
-        "git push && git push --tags"
-      ]
-    );
-    this.switchCommander.shellCommands(_commands_).then(function(response) {
+    _commands_.push("git push && git push --tags");
+    return this.switchCommander.shellCommands(_commands_).then(function(response) {
       logger.info("Synced to Git");
       logger.debug(response);
     }).catch(function(e) {

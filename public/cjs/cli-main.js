@@ -132,7 +132,7 @@ class SwitchCommander extends qcobjects_1.InheritClass {
                 }
                 (0, node_child_process_1.exec)(`npm i --save-dev ${appTemplateName}`, () => {
                     (async () => {
-                        const _package_json_template_file = await import(_package_json_template_fname);
+                        const _package_json_template_file = require(_package_json_template_fname);
                         _package_json_template_file.name = appName;
                         _package_json_template_file.version = "1.0.0";
                         _package_json_template_file.repository = {};

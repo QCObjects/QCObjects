@@ -1,5 +1,7 @@
 const ts = require('typescript');
 const path = require('path');
+const { readFileSync, writeFileSync } = require('fs');
+const glob = require('glob');
 
 // Get the tsconfig file name from command line arguments
 const configFileName = process.argv[2];
@@ -58,6 +60,36 @@ if (emittedFiles.length > 0) {
   console.log('Emitted files:');
   emittedFiles.forEach(file => console.log(file));
 }
+
+// Post-process CJS output: convert await import(var) → require(var) for data file imports
+// Detects variables assigned to paths ending in .json/.jsonp/.md/.mdc/.text/.txt
+const extensionsToConvert = ['json', 'jsonp', 'md', 'mdc', 'text', 'txt'];
+const extPattern = extensionsToConvert.join('|');
+const varDeclRegex = new RegExp(
+  `(?:const|let|var)\\s+(\\w+)\\s*=[^;]*?\\.(?:${extPattern})["'\`][^;]*;`,
+  'g'
+);
+
+glob.sync('public/cjs/**/*.js').forEach(file => {
+  const content = readFileSync(file, 'utf8');
+
+  const jsonVars = new Set();
+  let match;
+  while ((match = varDeclRegex.exec(content)) !== null) {
+    jsonVars.add(match[1]);
+  }
+
+  if (jsonVars.size > 0) {
+    const importRegex = new RegExp(
+      `await import\\((${[...jsonVars].join('|')})\\)`,
+      'g'
+    );
+    const newContent = content.replace(importRegex, 'require($1)');
+    if (newContent !== content) {
+      writeFileSync(file, newContent, 'utf8');
+    }
+  }
+});
 
 // Exit with an appropriate code
 const exitCode = emitResult.emitSkipped ? 1 : 0;

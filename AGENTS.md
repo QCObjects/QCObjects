@@ -3,76 +3,57 @@
 TypeScript CLI tool and HTTP/HTTP2 server for the [QCObjects](https://qcobjects.dev) framework.
 Node >=22, npm >=10.
 
-## Git workflow
-
-See `.opencode/instructions/git-workflow.md` — topic branches from `development`, no rebase, SemVer tags.
-See `docs/release-pipeline.md` — branch model, release channels, archive info.
-
-## Release pipeline
-
-- **Branches:** only `main` (release digest) and `development` (active dev)
-- **Version branches removed** (v2.3, v2.4-beta, v2.4-ts, v2.5-beta) — archived as
-  `archive/v2.4-beta`, `archive/v2.4-ts` tags (v2.3 captured by v2.3.x tags)
-- **Release channels encoded in tag suffix**, not branch name:
-
-  | Tag pattern | npm dist-tag | Workflow |
-  |-------------|-------------|----------|
-  | `vX.Y.Z`        | `latest` | `npmpublish-main.yml` |
-  | `vX.Y.Z-lts`    | `lts`    | `npmpublish-lts.yml`  |
-  | `vX.Y.Z-beta`   | `beta`   | `npmpublish-beta.yml` |
-
-- **Promotion:**
-  1. `development` → `v-patch --git --npm` → tag `vX.Y.Z-beta` (beta publish)
-  2. Edit VERSION suffix → `v-patch --git --npm` → tag `vX.Y.Z-lts` (LTS publish)
-  3. PR `development` → `main` → merge → tag `vX.Y.Z` on `main` (latest publish)
-
 ## Commands
 
 | Action | Command |
 |--------|---------|
-| Install | `npm install` |
-| Lint | `npm run lint` (`eslint src/**/*.ts --fix`) |
-| Test | `npm test` (lint → jasmine) |
-| Run single test | `npx ts-node --project ./tsconfig.jasmine.json ./node_modules/jasmine/bin/jasmine` |
-| Build (types → ts → esm) | `npm run build` |
-| Build TS only | `npm run build:ts` — **runs `npm test` first**, then `node ./transpile.js tsconfig.json` |
+| Install | `npm i --legacy-peer-deps` (peer deps don't auto-install on npm >=10) |
+| Lint | `npm run lint` |
+| Test (lint + jasmine) | `npm test` |
+| Run jasmine only | `npm run test:jasmine` |
+| Full build (types → CJS → ESM) | `npm run build` |
+| Build CJS only (runs test first) | `npm run build:ts` |
 | Build types only | `npm run build:ts-types` |
-| Build ESM bundle | `npm run build:esbuild` |
-| Dev server | `npm start` (aliased to `qcobjects-shell`) |
+| Build ESM + browser IIFE | `npm run build:esbuild` |
+| Dev server | `npm start` (aliases `qcobjects-shell`) |
 
 ## Architecture
 
 - **CLI framework:** Commander (`src/cli-main.ts` — `SwitchCommander` class)
 - **Commands** in `src/cli-commands-*.ts`, registered via `src/cli-commands.ts`
-- **Servers:** HTTP (`src/main-http-server.ts`), HTTP/2 (`src/main-http2-server.ts`), GAE variant
-- **Build pipeline:** Custom `transpile.js` (TS compiler API) produces CJS → `esbuild` produces ESM + browser IIFE
+- **Servers:** HTTP (`src/main-http-server.ts`), HTTP/2 (`src/main-http2-server.ts`), GAE (`src/main-http-gae-server.ts`)
+- **Build pipeline:** Custom `transpile.js` (TS compiler API) → CJS, then `build-esbuild-esm.js` → ESM + browser IIFE
 - **Output:** `public/cjs/`, `public/esm/`, `public/browser/`, `public/types/`
+- **Deno:** `deno.json` + `mod.ts` for Deno compatibility
+- **Entrypoints:** `src/qcobjects-cli.ts` (CLI), `src/qcobjects-http{-2,}-server.ts` (servers), `src/qcobjects-shell.ts`, `src/qcobjects-collab.ts`
+- **Source convention:** Most modules import `qcobjects` at top and use `InheritClass`, `Package()`, `Export()`, `CONFIG`, `logger`, `Component`, `Service`
+- **Plugin autodiscovery:** Scans `dependencies`/`devDependencies` for packages with `qcobjects-lib`, `qcobjects-handler`, `qcobjects-command` keywords
 
-## Testing quirks
+## Testing
 
-- **Framework:** Jasmine v3.7 (`spec/support/jasmine.json`)
-- Single spec: `spec/testsSpec.ts` — verifies `qcobjects` version matches between `peerDependencies` and `devDependencies`
-- Mock path in `tsconfig.jasmine.json`: `qcobjects-sdk` → `spec/mocks/qcobjects-sdk.mock.ts`
+- **Framework:** Jasmine v3.7, single spec at `spec/testsSpec.ts`
+- Verifies `qcobjects` version matches between `peerDependencies` and `devDependencies`
+- **Mock:** `tsconfig.jasmine.json` maps `qcobjects-sdk` → `spec/mocks/qcobjects-sdk.mock.ts` (file may not exist yet)
 - Config: `stopSpecOnExpectationFailure: true`, `failSpecWithNoExpectations: true`, `random: false`
-
-## QCObjects patterns used in source
-
-- `InheritClass`, `Package()`, `Export()`, `CONFIG`, `logger`, `Service`, `Component`
-- Plugin autodiscovery: scans `dependencies`/`devDependencies` for packages with `qcobjects-lib`, `qcobjects-handler`, `qcobjects-command` keywords
 
 ## Config & env
 
-- `config.json` at root — runtime config
+- `config.json` at root — **gitignored** (local dev only), default: `{"devmode":"debug"}`
 - `src/defaultsettings.ts` — `$ENV(VAR)` template syntax resolved at runtime
 - `process.env.PORT` overrides HTTP listen port
-- Dev mode: `config.json` `{"devmode":"debug"}`
+- Version tracked in `VERSION` file; CLI has built-in `v-patch`/`v-minor`/`v-major`/`v-sync`/`v-changelog` commands
 
-## Pre-commit
+## CI / Git
 
-`.pre-commit-config.yaml`: trailing-whitespace, end-of-file-fixer, check-yaml, check-added-large-files (500 KB max).
-Run `pre-commit install` to activate hooks.
+- **CI workflows** (`ci.yml`, `codeql-analysis.yml`) have **placeholder steps** (TODOs) — not runnable
+- Real publish: `.github/workflows/npmpublish.yml` — triggered by `v*.*.*` tags, uses OIDC (`id-token: write`), detects `-beta`/`-lts` suffix for npm dist-tag
+- **Branch model:** `main` ← `development` ← `feature/*`/`fix/*`/`bugfix/*`. PRs into `development` auto-created on topic-branch push. PRs to `main` must come from `development`.
+- **No rebase.** Use `git pull` (merge).
+- **Postversion** is `"git push"` (branch only). Tag is pushed separately by `syncGit` to avoid duplicate CI.
+- Version sync: `v-patch --git --npm` calls `npm version` internally (triggers `preversion`/`postversion`), then `syncGit` pushes VERSION commit + tag
+- See `.opencode/instructions/git-workflow.md` for detailed git workflow rules.
 
-## Build artifacts
+## ESLint
 
-- `build/templates/` — compiled template copies
-- Lockfile: `package-lock.json` only (no yarn/pnpm)
+- Uses `recommendedTypeChecked` but many core rules explicitly disabled (`no-explicit-any: off`, `no-unused-vars: off`, `no-var: off`, `no-unsafe-*: off`, etc.) — lint is permissive
+- Ignores `**/*.js`, `spec/**/*`, `node_modules`
