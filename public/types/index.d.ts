@@ -186,7 +186,7 @@ declare module "cli-commands-version" {
         constructor({ switchCommander }: {
             switchCommander: SwitchCommander;
         });
-        syncGit(versionString: any, commitMsg: any, syncNpm?: boolean): void;
+        syncGit(versionString: any, commitMsg: any, syncNpm?: boolean): Promise<void>;
         parseVersionString(versionString: string): {
             major: string;
             minor: string;

@@ -44,7 +44,7 @@ class CommandHandler extends qcobjects_1.InheritClass {
         this.switchCommander = switchCommander;
         const commandHandler = this;
         this.choiceOption = {
-            v_major(filename, options) {
+            async v_major(filename, options) {
                 filename = (typeof filename === "undefined") ? ("VERSION") : (filename);
                 const versionString = this.getVersionStringFromFile(filename);
                 const versionSuffix = this.parseVersionSuffix(versionString);
@@ -56,10 +56,10 @@ class CommandHandler extends qcobjects_1.InheritClass {
                 this.saveNewVersionFile(filename, newVersion);
                 if (options.syncGit) {
                     var commitMsg = options.commitMsg || `New Version v${newVersion}`;
-                    this.syncGit(newVersion, commitMsg, options.syncNpm);
+                    await this.syncGit(newVersion, commitMsg, options.syncNpm);
                 }
             },
-            v_minor(filename, options) {
+            async v_minor(filename, options) {
                 filename = (typeof filename === "undefined") ? ("VERSION") : (filename);
                 const versionString = this.getVersionStringFromFile(filename);
                 const versionSuffix = this.parseVersionSuffix(versionString);
@@ -71,10 +71,10 @@ class CommandHandler extends qcobjects_1.InheritClass {
                 this.saveNewVersionFile(filename, newVersion);
                 if (options.syncGit) {
                     var commitMsg = options.commitMsg || `New Version v${newVersion}`;
-                    this.syncGit(newVersion, commitMsg, options.syncNpm);
+                    await this.syncGit(newVersion, commitMsg, options.syncNpm);
                 }
             },
-            v_patch(filename, options) {
+            async v_patch(filename, options) {
                 filename = (typeof filename === "undefined") ? ("VERSION") : (filename);
                 const versionString = this.getVersionStringFromFile(filename);
                 const versionSuffix = this.parseVersionSuffix(versionString);
@@ -86,7 +86,7 @@ class CommandHandler extends qcobjects_1.InheritClass {
                 this.saveNewVersionFile(filename, newVersion);
                 if (options.syncGit) {
                     var commitMsg = options.commitMsg || `New Version v${newVersion}`;
-                    this.syncGit(newVersion, commitMsg, options.syncNpm);
+                    await this.syncGit(newVersion, commitMsg, options.syncNpm);
                 }
             },
             v_sync(filename, options) {
@@ -151,7 +151,7 @@ class CommandHandler extends qcobjects_1.InheritClass {
             .option("-m, --commit-msg [message]", "Commit Message")
             .description("Semantic Versioning: Upgrade to a new major version")
             .action(function (args, options) {
-            commandHandler.choiceOption.v_major.call(commandHandler, args, options);
+            return commandHandler.choiceOption.v_major.call(commandHandler, args, options);
         });
         switchCommander.program.command("v-minor [filename]")
             .option("--git, --sync-git", "Sync with Git")
@@ -159,7 +159,7 @@ class CommandHandler extends qcobjects_1.InheritClass {
             .option("-m, --commit-msg [message]", "Commit Message")
             .description("Semantic Versioning: Upgrade to a new minor version")
             .action(function (args, options) {
-            commandHandler.choiceOption.v_minor.call(commandHandler, args, options);
+            return commandHandler.choiceOption.v_minor.call(commandHandler, args, options);
         });
         switchCommander.program.command("v-patch [filename]")
             .option("--git, --sync-git", "Sync with Git")
@@ -167,7 +167,7 @@ class CommandHandler extends qcobjects_1.InheritClass {
             .option("-m, --commit-msg [message]", "Commit Message")
             .description("Semantic Versioning: Upgrade to a new patch version")
             .action(function (args, options) {
-            commandHandler.choiceOption.v_patch.call(commandHandler, args, options);
+            return commandHandler.choiceOption.v_patch.call(commandHandler, args, options);
         });
         switchCommander.program.command("v-sync [filename]")
             .option("-m, --commit-msg [message]", "Commit Message")
@@ -198,7 +198,7 @@ class CommandHandler extends qcobjects_1.InheritClass {
             _commands_.push(`git tag -a "v${versionString}" -m "${commitMsg}"`);
         }
         _commands_.push("git push && git push --tags");
-        this.switchCommander.shellCommands(_commands_).then(function (response) {
+        return this.switchCommander.shellCommands(_commands_).then(function (response) {
             qcobjects_1.logger.info("Synced to Git");
             qcobjects_1.logger.debug(response);
         }).catch(function (e) {
