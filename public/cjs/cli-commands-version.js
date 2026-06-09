@@ -75,6 +75,7 @@ class CommandHandler extends qcobjects_1.InheritClass {
                 }
             },
             async v_patch(filename, options) {
+
                 filename = (typeof filename === "undefined") ? ("VERSION") : (filename);
                 const versionString = this.getVersionStringFromFile(filename);
                 const versionSuffix = this.parseVersionSuffix(versionString);
