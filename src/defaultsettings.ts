@@ -33,7 +33,7 @@ import "qcobjects";
 import {readFileSync} from "node:fs";
 import path from "node:path";
 import fs from "node:fs";
-import { CONFIG, global, logger, _Crypt, findPackageNodePath, Export, _DataStringify } from "qcobjects";
+import { CONFIG, global, logger, _Crypt, findPackageNodePath, Export, _DataStringify, Processor } from "qcobjects";
 
 export const __get_version__ = () => {
 
@@ -81,9 +81,22 @@ Export(getProjectPath);
 
 
 const __load_default_settings__ = () => {
-  CONFIG.set("domain", "$ENV(DOMAIN)");
-  CONFIG.set("certificate_provider", "$ENV(CERTIFICATE_PROVIDER)");
-  CONFIG.set("devmode", "$ENV(DEVMODE)");
+  // Temporary $ENV(VAR,default) override until qcobjects core ships it
+  function ENV(_component: any, arg: string) {
+    if (typeof process === "undefined") { return ""; }
+    const commaIndex = arg.indexOf(",");
+    if (commaIndex === -1) {
+      return process.env[arg.trim()] ?? "";
+    }
+    const varName = arg.substring(0, commaIndex).trim();
+    const defaultValue = arg.substring(commaIndex + 1).trim();
+    return process.env[varName] ?? defaultValue;
+  }
+  Processor.setProcessor(ENV);
+
+  CONFIG.set("domain", "$ENV(DOMAIN,localhost)");
+  CONFIG.set("certificate_provider", "$ENV(CERTIFICATE_PROVIDER,self_signed)");
+  CONFIG.set("devmode", "$ENV(DEVMODE,info)");
   CONFIG.set("autodiscover", true);
   CONFIG.set("autodiscover_commands", true);
   CONFIG.set("autodiscover_handlers", true);
@@ -98,20 +111,20 @@ const __load_default_settings__ = () => {
   CONFIG.set("private-key-pem", "$config(domain)-privkey.pem");
   CONFIG.set("private-cert-pem", "$config(domain)-cert.pem");
   CONFIG.set("enableShellCommands", true);
-  CONFIG.set("OPENAI_API_KEY", "$ENV(OPENAI_API_KEY)");
+  CONFIG.set("OPENAI_API_KEY", "$ENV(OPENAI_API_KEY,)");
 
   // Set backend configuration
   const backend = {
     db_engine: {
-      name: "$ENV(ENGINE_NAME)",
-      databaseName: "$ENV(DATABASE_NAME)"
+      name: "$ENV(ENGINE_NAME,)",
+      databaseName: "$ENV(DATABASE_NAME,)"
     },
     auth: {
       enabled: true,
-      defaultUser: "$ENV(DEFAULT_USER)",
-      defaultPasswd: "$ENV(DEFAULT_PASSWORD)",
-      microsoftapikey: "$ENV(MICROSOFT_API_KEY)",
-      googleapikey: "$ENV(GOOGLE_API_KEY)"
+      defaultUser: "$ENV(DEFAULT_USER,)",
+      defaultPasswd: "$ENV(DEFAULT_PASSWORD,)",
+      microsoftapikey: "$ENV(MICROSOFT_API_KEY,)",
+      googleapikey: "$ENV(GOOGLE_API_KEY,)"
     },
     routes: [
     ]

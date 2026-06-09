@@ -22,6 +22,8 @@ class FileDispatcher extends InheritClass {
     headers = {},
     body = "",
     filename = "",
+    scriptname,
+    pathname,
     done
   }) {
     super({
@@ -31,6 +33,8 @@ class FileDispatcher extends InheritClass {
       headers,
       body,
       filename,
+      scriptname,
+      pathname,
       done
     });
     var o = this;

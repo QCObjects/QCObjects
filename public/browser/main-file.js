@@ -54,6 +54,8 @@ var global = (() => {
       headers = {},
       body = "",
       filename = "",
+      scriptname,
+      pathname,
       done
     }) {
       super({
@@ -63,6 +65,8 @@ var global = (() => {
         headers,
         body,
         filename,
+        scriptname,
+        pathname,
         done
       });
       var o = this;
