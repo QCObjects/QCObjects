@@ -59,9 +59,9 @@ class FileDispatcher extends qcobjects_1.InheritClass {
             done
         });
         var o = this;
-        var scriptname = o.scriptname;
+        scriptname = o.scriptname;
         this.filename = scriptname;
-        var pathname = (o.pathname !== "") ? (o.pathname + "/") : ("");
+        pathname = (o.pathname !== "") ? (o.pathname + "/") : ("");
         var appTemplateInstance = this;
         if (typeof appTemplateInstance.headers === "undefined") {
             appTemplateInstance.headers = {

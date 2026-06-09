@@ -75,7 +75,6 @@ class CommandHandler extends qcobjects_1.InheritClass {
                 }
             },
             async v_patch(filename, options) {
-
                 filename = (typeof filename === "undefined") ? ("VERSION") : (filename);
                 const versionString = this.getVersionStringFromFile(filename);
                 const versionSuffix = this.parseVersionSuffix(versionString);
@@ -147,24 +146,24 @@ class CommandHandler extends qcobjects_1.InheritClass {
             }
         };
         switchCommander.program.command("v-major [filename]")
-            .option("--git, --sync-git", "Sync with Git")
-            .option("--npm, --sync-npm", "Sync with NPM")
+            .option("--sync-git, --git", "Sync with Git")
+            .option("--sync-npm, --npm", "Sync with NPM")
             .option("-m, --commit-msg [message]", "Commit Message")
             .description("Semantic Versioning: Upgrade to a new major version")
             .action(function (args, options) {
             return commandHandler.choiceOption.v_major.call(commandHandler, args, options);
         });
         switchCommander.program.command("v-minor [filename]")
-            .option("--git, --sync-git", "Sync with Git")
-            .option("--npm, --sync-npm", "Sync with NPM")
+            .option("--sync-git, --git", "Sync with Git")
+            .option("--sync-npm, --npm", "Sync with NPM")
             .option("-m, --commit-msg [message]", "Commit Message")
             .description("Semantic Versioning: Upgrade to a new minor version")
             .action(function (args, options) {
             return commandHandler.choiceOption.v_minor.call(commandHandler, args, options);
         });
         switchCommander.program.command("v-patch [filename]")
-            .option("--git, --sync-git", "Sync with Git")
-            .option("--npm, --sync-npm", "Sync with NPM")
+            .option("--sync-git, --git", "Sync with Git")
+            .option("--sync-npm, --npm", "Sync with NPM")
             .option("-m, --commit-msg [message]", "Commit Message")
             .description("Semantic Versioning: Upgrade to a new patch version")
             .action(function (args, options) {
