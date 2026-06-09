@@ -142,34 +142,19 @@ class CommandHandler extends InheritClass {
     });
   }
   syncGit(versionString, commitMsg, syncNpm = false) {
-    let _commands_ = [];
+    let _commands_ = ["git fetch --tags -f"];
+    _commands_.push(`git add . && git commit -am "${commitMsg}"`);
     if (syncNpm) {
-      _commands_ = _commands_.concat(
-        [
-          "git fetch --tags -f",
-          `npm version "${versionString}" -m "${commitMsg}"`
-        ]
-      );
+      _commands_.push(`npm version "${versionString}" -m "${commitMsg}"`);
     }
-    _commands_ = _commands_.concat(
-      [
-        `git add . && git commit -am "${commitMsg}"`,
-        "git fetch origin --tags",
-        "git tag -ln"
-      ]
-    );
+    _commands_ = _commands_.concat([
+      "git fetch origin --tags",
+      "git tag -ln"
+    ]);
     if (!syncNpm) {
-      _commands_ = _commands_.concat(
-        [
-          `git tag -a "v${versionString}" -m "${commitMsg}"`
-        ]
-      );
+      _commands_.push(`git tag -a "v${versionString}" -m "${commitMsg}"`);
     }
-    _commands_ = _commands_.concat(
-      [
-        "git push && git push --tags"
-      ]
-    );
+    _commands_.push("git push && git push --tags");
     this.switchCommander.shellCommands(_commands_).then(function(response) {
       logger.info("Synced to Git");
       logger.debug(response);

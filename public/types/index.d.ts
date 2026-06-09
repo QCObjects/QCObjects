@@ -152,7 +152,7 @@ declare module "cli-main" {
         };
         program: any;
         constructor();
-        shellCommands(_shell_commands: any[]): Promise<unknown>;
+        shellCommands(_shell_commands: any[]): Promise<any[]>;
         fileListRecursive(dir: string): string | string[];
         register(email: any, phonenumber: any): Promise<unknown>;
         generateServiceWorker(appName: any, dirPrefix?: string): Promise<unknown>;
