@@ -1,6 +1,6 @@
 {
   "name": "qcobjects-cli",
-  "version": "2.5.155",
+  "version": "2.5.156",
   "description": "qcobjects cli command line tool",
   "main": "public/cjs/index.js",
   "module": "public/esm/index.mjs",
