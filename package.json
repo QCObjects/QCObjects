@@ -148,8 +148,8 @@
     "yaml": "^2.6.0"
   },
   "peerDependencies": {
-    "qcobjects": "^2.5.142-beta",
-    "qcobjects-sdk": ">=2.5.101-beta"
+    "qcobjects": ">=2.5.142",
+    "qcobjects-sdk": ">=2.5.105"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^2.1.4",
