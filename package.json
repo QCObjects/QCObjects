@@ -127,16 +127,16 @@
   },
   "homepage": "https://qcobjects.dev",
   "bin": {
-    "qco": "public/cjs/qcobjects-cli.js",
-    "qcobjects": "public/cjs/qcobjects-cli.js",
-    "qcobjects-cli": "public/cjs/qcobjects-cli.js",
-    "qcobjects-server": "public/cjs/qcobjects-http2-server.js",
-    "qcobjects-http2-server": "public/cjs/qcobjects-http2-server.js",
-    "qcobjects-shell": "public/cjs/qcobjects-shell.js",
-    "qcobjects-createcert": "public/cjs/qcobjects-createcert.js",
-    "qcobjects-gae-server": "public/cjs/qcobjects-gae-http-server.js",
-    "qcobjects-http-server": "public/cjs/qcobjects-http-server.js",
-    "qcobjects-collab": "public/cjs/qcobjects-collab.js"
+    "qco": "bin/qcobjects-cli.js",
+    "qcobjects": "bin/qcobjects-cli.js",
+    "qcobjects-cli": "bin/qcobjects-cli.js",
+    "qcobjects-server": "bin/qcobjects-cli.js",
+    "qcobjects-http2-server": "bin/qcobjects-cli.js",
+    "qcobjects-shell": "bin/qcobjects-cli.js",
+    "qcobjects-createcert": "bin/qcobjects-cli.js",
+    "qcobjects-gae-server": "bin/qcobjects-cli.js",
+    "qcobjects-http-server": "bin/qcobjects-cli.js",
+    "qcobjects-collab": "bin/qcobjects-cli.js"
   },
   "dependencies": {
     "commander": "^10.0.1",
