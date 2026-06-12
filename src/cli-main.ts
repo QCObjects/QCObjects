@@ -102,7 +102,7 @@ export class SwitchCommander extends InheritClass {
           return;
         }
 
-        exec(`npm i --save-dev ${appTemplateName}`, () => {
+        exec(`npm i --save-dev --legacy-peer-deps ${appTemplateName}`, () => {
 
           (async () => {
             const _package_json_template_file = await import(_package_json_template_fname);
@@ -131,10 +131,10 @@ export class SwitchCommander extends InheritClass {
                     execSync("npm install --save-dev qcobjects-cli ");
                   });
                   */
-                  execSync("npm install --save-dev qcobjects-cli ");
+                  execSync("npm install --save-dev --legacy-peer-deps qcobjects-cli ");
                 });
 
-                exec("npm cache verify && npm i ", (err) => {
+                exec("npm cache verify && npm i --legacy-peer-deps ", (err) => {
                   if (err) {
                     throw Error(err.message);
                     // eslint-disable-next-line no-unreachable
