@@ -156,6 +156,9 @@ export class SwitchCommander extends InheritClass {
                       "User-Agent": "qcobjects-cli"
                     };
                     githubService.done = () => { };
+                    githubService.fail = () => {
+                      logger.debug("Could not fetch .gitignore from GitHub, skipping.");
+                    };
                     serviceLoader(githubService)
                       .then(({ service }: { service: any }) => {
                         fs.writeFileSync(path.resolve(CONFIG.get("projectPath"), "./.gitignore"), service.template);

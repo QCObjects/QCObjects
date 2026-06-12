@@ -10,7 +10,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       # TODO: Add setup step for your language/runtime
       # TODO: Add lint step (e.g., ruff check .)
       - name: Lint (placeholder)
@@ -19,7 +19,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       # TODO: Add setup step for your language/runtime
       # TODO: Add test step (e.g., pytest -v)
       - name: Test (placeholder)
