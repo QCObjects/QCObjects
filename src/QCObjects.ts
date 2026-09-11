@@ -1,5 +1,5 @@
 /**
- * QCObjects  2.4
+ * QCObjects Framework
  * ________________
  *
  * Author: Jean Machuca <correojean@gmail.com>
