@@ -6,7 +6,11 @@ import { _protected_code_ } from "./introspection";
 import { isBrowser } from "./platform";
 import { I_ComponentWidget_ } from "types";
 
-class QCObjectsWidgetNode implements I_ComponentWidget_ {
+class QCObjectsWidgetNode {
+  // Deliberate stub for non-browser ecosystems: no DOM here, every member
+  // throws. Index signature keeps it shape-compatible without chasing
+  // lib.dom additions; do NOT re-add an `implements HTMLElement` clause.
+  [key: string]: any;
   writingSuggestions!: string;
   currentCSSZoom!: number;
   ariaColIndexText!: string | null;
@@ -210,7 +214,7 @@ class QCObjectsWidgetNode implements I_ComponentWidget_ {
   parentElement!: HTMLElement | null;
   parentNode!: ParentNode | null;
   previousSibling!: ChildNode | null;
-  textContent!: string | null;
+  textContent!: string;
   appendChild<T extends Node>(node: T): T {
     throw new Error("Method not implemented.");
   }
@@ -523,7 +527,7 @@ if (isBrowser) {
       super();
       throw new Error ("Class not implemented.");
     }
-  };
+  } as unknown as CustomElementConstructor;
 }
 Export(_ComponentWidget_);
 export const RegisterWidget = (widgetName: string):void => {

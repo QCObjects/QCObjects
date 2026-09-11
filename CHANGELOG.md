@@ -621,6 +621,10 @@ v2.4.9-beta     allow _new_ only to be called once for every object instance
 # Changelog 
 
 This is an automatic Changelog history of versions generated using the command: **qcobjects v-changelog > CHANGELOG.md**
+## v2.6.1
+
+	- Build fixes: WidgetsFactory lib.dom conformance (unblocks npm publish)
+
 ## v2.6.0
 
 	- License migration LGPLv3 -> MIT (LICENSE.txt, package.json, source headers)
