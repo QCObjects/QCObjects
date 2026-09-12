@@ -1,5 +1,4 @@
 import { isBrowser } from "./platform";
-import process from "node:process";
 
 export var _basePath_:string = (
     function ():string {
@@ -9,9 +8,15 @@ export var _basePath_:string = (
         baseURI.pop();
         _basePath = baseURI.join("/") + "/";
       } else {
-        if (typeof process !== "undefined") {
-          _basePath = `${(process).cwd()}/`;
-        } else {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const nodeProcess = require("node:process");
+          if (typeof nodeProcess !== "undefined") {
+            _basePath = `${(nodeProcess).cwd()}/`;
+          } else {
+            _basePath = "";
+          }
+        } catch {
           _basePath = "";
         }
       }

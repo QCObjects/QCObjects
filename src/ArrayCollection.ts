@@ -113,7 +113,7 @@ export class ArrayCollection implements IArrayCollection {
     const self = this;
     let _index = 0;
     self.source = New(ClassFactory("ArrayList"), source);
-    for (const _k in self.source) {
+    for (const _k of Object.keys(self.source)) {
       if (!isNaN(_k as any)) {
         logger.debug("binding " + _k.toString());
         (function (_pname:any) {

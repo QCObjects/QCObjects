@@ -4,6 +4,7 @@ import { isBrowser } from "./platform";
 export const _DOMCreateElement = function (elementName: string, props?: any[], children?: any): IQCObjectsElement {
     let _ret_;
     if (isBrowser) {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- load-bearing: tsc rejects the unasserted HTMLElement at the IQCObjectsElement return below (TS2740); the rule only sees the evolving-let receiver
         _ret_ = _DOMCreateComplexElement(elementName, props, children) as unknown as IQCObjectsElement;
     } else {
         _ret_ = {} as IQCObjectsElement;

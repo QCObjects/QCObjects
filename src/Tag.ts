@@ -31,7 +31,7 @@ export class TagElements extends ArrayList implements ITagElements {
     findElements(elementName:any):any {
       const _o = New(ClassFactory("TagElements"));
       if (isBrowser) {
-        for (const _k in this) {
+        for (const _k of Object.keys(this)) {
           if (typeof _k === "number" && typeof this[_k] !== "function" && Object.hasOwn(this[_k], "subelements")) {
             _o.push(this[_k].subelements(elementName));
           }

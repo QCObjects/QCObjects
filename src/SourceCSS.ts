@@ -1,4 +1,4 @@
-import { ISourceCSS, TBody } from "types";
+import { ISourceCSS } from "types";
 import { _basePath_ } from "./basePath";
 import { _Cast } from "./Cast";
 import { _domain_ } from "./domain";
@@ -17,7 +17,7 @@ export class SourceCSS extends InheritClass implements ISourceCSS {
 
   constructor(o: any) {
     super(o);
-    this.body = _DOMCreateElement("link") as TBody;
+    this.body = _DOMCreateElement("link");
   }
   fail(): void {
     throw new Error("Method not implemented.");
