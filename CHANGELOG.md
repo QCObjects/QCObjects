@@ -621,6 +621,12 @@ v2.4.9-beta     allow _new_ only to be called once for every object instance
 # Changelog 
 
 This is an automatic Changelog history of versions generated using the command: **qcobjects v-changelog > CHANGELOG.md**
+## v2.6.2
+
+	- fix: repository.url + bugs.url QuickCorp -> QCObjects (Sigstore provenance E422 hard-blocks OIDC publishes against stale org)
+	- fix: lazify node builtins (basePath, findPackageNodePath) + type-only types re-export (browser-safe dists; 0 eager node:/types top-level imports)
+	- fix: eslint-disable for no-unnecessary-type-assertion on load-bearing assertion (repo build was self-breaking)
+
 ## v2.6.1
 
 	- Build fixes: WidgetsFactory lib.dom conformance (unblocks npm publish)
