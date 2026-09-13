@@ -283,9 +283,9 @@ var init_platform = __esm({
         return r;
       })(name);
     }, "_require_");
-    is_phonegap = /* @__PURE__ */ function() {
+    is_phonegap = /* @__PURE__ */ (function() {
       return typeof cordova !== "undefined";
-    }();
+    })();
   }
 });
 
@@ -303,6 +303,7 @@ var init_Logger = __esm({
       debugEnabled = true;
       infoEnabled = true;
       warnEnabled = true;
+      errorEnabled = true;
       debug(message) {
         if (this.debugEnabled) {
           console.log("\x1B[35m%s\x1B[0m", `[DEBUG][${performance.now().toLocaleString()}] ${message}`);
@@ -322,6 +323,11 @@ var init_Logger = __esm({
       warn(message) {
         if (this.warnEnabled) {
           console.warn("\x1B[31m%s\x1B[0m", `[WARN][${performance.now().toLocaleString()}] ${message}`);
+        }
+      }
+      error(message) {
+        if (this.errorEnabled) {
+          console.error("\x1B[31m%s\x1B[0m", `[ERROR][${performance.now().toLocaleString()}] ${message}`);
         }
       }
     };
@@ -405,7 +411,7 @@ var init_DOMCreateElement = __esm({
         });
       }
       if (Array.isArray(children)) {
-        children.filter((child) => child instanceof Node).forEach((child) => {
+        children.filter(((child) => child instanceof Node)).forEach((child) => {
           element.appendChild(child);
         });
       } else if (children instanceof Node) {
@@ -436,9 +442,9 @@ var init_introspection = __esm({
   "src/introspection.ts"() {
     "use strict";
     _protected_code_ = /* @__PURE__ */ __name((_) => {
-      const __oldtoString = typeof _.prototype !== "undefined" ? _.prototype.toString : function() {
+      const __oldtoString = typeof _.prototype !== "undefined" ? _.prototype.toString : (function() {
         return "";
-      };
+      });
       if (typeof _.prototype !== "undefined") {
         _.prototype.toString = function() {
           const _protected_symbols = [
@@ -1226,27 +1232,31 @@ var init_Base64 = __esm({
 });
 
 // src/basePath.ts
-import process2 from "node:process";
 var _basePath_, setBasePath;
 var init_basePath = __esm({
   "src/basePath.ts"() {
     "use strict";
     init_platform();
-    _basePath_ = function() {
+    _basePath_ = (function() {
       let _basePath = "";
       if (isBrowser) {
         const baseURI = document.baseURI.split("?")[0].split("/");
         baseURI.pop();
         _basePath = baseURI.join("/") + "/";
       } else {
-        if (typeof process2 !== "undefined") {
-          _basePath = `${process2.cwd()}/`;
-        } else {
+        try {
+          const nodeProcess = __require("node:process");
+          if (typeof nodeProcess !== "undefined") {
+            _basePath = `${nodeProcess.cwd()}/`;
+          } else {
+            _basePath = "";
+          }
+        } catch {
           _basePath = "";
         }
       }
       return _basePath;
-    }();
+    })();
     setBasePath = /* @__PURE__ */ __name((value) => {
       _basePath_ = value;
     }, "setBasePath");
@@ -1483,14 +1493,14 @@ var init_CONFIG = __esm({
         }
         let _conf;
         try {
-          _conf = function(config) {
+          _conf = (function(config) {
             if (config._CONFIG_ENC === null) {
               config._CONFIG_ENC = _Crypt.encrypt(_DataStringify({}), _secretKey);
             }
             const _protectedEnc = config._CONFIG_ENC.valueOf();
             const _protectedConf = config._CONFIG?.valueOf();
             return _CastProps(_protectedConf, _DecryptObject(_protectedEnc));
-          }(ConfigSettings.instance);
+          })(ConfigSettings.instance);
         } catch (e) {
           _conf = {};
           console.error(e);
@@ -1503,14 +1513,14 @@ var init_CONFIG = __esm({
       get(name, _default) {
         let _value;
         try {
-          const _conf = function(config) {
+          const _conf = (function(config) {
             if (config._CONFIG_ENC === null) {
               config._CONFIG_ENC = _Crypt.encrypt(_DataStringify({}), _secretKey);
             }
             const _protectedEnc = config._CONFIG_ENC.valueOf();
             const _protectedConf = config._CONFIG.valueOf();
             return _CastProps(_protectedConf, _DecryptObject(_protectedEnc));
-          }(ConfigSettings.instance);
+          })(ConfigSettings.instance);
           if (typeof _conf[name] !== "undefined") {
             _value = _conf[name];
           }
@@ -3891,9 +3901,19 @@ var init_top = __esm({
       Export(ClassFactory("GLOBAL"));
     }
     if (isBrowser && typeof window !== "undefined") {
-      set("global", window);
+      Object.defineProperty(_top, "global", {
+        writable: true,
+        configurable: true,
+        enumerable: true,
+        value: window
+      });
     } else if (isBrowser && typeof globalThis !== "undefined") {
-      set("global", globalThis);
+      Object.defineProperty(_top, "global", {
+        writable: true,
+        configurable: true,
+        enumerable: true,
+        value: globalThis
+      });
     }
     _define_props(_top);
   }
@@ -4052,7 +4072,6 @@ var init_defaultProcessors = __esm({
 });
 
 // src/findPackageNodePath.ts
-import fs from "node:fs";
 var findPackageNodePath;
 var init_findPackageNodePath = __esm({
   "src/findPackageNodePath.ts"() {
@@ -4065,6 +4084,7 @@ var init_findPackageNodePath = __esm({
       let sdkPath = null;
       if (!isBrowser) {
         try {
+          const fs = __require("node:fs");
           let sdkPaths = [
             `${CONFIG.get("projectPath")}${CONFIG.get("relativeImportPath")}`,
             `${CONFIG.get("basePath")}${CONFIG.get("relativeImportPath")}`,
@@ -4347,11 +4367,11 @@ var init_ArrayCollection = __esm({
         }, 0);
       }
       sortBy(propName, sortAsc) {
-        const sort_function = sortAsc ? function(prev, current) {
+        const sort_function = sortAsc ? (function(prev, current) {
           return current[propName] < prev[propName] ? 1 : -1;
-        } : function(prev, current) {
+        }) : (function(prev, current) {
           return current[propName] > prev[propName] ? 1 : -1;
-        };
+        });
         return this.sort(sort_function);
       }
       matrix(length, fillValue) {
@@ -4418,7 +4438,7 @@ var init_ArrayCollection = __esm({
         const self2 = this;
         let _index = 0;
         self2.source = New(ClassFactory("ArrayList"), source);
-        for (const _k in self2.source) {
+        for (const _k of Object.keys(self2.source)) {
           if (!isNaN(_k)) {
             logger.debug("binding " + _k.toString());
             (function(_pname) {
@@ -4485,7 +4505,7 @@ var init_Tag = __esm({
       findElements(elementName) {
         const _o = New(ClassFactory("TagElements"));
         if (isBrowser) {
-          for (const _k in this) {
+          for (const _k of Object.keys(this)) {
             if (typeof _k === "number" && typeof this[_k] !== "function" && Object.hasOwn(this[_k], "subelements")) {
               _o.push(this[_k].subelements(elementName));
             }
@@ -4703,7 +4723,7 @@ var require_MainProcess = __commonJS({
     init_globalSettings();
     init_loadSDK();
     init_range();
-    (/* @__PURE__ */ __name(function __qcobjects__(_top2) {
+    (/* @__PURE__ */ __name((function __qcobjects__(_top2) {
       if (typeof Object.defineProperty !== "undefined" && typeof _top2 !== "undefined") {
         try {
           Object.defineProperty(_top2, "__qcobjects__", {
@@ -4876,11 +4896,11 @@ var require_MainProcess = __commonJS({
         _protected_code_(Array.max);
         _protected_code_(Array.prototype.max);
         Array.prototype.sortBy = function(propName, sortAsc = true) {
-          const sort_function = sortAsc ? function(prev, current) {
+          const sort_function = sortAsc ? (function(prev, current) {
             return current[propName] < prev[propName] ? 1 : -1;
-          } : function(prev, current) {
+          }) : (function(prev, current) {
             return current[propName] > prev[propName] ? 1 : -1;
-          };
+          });
           return this.sort(sort_function);
         };
         Array.sortBy = function(a, propName, sortAsc = true) {
@@ -5051,7 +5071,7 @@ var require_MainProcess = __commonJS({
           }
         })(isBrowser);
       }
-    }, "__qcobjects__"))(_top);
+    }), "__qcobjects__"))(_top);
   }
 });
 
@@ -5439,7 +5459,7 @@ var SourceJS = class extends InheritClass {
     const context = this;
     try {
       document.getElementsByTagName(context.containerTag)[0].appendChild(
-        function(s, url, context2) {
+        (function(s, url, context2) {
           s.type = context2.type;
           s.src = url;
           s.crossOrigin = Object.hasOwn(context2, "crossOrigin") ? context2.crossOrigin : "anonymous";
@@ -5459,7 +5479,7 @@ var SourceJS = class extends InheritClass {
           };
           context2.body = s;
           return s;
-        }.call(
+        }).call(
           this,
           _DOMCreateElement("script"),
           this.external ? this.url : this.basePath + this.url,
@@ -5522,7 +5542,7 @@ var SourceCSS = class extends InheritClass {
     const context = this;
     if (isBrowser) {
       window.document.getElementsByTagName("head")[0].appendChild(
-        function(s, url, context2) {
+        (function(s, url, context2) {
           s.type = "text/css";
           s.rel = "stylesheet";
           s.href = url;
@@ -5535,7 +5555,7 @@ var SourceCSS = class extends InheritClass {
           s.onload = context2.done;
           context2.body = s;
           return s;
-        }.call(
+        }).call(
           this,
           _DOMCreateElement("link"),
           this.external ? this.url : this.basePath + this.url,
