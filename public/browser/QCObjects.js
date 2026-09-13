@@ -286,9 +286,9 @@ var global = (() => {
           return r;
         })(name);
       }, "_require_");
-      is_phonegap = /* @__PURE__ */ function() {
+      is_phonegap = /* @__PURE__ */ (function() {
         return typeof cordova !== "undefined";
-      }();
+      })();
     }
   });
 
@@ -306,6 +306,7 @@ var global = (() => {
         debugEnabled = true;
         infoEnabled = true;
         warnEnabled = true;
+        errorEnabled = true;
         debug(message) {
           if (this.debugEnabled) {
             console.log("\x1B[35m%s\x1B[0m", `[DEBUG][${performance.now().toLocaleString()}] ${message}`);
@@ -325,6 +326,11 @@ var global = (() => {
         warn(message) {
           if (this.warnEnabled) {
             console.warn("\x1B[31m%s\x1B[0m", `[WARN][${performance.now().toLocaleString()}] ${message}`);
+          }
+        }
+        error(message) {
+          if (this.errorEnabled) {
+            console.error("\x1B[31m%s\x1B[0m", `[ERROR][${performance.now().toLocaleString()}] ${message}`);
           }
         }
       };
@@ -408,7 +414,7 @@ var global = (() => {
           });
         }
         if (Array.isArray(children)) {
-          children.filter((child) => child instanceof Node).forEach((child) => {
+          children.filter(((child) => child instanceof Node)).forEach((child) => {
             element.appendChild(child);
           });
         } else if (children instanceof Node) {
@@ -439,9 +445,9 @@ var global = (() => {
     "src/introspection.ts"() {
       "use strict";
       _protected_code_ = /* @__PURE__ */ __name((_) => {
-        const __oldtoString = typeof _.prototype !== "undefined" ? _.prototype.toString : function() {
+        const __oldtoString = typeof _.prototype !== "undefined" ? _.prototype.toString : (function() {
           return "";
-        };
+        });
         if (typeof _.prototype !== "undefined") {
           _.prototype.toString = function() {
             const _protected_symbols = [
@@ -1229,27 +1235,31 @@ var global = (() => {
   });
 
   // src/basePath.ts
-  var import_node_process, _basePath_, setBasePath;
+  var _basePath_, setBasePath;
   var init_basePath = __esm({
     "src/basePath.ts"() {
       "use strict";
       init_platform();
-      import_node_process = __toESM(__require("node:process"));
-      _basePath_ = function() {
+      _basePath_ = (function() {
         let _basePath = "";
         if (isBrowser) {
           const baseURI = document.baseURI.split("?")[0].split("/");
           baseURI.pop();
           _basePath = baseURI.join("/") + "/";
         } else {
-          if (typeof import_node_process.default !== "undefined") {
-            _basePath = `${import_node_process.default.cwd()}/`;
-          } else {
+          try {
+            const nodeProcess = __require("node:process");
+            if (typeof nodeProcess !== "undefined") {
+              _basePath = `${nodeProcess.cwd()}/`;
+            } else {
+              _basePath = "";
+            }
+          } catch {
             _basePath = "";
           }
         }
         return _basePath;
-      }();
+      })();
       setBasePath = /* @__PURE__ */ __name((value) => {
         _basePath_ = value;
       }, "setBasePath");
@@ -1486,14 +1496,14 @@ var global = (() => {
           }
           let _conf;
           try {
-            _conf = function(config) {
+            _conf = (function(config) {
               if (config._CONFIG_ENC === null) {
                 config._CONFIG_ENC = _Crypt.encrypt(_DataStringify({}), _secretKey);
               }
               const _protectedEnc = config._CONFIG_ENC.valueOf();
               const _protectedConf = config._CONFIG?.valueOf();
               return _CastProps(_protectedConf, _DecryptObject(_protectedEnc));
-            }(ConfigSettings.instance);
+            })(ConfigSettings.instance);
           } catch (e) {
             _conf = {};
             console.error(e);
@@ -1506,14 +1516,14 @@ var global = (() => {
         get(name, _default) {
           let _value;
           try {
-            const _conf = function(config) {
+            const _conf = (function(config) {
               if (config._CONFIG_ENC === null) {
                 config._CONFIG_ENC = _Crypt.encrypt(_DataStringify({}), _secretKey);
               }
               const _protectedEnc = config._CONFIG_ENC.valueOf();
               const _protectedConf = config._CONFIG.valueOf();
               return _CastProps(_protectedConf, _DecryptObject(_protectedEnc));
-            }(ConfigSettings.instance);
+            })(ConfigSettings.instance);
             if (typeof _conf[name] !== "undefined") {
               _value = _conf[name];
             }
@@ -3894,9 +3904,19 @@ var global = (() => {
         Export(ClassFactory("GLOBAL"));
       }
       if (isBrowser && typeof window !== "undefined") {
-        set("global", window);
+        Object.defineProperty(_top, "global", {
+          writable: true,
+          configurable: true,
+          enumerable: true,
+          value: window
+        });
       } else if (isBrowser && typeof globalThis !== "undefined") {
-        set("global", globalThis);
+        Object.defineProperty(_top, "global", {
+          writable: true,
+          configurable: true,
+          enumerable: true,
+          value: globalThis
+        });
       }
       _define_props(_top);
     }
@@ -4055,7 +4075,7 @@ var global = (() => {
   });
 
   // src/findPackageNodePath.ts
-  var import_node_fs, findPackageNodePath;
+  var findPackageNodePath;
   var init_findPackageNodePath = __esm({
     "src/findPackageNodePath.ts"() {
       "use strict";
@@ -4063,11 +4083,11 @@ var global = (() => {
       init_Export();
       init_Logger();
       init_platform();
-      import_node_fs = __toESM(__require("node:fs"));
       findPackageNodePath = /* @__PURE__ */ __name(function(packagename) {
         let sdkPath = null;
         if (!isBrowser) {
           try {
+            const fs = __require("node:fs");
             let sdkPaths = [
               `${CONFIG.get("projectPath")}${CONFIG.get("relativeImportPath")}`,
               `${CONFIG.get("basePath")}${CONFIG.get("relativeImportPath")}`,
@@ -4083,7 +4103,7 @@ var global = (() => {
               ""
             ].concat(module.paths);
             sdkPaths = sdkPaths.filter((p) => {
-              return import_node_fs.default.existsSync(p + "/" + packagename);
+              return fs.existsSync(p + "/" + packagename);
             });
             if (sdkPaths.length > 0) {
               sdkPath = sdkPaths[0];
@@ -4350,11 +4370,11 @@ var global = (() => {
           }, 0);
         }
         sortBy(propName, sortAsc) {
-          const sort_function = sortAsc ? function(prev, current) {
+          const sort_function = sortAsc ? (function(prev, current) {
             return current[propName] < prev[propName] ? 1 : -1;
-          } : function(prev, current) {
+          }) : (function(prev, current) {
             return current[propName] > prev[propName] ? 1 : -1;
-          };
+          });
           return this.sort(sort_function);
         }
         matrix(length, fillValue) {
@@ -4421,7 +4441,7 @@ var global = (() => {
           const self2 = this;
           let _index = 0;
           self2.source = New(ClassFactory("ArrayList"), source);
-          for (const _k in self2.source) {
+          for (const _k of Object.keys(self2.source)) {
             if (!isNaN(_k)) {
               logger.debug("binding " + _k.toString());
               (function(_pname) {
@@ -4488,7 +4508,7 @@ var global = (() => {
         findElements(elementName) {
           const _o = New(ClassFactory("TagElements"));
           if (isBrowser) {
-            for (const _k in this) {
+            for (const _k of Object.keys(this)) {
               if (typeof _k === "number" && typeof this[_k] !== "function" && Object.hasOwn(this[_k], "subelements")) {
                 _o.push(this[_k].subelements(elementName));
               }
@@ -4706,7 +4726,7 @@ var global = (() => {
       init_globalSettings();
       init_loadSDK();
       init_range();
-      (/* @__PURE__ */ __name(function __qcobjects__(_top2) {
+      (/* @__PURE__ */ __name((function __qcobjects__(_top2) {
         if (typeof Object.defineProperty !== "undefined" && typeof _top2 !== "undefined") {
           try {
             Object.defineProperty(_top2, "__qcobjects__", {
@@ -4879,11 +4899,11 @@ var global = (() => {
           _protected_code_(Array.max);
           _protected_code_(Array.prototype.max);
           Array.prototype.sortBy = function(propName, sortAsc = true) {
-            const sort_function = sortAsc ? function(prev, current) {
+            const sort_function = sortAsc ? (function(prev, current) {
               return current[propName] < prev[propName] ? 1 : -1;
-            } : function(prev, current) {
+            }) : (function(prev, current) {
               return current[propName] > prev[propName] ? 1 : -1;
-            };
+            });
             return this.sort(sort_function);
           };
           Array.sortBy = function(a, propName, sortAsc = true) {
@@ -5054,7 +5074,7 @@ var global = (() => {
             }
           })(isBrowser);
         }
-      }, "__qcobjects__"))(_top);
+      }), "__qcobjects__"))(_top);
     }
   });
 
@@ -5537,7 +5557,7 @@ var global = (() => {
       const context = this;
       try {
         document.getElementsByTagName(context.containerTag)[0].appendChild(
-          function(s, url, context2) {
+          (function(s, url, context2) {
             s.type = context2.type;
             s.src = url;
             s.crossOrigin = Object.hasOwn(context2, "crossOrigin") ? context2.crossOrigin : "anonymous";
@@ -5557,7 +5577,7 @@ var global = (() => {
             };
             context2.body = s;
             return s;
-          }.call(
+          }).call(
             this,
             _DOMCreateElement("script"),
             this.external ? this.url : this.basePath + this.url,
@@ -5620,7 +5640,7 @@ var global = (() => {
       const context = this;
       if (isBrowser) {
         window.document.getElementsByTagName("head")[0].appendChild(
-          function(s, url, context2) {
+          (function(s, url, context2) {
             s.type = "text/css";
             s.rel = "stylesheet";
             s.href = url;
@@ -5633,7 +5653,7 @@ var global = (() => {
             s.onload = context2.done;
             context2.body = s;
             return s;
-          }.call(
+          }).call(
             this,
             _DOMCreateElement("link"),
             this.external ? this.url : this.basePath + this.url,
