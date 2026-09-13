@@ -200,9 +200,19 @@ const _define_props = function (_top: any) {
   }
 
   if (isBrowser && typeof window !== "undefined") {
-    set("global", window);
+    Object.defineProperty(_top, "global", {
+      writable: true,
+      configurable: true,
+      enumerable: true,
+      value: window
+    });
   } else if (isBrowser && typeof globalThis !== "undefined") {
-    set("global", globalThis);
+    Object.defineProperty(_top, "global", {
+      writable: true,
+      configurable: true,
+      enumerable: true,
+      value: globalThis
+    });
   }
 
   _define_props(_top);
