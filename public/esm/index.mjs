@@ -6599,6 +6599,7 @@ export {
   asyncLoad,
   captureFalseTouch,
   componentLoader,
+  componentsStack,
   findPackageNodePath,
   get,
   getDocumentLayout,

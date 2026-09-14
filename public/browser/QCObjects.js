@@ -5127,6 +5127,7 @@ var global = (() => {
     asyncLoad: () => asyncLoad,
     captureFalseTouch: () => captureFalseTouch,
     componentLoader: () => componentLoader,
+    componentsStack: () => componentsStack,
     findPackageNodePath: () => findPackageNodePath,
     get: () => get,
     getDocumentLayout: () => getDocumentLayout,
