@@ -358,12 +358,12 @@ export class Component extends InheritClass implements IComponent {
                     (a as any).oldclick = a.onclick;
                     a.onclick = function (e) {
                         let _ret_ = true;
-                        if (!_top.global.get("routingPaths")) {
-                            _top.global.set("routingPaths", []);
+                        if (!_top.get("routingPaths")) {
+                            _top.set("routingPaths", []);
                         }
                         const routingWay = CONFIG.get("routingWay");
                         const routingPath = (e.target as any)[routingWay];
-                        if (_top.global.get("routingPaths").includes(routingPath) &&
+                        if (_top.get("routingPaths").includes(routingPath) &&
                             (e.target as any)[routingWay] !== (location as any)[routingWay] &&
                             (e.target as HTMLAnchorElement).href !== document.location.href
                         ) {
@@ -943,11 +943,11 @@ export class Component extends InheritClass implements IComponent {
                             if (!component.routingPaths.includes(routing.path as never)) {
                                 component.routingPaths.push(routing.path as never);
                             }
-                            if (!_top.global.get("routingPaths")) {
-                                _top.global.set("routingPaths", []);
+                            if (!_top.get("routingPaths")) {
+                                _top.set("routingPaths", []);
                             }
-                            if (!_top.global.get("routingPaths").includes(routing.path)) {
-                                _top.global.get("routingPaths").push(routing.path);
+                            if (!_top.get("routingPaths").includes(routing.path)) {
+                                _top.get("routingPaths").push(routing.path);
                             }
                             return routingNode;
                         });
@@ -1132,7 +1132,7 @@ export class Component extends InheritClass implements IComponent {
                 const _componentRoot = component.componentRoot as IQCObjectsShadowedElement;
                 const lang1 = CONFIG.get("lang", "en");
                 const lang2 = navigator.language.slice(0, 2);
-                const i18n = _top.global.get("i18n");
+                const i18n = _top.get("i18n");
                 if ((lang1 !== lang2) && (typeof i18n === "object" && Object.hasOwn(i18n, "messages"))) {
                     const callback_i18n = () => {
                         return new Promise<void>(function (resolve) {

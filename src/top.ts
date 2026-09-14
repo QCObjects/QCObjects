@@ -2,11 +2,7 @@ import { IComplexStorageCache, IComponent, IConfigService, IQCObjectsElement } f
 import { buildComponents } from "./ComponentFactory";
 import { _CastProps } from "./Cast";
 import { GlobalSettings } from "./globalSettings";
-import { Class } from "./Class";
-import { ClassFactory } from "./ClassFactory";
-import { Export } from "./Export";
-import { isBrowser } from "./platform";
-import {  _QC_CLASSES, getPackagesNamesList, getPackagesList, getClassesList, getClassesNamesList } from "./PrimaryCollections";
+import {  getPackagesNamesList, getPackagesList, getClassesList, getClassesNamesList } from "./PrimaryCollections";
 import { logger } from "./Logger";
 
 type QCObjects = {
@@ -85,7 +81,7 @@ type QCObjects = {
     Toggle:any, 
     logger:any, 
     sdk:any, 
-    global:any, 
+    configService:any, 
     ClassFactory:any, 
     Package:any, 
     Import:any,
@@ -96,14 +92,7 @@ type QCObjects = {
     ClassesNameList:any[]
 } &  typeof self   & typeof global ;
 
-export var _top: QCObjects = (
-            (typeof module !== "undefined" && typeof module.exports !== "undefined" && module.exports) ||
-            (typeof global !== "undefined" && global) ||
-            (typeof globalThis !== "undefined" && globalThis) ||
-            (typeof window !== "undefined" && window) ||
-            (typeof self !== "undefined" && self !== null && self) ||
-            this
-) as QCObjects;
+export var _top: QCObjects = {} as QCObjects;
 (_top as any).lastCache = undefined;
 export let componentsStack:IComponent[] = [];
 
@@ -117,7 +106,7 @@ export const buildComponentsStack = ():void => {
 };
 export let configService:IConfigService;
 export const setConfigService = (_configService:IConfigService):void => {
-    _top.global.configService = _configService;
+    _top.configService = _configService;
     configService = _configService;
 };
 
@@ -191,28 +180,5 @@ const _define_props = function (_top: any) {
 
   };
 
-
-  if (isBrowser) {
-    // use of GLOBAL word is deprecated in node.js
-    // this is only for compatibility purpose with old versions of QCObjects in browsers
-    Class("GLOBAL", (_QC_CLASSES as any).global); // case insensitive for compatibility con old versions;
-    Export(ClassFactory("GLOBAL"));
-  }
-
-  if (isBrowser && typeof window !== "undefined") {
-    Object.defineProperty(_top, "global", {
-      writable: true,
-      configurable: true,
-      enumerable: true,
-      value: window
-    });
-  } else if (isBrowser && typeof globalThis !== "undefined") {
-    Object.defineProperty(_top, "global", {
-      writable: true,
-      configurable: true,
-      enumerable: true,
-      value: globalThis
-    });
-  }
 
   _define_props(_top);
