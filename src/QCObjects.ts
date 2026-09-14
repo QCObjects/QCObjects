@@ -25,7 +25,7 @@
 export * as AssignPolyfill from "./assign";
 export * as __top__ from "./top";
 export * as qcobjects from "./MainProcess";
-export {_top, resetTop} from "./top";
+export {_top, resetTop, componentsStack} from "./top";
 export { _QC_CLASSES, _QC_PACKAGES, _QC_PACKAGES_IMPORTED, _QC_READY_LISTENERS } from "./PrimaryCollections";
 export { _DataStringify } from "./DataStringify";
 export { _DOMCreateElement } from "./DOMCreateElement";
