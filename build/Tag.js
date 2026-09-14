@@ -31,7 +31,7 @@ class TagElements extends ArrayCollection_1.ArrayList {
     findElements(elementName) {
         const _o = (0, New_1.New)((0, ClassFactory_1.ClassFactory)("TagElements"));
         if (platform_1.isBrowser) {
-            for (const _k in this) {
+            for (const _k of Object.keys(this)) {
                 if (typeof _k === "number" && typeof this[_k] !== "function" && Object.hasOwn(this[_k], "subelements")) {
                     _o.push(this[_k].subelements(elementName));
                 }

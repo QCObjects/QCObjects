@@ -304,12 +304,12 @@ class Component extends InheritClass_1.InheritClass {
                     a.oldclick = a.onclick;
                     a.onclick = function (e) {
                         let _ret_ = true;
-                        if (!top_1._top.global.get("routingPaths")) {
-                            top_1._top.global.set("routingPaths", []);
+                        if (!top_1._top.get("routingPaths")) {
+                            top_1._top.set("routingPaths", []);
                         }
                         const routingWay = CONFIG_1.CONFIG.get("routingWay");
                         const routingPath = e.target[routingWay];
-                        if (top_1._top.global.get("routingPaths").includes(routingPath) &&
+                        if (top_1._top.get("routingPaths").includes(routingPath) &&
                             e.target[routingWay] !== location[routingWay] &&
                             e.target.href !== document.location.href) {
                             Logger_1.logger.debug("A ROUTING WAS FOUND: " + routingPath);
@@ -859,10 +859,10 @@ class Component extends InheritClass_1.InheritClass {
                         component.routingNodes = componentBody?.subelements("routing");
                         component.routings = [];
                         component.routingNodes.map((routingNode) => {
-                            const attributeNames = routingNode.getAttributeNames();
+                            const attributeNames = (routingNode).getAttributeNames();
                             const routing = {};
                             attributeNames.map((attributeName, a) => {
-                                routing[attributeNames[a]] = routingNode.getAttribute(attributeNames[a]);
+                                routing[attributeNames[a]] = (routingNode).getAttribute(attributeNames[a]);
                                 return attributeName;
                             });
                             component.routings.push(routing);
@@ -872,11 +872,11 @@ class Component extends InheritClass_1.InheritClass {
                             if (!component.routingPaths.includes(routing.path)) {
                                 component.routingPaths.push(routing.path);
                             }
-                            if (!top_1._top.global.get("routingPaths")) {
-                                top_1._top.global.set("routingPaths", []);
+                            if (!top_1._top.get("routingPaths")) {
+                                top_1._top.set("routingPaths", []);
                             }
-                            if (!top_1._top.global.get("routingPaths").includes(routing.path)) {
-                                top_1._top.global.get("routingPaths").push(routing.path);
+                            if (!top_1._top.get("routingPaths").includes(routing.path)) {
+                                top_1._top.get("routingPaths").push(routing.path);
                             }
                             return routingNode;
                         });
@@ -1055,7 +1055,7 @@ class Component extends InheritClass_1.InheritClass {
                 const _componentRoot = component.componentRoot;
                 const lang1 = CONFIG_1.CONFIG.get("lang", "en");
                 const lang2 = navigator.language.slice(0, 2);
-                const i18n = top_1._top.global.get("i18n");
+                const i18n = top_1._top.get("i18n");
                 if ((lang1 !== lang2) && (typeof i18n === "object" && Object.hasOwn(i18n, "messages"))) {
                     const callback_i18n = () => {
                         return new Promise(function (resolve) {

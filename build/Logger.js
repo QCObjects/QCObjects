@@ -7,6 +7,7 @@ class Logger {
     debugEnabled = true;
     infoEnabled = true;
     warnEnabled = true;
+    errorEnabled = true;
     debug(message) {
         if (this.debugEnabled) {
             console.log("\x1b[35m%s\x1b[0m", `[DEBUG][${performance.now().toLocaleString()}] ${message}`);
@@ -27,6 +28,11 @@ class Logger {
     warn(message) {
         if (this.warnEnabled) {
             console.warn("\x1b[31m%s\x1b[0m", `[WARN][${performance.now().toLocaleString()}] ${message}`);
+        }
+    }
+    error(message) {
+        if (this.errorEnabled) {
+            console.error("\x1b[31m%s\x1b[0m", `[ERROR][${performance.now().toLocaleString()}] ${message}`);
         }
     }
 }

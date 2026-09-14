@@ -31,7 +31,7 @@ export const _fireAsyncLoad = ():void => {
                     });
                   }
             });
-        } else if (typeof _top.global !== "undefined") {
+        } else if (typeof _top !== "undefined") {
             // eslint-disable-next-line array-callback-return
             _asyncLoad.map(function (fc) {
                 (fc).dispatch.call(fc);

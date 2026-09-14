@@ -32,7 +32,7 @@ const _fireAsyncLoad = () => {
             }
         });
     }
-    else if (typeof top_1._top.global !== "undefined") {
+    else if (typeof top_1._top !== "undefined") {
         // eslint-disable-next-line array-callback-return
         exports._asyncLoad.map(function (fc) {
             (fc).dispatch.call(fc);
