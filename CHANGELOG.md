@@ -621,6 +621,10 @@ v2.4.9-beta     allow _new_ only to be called once for every object instance
 # Changelog 
 
 This is an automatic Changelog history of versions generated using the command: **qcobjects v-changelog > CHANGELOG.md**
+## v2.7.1
+
+	- fix: rebuild dists + re-export componentsStack at top level (runtime undefined in 2.7.0)
+
 ## v2.7.0
 
 	- BREAKING: `_top` no longer aliases the ambient global scope (window|global|self|top|globalThis); it is now a detached `{}` object. `import * as QCObjects from "qcobjects"` (or `import * as global`) still works; the unified context is the exported binding, not a synthesized property on the ambient object.
