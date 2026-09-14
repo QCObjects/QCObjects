@@ -5,6 +5,7 @@ const platform_1 = require("./platform");
 const _DOMCreateElement = function (elementName, props, children) {
     let _ret_;
     if (platform_1.isBrowser) {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- load-bearing: tsc rejects the unasserted HTMLElement at the IQCObjectsElement return below (TS2740); the rule only sees the evolving-let receiver
         _ret_ = (0, exports._DOMCreateComplexElement)(elementName, props, children);
     }
     else {

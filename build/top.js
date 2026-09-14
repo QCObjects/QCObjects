@@ -4,18 +4,9 @@ exports.get = exports.set = exports.setConfigService = exports.configService = e
 const ComponentFactory_1 = require("./ComponentFactory");
 const Cast_1 = require("./Cast");
 const globalSettings_1 = require("./globalSettings");
-const Class_1 = require("./Class");
-const ClassFactory_1 = require("./ClassFactory");
-const Export_1 = require("./Export");
-const platform_1 = require("./platform");
 const PrimaryCollections_1 = require("./PrimaryCollections");
 const Logger_1 = require("./Logger");
-exports._top = ((typeof module !== "undefined" && typeof module.exports !== "undefined" && module.exports) ||
-    (typeof global !== "undefined" && global) ||
-    (typeof globalThis !== "undefined" && globalThis) ||
-    (typeof window !== "undefined" && window) ||
-    (typeof self !== "undefined" && self !== null && self) ||
-    this);
+exports._top = {};
 exports._top.lastCache = undefined;
 exports.componentsStack = [];
 const resetTop = () => {
@@ -28,7 +19,7 @@ const buildComponentsStack = () => {
 };
 exports.buildComponentsStack = buildComponentsStack;
 const setConfigService = (_configService) => {
-    exports._top.global.configService = _configService;
+    exports._top.configService = _configService;
     exports.configService = _configService;
 };
 exports.setConfigService = setConfigService;
@@ -87,16 +78,4 @@ const _define_props = function (_top) {
         });
     }
 };
-if (platform_1.isBrowser) {
-    // use of GLOBAL word is deprecated in node.js
-    // this is only for compatibility purpose with old versions of QCObjects in browsers
-    (0, Class_1.Class)("GLOBAL", PrimaryCollections_1._QC_CLASSES.global); // case insensitive for compatibility con old versions;
-    (0, Export_1.Export)((0, ClassFactory_1.ClassFactory)("GLOBAL"));
-}
-if (platform_1.isBrowser && typeof window !== "undefined") {
-    (0, exports.set)("global", window);
-}
-else if (platform_1.isBrowser && typeof globalThis !== "undefined") {
-    (0, exports.set)("global", globalThis);
-}
 _define_props(exports._top);

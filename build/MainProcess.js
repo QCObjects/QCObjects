@@ -434,11 +434,11 @@ const range_1 = require("./range");
             }, []);
         }
         if (!platform_1.isBrowser) {
-            if (typeof _top.global !== "undefined" && Object.hasOwn(_top.global, "_fireAsyncLoad")) {
+            if (typeof _top._fireAsyncLoad !== "undefined") {
                 asyncLoad_1._fireAsyncLoad.call(_top);
             }
-            if (typeof _top.global !== "undefined" && Object.hasOwn(_top.global, "onload")) {
-                _top.global.onload.call(_top);
+            if (typeof _top.onload !== "undefined") {
+                _top.onload.call(_top);
             }
         }
         /* Freezing Object && Object.prototype to prevent prototype pollution risks */

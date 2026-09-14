@@ -495,11 +495,11 @@ import { range } from "./range";
     }
 
     if (!isBrowser) {
-      if (typeof _top.global !== "undefined" && Object.hasOwn(_top.global, "_fireAsyncLoad")) {
+      if (typeof _top._fireAsyncLoad !== "undefined") {
         _fireAsyncLoad.call(_top);
       }
-      if (typeof _top.global !== "undefined" && Object.hasOwn(_top.global, "onload")) {
-        _top.global.onload.call(_top);
+      if (typeof _top.onload !== "undefined") {
+        _top.onload.call(_top);
       }
     }
 

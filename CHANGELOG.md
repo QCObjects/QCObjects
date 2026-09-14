@@ -621,6 +621,13 @@ v2.4.9-beta     allow _new_ only to be called once for every object instance
 # Changelog 
 
 This is an automatic Changelog history of versions generated using the command: **qcobjects v-changelog > CHANGELOG.md**
+## v2.7.0
+
+	- BREAKING: `_top` no longer aliases the ambient global scope (window|global|self|top|globalThis); it is now a detached `{}` object. `import * as QCObjects from "qcobjects"` (or `import * as global`) still works; the unified context is the exported binding, not a synthesized property on the ambient object.
+	- BREAKING: `global.set()` / `global.get()` are DEPRECATED. Functionality is far from warranted across environments and will be removed. Migrate to `QCObjects.set()` / `QCObjects.get()` (or `_top.set()` / `_top.get()`), which remain unchanged.
+	- Remove the legacy `global` prototype-injection block (Class "GLOBAL" + Object.defineProperty on the ambient `global` accessor) that caused the non-portable `Cannot redefine/set property: global` errors under strict mode.
+	- Internal consumers migrated from `_top.global.get/set/configService` to `_top.get/set/configService`.
+
 ## v2.6.4
 
 	- fix: define global via Object.defineProperty (browser strict-mode; window.global read-only accessor)

@@ -37,9 +37,11 @@ declare module "Logger" {
         debugEnabled: boolean;
         infoEnabled: boolean;
         warnEnabled: boolean;
+        errorEnabled: boolean;
         debug(message: string): void;
         info(message: string): void;
         warn(message: string): void;
+        error(message: string): void;
     }
     export const logger: Logger;
 }
@@ -615,7 +617,7 @@ declare module "top" {
         Toggle: any;
         logger: any;
         sdk: any;
-        global: any;
+        configService: any;
         ClassFactory: any;
         Package: any;
         Import: any;
@@ -1045,7 +1047,7 @@ declare module "QCObjects" {
     export { Toggle } from "Toggle";
     export { findPackageNodePath } from "findPackageNodePath";
     export { getDocumentLayout } from "DocumentLayout";
-    export { IQCObjectsElement, IQCObjectsShadowedElement } from "types";
+    export type { IQCObjectsElement, IQCObjectsShadowedElement } from "types";
     export { __to_number } from "mathFunctions";
     export { _top as global } from "top";
     export { __make_global__ } from "make_global";
@@ -1061,4 +1063,3 @@ declare module "uniqueID" {
     export const uniqueId: Function;
 }
 //# sourceMappingURL=index.d.ts.map
-export {};

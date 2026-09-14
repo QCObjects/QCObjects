@@ -107,7 +107,7 @@ class ArrayCollection {
         const self = this;
         let _index = 0;
         self.source = (0, New_1.New)((0, ClassFactory_1.ClassFactory)("ArrayList"), source);
-        for (const _k in self.source) {
+        for (const _k of Object.keys(self.source)) {
             if (!isNaN(_k)) {
                 Logger_1.logger.debug("binding " + _k.toString());
                 (function (_pname) {

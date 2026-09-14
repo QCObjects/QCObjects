@@ -593,68 +593,68 @@ var init_InheritClass = __esm({
             ..._o_.__definition
           };
         }
-        const self2 = this;
+        const self = this;
         if (typeof _o_ !== "undefined" && _o_ !== null) {
           Object.keys(_o_).filter(function(k) {
             return isNaN(k) && !["__instanceID", "__classType", "__definition"].includes(k);
           }).forEach(function(key) {
-            if (typeof self2[key] === "function") {
-              self2[key] = _o_[key].bind(self2);
+            if (typeof self[key] === "function") {
+              self[key] = _o_[key].bind(self);
             } else {
-              self2[key] = _o_[key];
+              self[key] = _o_[key];
             }
           });
         }
         IncrementInstanceID();
-        if (!self2.__instanceID) {
-          Object.defineProperty(self2, "__instanceID", {
+        if (!self.__instanceID) {
+          Object.defineProperty(self, "__instanceID", {
             value: __instanceID,
             writable: false
           });
         }
-        if (typeof self2.__definition !== "undefined") {
-          Object.keys(self2.__definition).filter(function(k) {
+        if (typeof self.__definition !== "undefined") {
+          Object.keys(self.__definition).filter(function(k) {
             return isNaN(k) && !["name", "__instanceID", "__classType", "__definition"].includes(k);
           }).forEach(function(key) {
-            if (typeof self2.__definition[key] === "function") {
-              self2[key] = self2.__definition[key].bind(self2);
+            if (typeof self.__definition[key] === "function") {
+              self[key] = self.__definition[key].bind(self);
             } else {
-              self2[key] = self2.__definition[key];
+              self[key] = self.__definition[key];
             }
           });
         }
-        _methods_(_QC_CLASSES[self2.__classType]).map(function(m) {
-          self2[m.name] = m.bind(self2);
+        _methods_(_QC_CLASSES[self.__classType]).map(function(m) {
+          self[m.name] = m.bind(self);
           return m;
         });
-        _methods_(self2.__definition).map(function(m) {
-          self2[m.name] = m.bind(self2);
+        _methods_(self.__definition).map(function(m) {
+          self[m.name] = m.bind(self);
           return m;
         });
-        if (self2.body) {
-          if (typeof self2.__definition === "undefined" || !Object.hasOwn(self2.__definition, "body") || typeof self2.__definition.body === "undefined") {
+        if (self.body) {
+          if (typeof self.__definition === "undefined" || !Object.hasOwn(self.__definition, "body") || typeof self.__definition.body === "undefined") {
             try {
               if (isBrowser) {
-                self2.body = _DOMCreateElement(self2.__definition.__classType);
+                self.body = _DOMCreateElement(self.__definition.__classType);
               } else {
-                self2.body = {};
+                self.body = {};
               }
             } catch (e) {
               logger.debug(`An error ocurred: ${e}.`);
-              self2.body = {};
+              self.body = {};
             }
-          } else if (Object.hasOwn(self2.__definition, "body")) {
-            self2.body = self2.__definition.body;
+          } else if (Object.hasOwn(self.__definition, "body")) {
+            self.body = self.__definition.body;
           }
         }
         try {
-          self2.__new__.call(self2, _o_);
-          if (typeof self2 === "object" && Object.hasOwn(self2, "_new_") && typeof self2._new_.isCalled === "undefined") {
+          self.__new__.call(self, _o_);
+          if (typeof self === "object" && Object.hasOwn(self, "_new_") && typeof self._new_.isCalled === "undefined") {
             try {
-              self2._new_(_o_);
-              self2._new_.isCalled = true;
+              self._new_(_o_);
+              self._new_.isCalled = true;
             } catch (e) {
-              logger.warn(`${self2.__classType}._new_() failed with error: ${e}`);
+              logger.warn(`${self.__classType}._new_() failed with error: ${e}`);
             }
           }
         } catch (e) {
@@ -948,62 +948,62 @@ var init_Class = __esm({
         }
         constructor(_o_) {
           super(_o_ || {});
-          const self2 = this;
+          const self = this;
           IncrementInstanceID();
-          if (!self2.__instanceID) {
-            Object.defineProperty(self2, "__instanceID", {
+          if (!self.__instanceID) {
+            Object.defineProperty(self, "__instanceID", {
               value: __instanceID,
               writable: false
             });
           }
-          if (typeof self2.__definition !== "undefined") {
-            Object.keys(self2.__definition).filter(function(k) {
+          if (typeof self.__definition !== "undefined") {
+            Object.keys(self.__definition).filter(function(k) {
               return isNaN(k) && !["name", "__instanceID", "__classType", "__definition"].includes(k);
             }).forEach(function(key) {
-              if (typeof self2.__definition[key] === "function") {
-                self2[key] = self2.__definition[key].bind(self2);
+              if (typeof self.__definition[key] === "function") {
+                self[key] = self.__definition[key].bind(self);
               } else {
-                self2[key] = self2.__definition[key];
+                self[key] = self.__definition[key];
               }
             });
           }
-          _methods_(_QC_CLASSES[self2.__classType]).map(function(m) {
-            self2[m.name] = m.bind(self2);
+          _methods_(_QC_CLASSES[self.__classType]).map(function(m) {
+            self[m.name] = m.bind(self);
             return m;
           });
-          _methods_(self2.__definition).map(function(m) {
-            self2[m.name] = m.bind(self2);
+          _methods_(self.__definition).map(function(m) {
+            self[m.name] = m.bind(self);
             return m;
           });
-          if (self2.body) {
-            if (typeof self2.__definition === "undefined" || !Object.hasOwn(self2.__definition, "body") || typeof self2.__definition.body === "undefined") {
+          if (self.body) {
+            if (typeof self.__definition === "undefined" || !Object.hasOwn(self.__definition, "body") || typeof self.__definition.body === "undefined") {
               try {
                 if (isBrowser) {
-                  self2.body = _DOMCreateElement(self2.__definition.__classType);
+                  self.body = _DOMCreateElement(self.__definition.__classType);
                 } else {
-                  self2.body = {};
+                  self.body = {};
                 }
               } catch (e) {
                 logger.debug(`An error ocurred: ${e}.`);
-                self2.body = {};
+                self.body = {};
               }
-            } else if (Object.hasOwn(self2.__definition, "body")) {
-              self2.body = self2.__definition.body;
+            } else if (Object.hasOwn(self.__definition, "body")) {
+              self.body = self.__definition.body;
             }
           }
           try {
-            if (typeof self2.__new__ === "function") {
-              self2.__new__.call(self2, _o_);
+            if (typeof self.__new__ === "function") {
+              self.__new__.call(self, _o_);
             } else if (typeof super.__new__ === "function") {
-              self2.__new__ = super.__new__.bind(self2);
-              self2.__new__.call(self2, _o_);
+              self.__new__ = super.__new__.bind(self);
+              self.__new__.call(self, _o_);
             }
-            if (typeof self2 === "object" && Object.hasOwn(self2, "_new_") && typeof self2._new_.isCalled === "undefined") {
+            if (typeof self === "object" && Object.hasOwn(self, "_new_") && typeof self._new_.isCalled === "undefined") {
               try {
-                self2._new_(_o_);
-                self2._new_.isCalled = true;
+                self._new_(_o_);
+                self._new_.isCalled = true;
               } catch (e) {
-                logger.warn(`${self2.__classType}._new_() failed with error: ${e}`);
+                logger.warn(`${self.__classType}._new_() failed with error: ${e}`);
               }
             }
           } catch (e) {
@@ -1727,7 +1727,7 @@ var init_asyncLoad = __esm({
             });
           }
         });
-      } else if (typeof _top.global !== "undefined") {
+      } else if (typeof _top !== "undefined") {
         _asyncLoad.map(function(fc) {
           fc.dispatch.call(fc);
         });
@@ -2498,30 +2498,30 @@ var init_Component = __esm({
           controller,
           view
         });
-        const self2 = this;
+        const self = this;
         if (typeof name !== "undefined") {
-          self2.name = name;
+          self.name = name;
         }
-        if (typeof self2.name === "undefined" && typeof name === "undefined") {
-          logger.warn("A name is not defined for " + __getType__(self2));
+        if (typeof self.name === "undefined" && typeof name === "undefined") {
+          logger.warn("A name is not defined for " + __getType__(self));
         }
-        self2.routingWay = CONFIG.get("routingWay");
-        self2.processorHandler = new Processor({
-          component: self2
+        self.routingWay = CONFIG.get("routingWay");
+        self.processorHandler = new Processor({
+          component: self
         });
-        self2.data = typeof self2.data === "undefined" || self2.data === null ? {} : self2.data;
-        self2.data = Object.assign(self2.data, self2.dataAttributes);
-        self2.createServiceInstance().then(() => {
-          if (typeof self2.__new__ === "function") {
-            self2.__new__(self2);
+        self.data = typeof self.data === "undefined" || self.data === null ? {} : self.data;
+        self.data = Object.assign(self.data, self.dataAttributes);
+        self.createServiceInstance().then(() => {
+          if (typeof self.__new__ === "function") {
+            self.__new__(self);
           }
-          self2._generateRoutingPaths(self2.body).then(function() {
-            self2._reroute_().then(function() {
-              return self2.rebuild().then(function() {
-                logger.info(`Component._new_ The component ${self2.name} was built successfully!`);
+          self._generateRoutingPaths(self.body).then(function() {
+            self._reroute_().then(function() {
+              return self.rebuild().then(function() {
+                logger.info(`Component._new_ The component ${self.name} was built successfully!`);
               }).catch(function(standardResponse) {
-                logger.warn(`Component._new_ Something went wrong building the component ${self2.name}`);
-                console.error(`Component._new_ Something went wrong building the component ${self2.name}`, standardResponse);
+                logger.warn(`Component._new_ Something went wrong building the component ${self.name}`);
+                console.error(`Component._new_ Something went wrong building the component ${self.name}`, standardResponse);
               });
             }).catch((e) => {
               throw Error(`Unexpected error ${e}`);
@@ -2537,39 +2537,39 @@ var init_Component = __esm({
         logger.debug("[cacheIndex] This property is readonly");
       }
       get cacheIndex() {
-        const self2 = this;
-        const __routing_path__ = _DataStringify(self2.routingPath);
-        return Base64.encode(self2.name + __routing_path__);
+        const self = this;
+        const __routing_path__ = _DataStringify(self.routingPath);
+        return Base64.encode(self.name + __routing_path__);
       }
       set parsedAssignmentText(value) {
         logger.debug("[parsedAssignmentText] This property is readonly");
       }
       get parsedAssignmentText() {
-        const self2 = this;
-        self2._parsedAssignmentText = self2.parseTemplate(self2.template);
-        if (typeof self2._parsedAssignmentText === "undefined") {
+        const self = this;
+        self._parsedAssignmentText = self.parseTemplate(self.template);
+        if (typeof self._parsedAssignmentText === "undefined") {
           throw Error(`[Component][${this.name}][parsedAssignmentText] Could not generate content!`);
         }
-        return self2._parsedAssignmentText;
+        return self._parsedAssignmentText;
       }
       set shadowRoot(value) {
-        const self2 = this;
-        if (typeof self2.__shadowRoot === "undefined") {
-          self2.__shadowRoot = value;
+        const self = this;
+        if (typeof self.__shadowRoot === "undefined") {
+          self.__shadowRoot = value;
         } else {
           logger.debug("[shadowRoot] This property can only be assigned once!");
         }
       }
       get shadowRoot() {
-        const self2 = this;
-        return self2.__shadowRoot;
+        const self = this;
+        return self.__shadowRoot;
       }
       set routingSelected(value) {
         logger.debug("[routingSelected] This is a read-only property of the component");
       }
       get routingSelected() {
-        const self2 = this;
-        return __valid_routings__(self2.routings, self2.routingPath);
+        const self = this;
+        return __valid_routings__(self.routings, self.routingPath);
       }
       set routingParams(value) {
         logger.debug("[routingParams] This is a read-only property of the component");
@@ -2685,12 +2685,12 @@ var init_Component = __esm({
               a.oldclick = a.onclick;
               a.onclick = function(e) {
                 let _ret_ = true;
-                if (!_top.global.get("routingPaths")) {
-                  _top.global.set("routingPaths", []);
+                if (!_top.get("routingPaths")) {
+                  _top.set("routingPaths", []);
                 }
                 const routingWay = CONFIG.get("routingWay");
                 const routingPath = e.target[routingWay];
-                if (_top.global.get("routingPaths").includes(routingPath) && e.target[routingWay] !== location[routingWay] && e.target.href !== document.location.href) {
+                if (_top.get("routingPaths").includes(routingPath) && e.target[routingWay] !== location[routingWay] && e.target.href !== document.location.href) {
                   logger.debug("A ROUTING WAS FOUND: " + routingPath);
                   window.history.pushState({
                     href: e.target.href
@@ -3216,11 +3216,11 @@ var init_Component = __esm({
                   if (!component.routingPaths.includes(routing.path)) {
                     component.routingPaths.push(routing.path);
                   }
-                  if (!_top.global.get("routingPaths")) {
-                    _top.global.set("routingPaths", []);
+                  if (!_top.get("routingPaths")) {
+                    _top.set("routingPaths", []);
                   }
-                  if (!_top.global.get("routingPaths").includes(routing.path)) {
-                    _top.global.get("routingPaths").push(routing.path);
+                  if (!_top.get("routingPaths").includes(routing.path)) {
+                    _top.get("routingPaths").push(routing.path);
                   }
                   return routingNode;
                 });
@@ -3390,7 +3390,7 @@ var init_Component = __esm({
             const _componentRoot = component.componentRoot;
             const lang1 = CONFIG.get("lang", "en");
             const lang2 = navigator.language.slice(0, 2);
-            const i18n = _top.global.get("i18n");
+            const i18n = _top.get("i18n");
             if (lang1 !== lang2 && (typeof i18n === "object" && Object.hasOwn(i18n, "messages"))) {
               const callback_i18n = /* @__PURE__ */ __name(() => {
                 return new Promise(function(resolve) {
@@ -3823,13 +3823,9 @@ var init_top = __esm({
     init_ComponentFactory();
     init_Cast();
     init_globalSettings();
-    init_Class();
-    init_ClassFactory();
-    init_Export();
-    init_platform();
     init_PrimaryCollections();
     init_Logger();
-    _top = typeof module !== "undefined" && typeof module.exports !== "undefined" && module.exports || typeof global !== "undefined" && global || typeof globalThis !== "undefined" && globalThis || typeof window !== "undefined" && window || typeof self !== "undefined" && self !== null && self || void 0;
+    _top = {};
     _top.lastCache = void 0;
     componentsStack = [];
     resetTop = /* @__PURE__ */ __name(() => {
@@ -3840,7 +3836,7 @@ var init_top = __esm({
       componentsStack = buildComponents(document);
     }, "buildComponentsStack");
     setConfigService = /* @__PURE__ */ __name((_configService) => {
-      _top.global.configService = _configService;
+      _top.configService = _configService;
       configService = _configService;
     }, "setConfigService");
     set = /* @__PURE__ */ __name((name, value) => {
@@ -3896,25 +3892,6 @@ var init_top = __esm({
         });
       }
     }, "_define_props");
-    if (isBrowser) {
-      Class("GLOBAL", _QC_CLASSES.global);
-      Export(ClassFactory("GLOBAL"));
-    }
-    if (isBrowser && typeof window !== "undefined") {
-      Object.defineProperty(_top, "global", {
-        writable: true,
-        configurable: true,
-        enumerable: true,
-        value: window
-      });
-    } else if (isBrowser && typeof globalThis !== "undefined") {
-      Object.defineProperty(_top, "global", {
-        writable: true,
-        configurable: true,
-        enumerable: true,
-        value: globalThis
-      });
-    }
     _define_props(_top);
   }
 });
@@ -3988,7 +3965,7 @@ var init_defaultProcessors = __esm({
           if (typeof componentInstance === "undefined" || componentInstance === null) {
             throw Error(`mapper.${componentName}.${valueName} does not have a component instance or it is null.`);
           }
-          const globalValue = _top2.global.get(valueName);
+          const globalValue = _top2.get(valueName);
           const componentValue = componentInstance.get(valueName);
           const dataValue = componentInstance.data[valueName];
           const list = typeof dataValue !== "undefined" ? dataValue : typeof componentValue !== "undefined" ? componentValue : globalValue;
@@ -4339,8 +4316,8 @@ var init_ArrayCollection = __esm({
       }
       prototype;
       unique() {
-        return this.filter(function(value, index, self2) {
-          return self2.indexOf(value) === index;
+        return this.filter(function(value, index, self) {
+          return self.indexOf(value) === index;
         });
       }
       table() {
@@ -4424,42 +4401,42 @@ var init_ArrayCollection = __esm({
         logger.debug(value);
       }
       push(value) {
-        const self2 = this;
+        const self = this;
         logger.debug("VALUE ADDED");
         logger.debug(value);
-        return self2.source.push(value);
+        return self.source.push(value);
       }
       pop() {
-        const self2 = this;
+        const self = this;
         logger.debug("VALUE POPPED");
-        return self2.source.pop();
+        return self.source.pop();
       }
       _new_(source) {
-        const self2 = this;
+        const self = this;
         let _index = 0;
-        self2.source = New(ClassFactory("ArrayList"), source);
-        for (const _k of Object.keys(self2.source)) {
+        self.source = New(ClassFactory("ArrayList"), source);
+        for (const _k of Object.keys(self.source)) {
           if (!isNaN(_k)) {
             logger.debug("binding " + _k.toString());
             (function(_pname) {
-              Object.defineProperty(self2, _pname, {
+              Object.defineProperty(self, _pname, {
                 set(value) {
                   logger.debug("setting " + _pname + "=" + value);
-                  self2.source[_pname] = value;
-                  self2.changed(_pname, value);
+                  self.source[_pname] = value;
+                  self.changed(_pname, value);
                 },
                 get() {
-                  return self2.source[_pname];
+                  return self.source[_pname];
                 }
               });
             })(_k);
             _index++;
           }
         }
-        self2.source.length = _index;
-        Object.defineProperty(self2, "length", {
+        self.source.length = _index;
+        Object.defineProperty(self, "length", {
           get() {
-            return self2.source.length;
+            return self.source.length;
           }
         });
       }
@@ -4837,8 +4814,8 @@ var require_MainProcess = __commonJS({
         Export(isQCObjects_Object);
         Export(NamespaceRef);
         Array.prototype.unique = function() {
-          return this.filter(function(value, index, self2) {
-            return self2.indexOf(value) === index;
+          return this.filter(function(value, index, self) {
+            return self.indexOf(value) === index;
           });
         };
         Array.unique = function(a) {
@@ -5050,11 +5027,11 @@ var require_MainProcess = __commonJS({
           }, []);
         }
         if (!isBrowser) {
-          if (typeof _top2.global !== "undefined" && Object.hasOwn(_top2.global, "_fireAsyncLoad")) {
+          if (typeof _top2._fireAsyncLoad !== "undefined") {
             _fireAsyncLoad.call(_top2);
           }
-          if (typeof _top2.global !== "undefined" && Object.hasOwn(_top2.global, "onload")) {
-            _top2.global.onload.call(_top2);
+          if (typeof _top2.onload !== "undefined") {
+            _top2.onload.call(_top2);
           }
         }
         (function(isBrowser2) {
