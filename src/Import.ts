@@ -44,7 +44,7 @@ export const Import = function (packagename:string, ready?:Function, external?:b
             };
 
             const readyImported = function (e: { target: { remove: () => void; }; }) {
-                _QC_PACKAGES_IMPORTED.push(ready as never);
+                _QC_PACKAGES_IMPORTED.push(ready);
                 if (allPackagesImported()) {
                     _QC_PACKAGES_IMPORTED.map( (_imported_) => {
                         return _QC_READY_LISTENERS.push(_imported_);

@@ -23,12 +23,34 @@ export const ComponentURI = ({ TPL_SOURCE, COMPONENTS_BASE_PATH, COMPONENT_NAME,
     return templateURI;
 };
 
+/**
+ * Reads an HTML boolean attribute.
+ * A valueless attribute (getAttribute returns "") means true, as do any values
+ * other than an explicit negation. Only absence means false.
+ *
+ * Exported so the SDK and application code resolve boolean attributes with the
+ * same semantics the framework uses, instead of duplicating the comparison.
+ */
+export const __booleanAttribute_ = (element: Element, attributeName: string): boolean => {
+    const __value__ = element.getAttribute(attributeName);
+    if (__value__ === null) {
+        return false;
+    }
+    const __normalized__ = __value__.trim().toLowerCase();
+    return (__normalized__ !== "false" && __normalized__ !== "0");
+};
+
+/** True when the attribute is not present in the tag at all. */
+export const __attributeNotSet_ = (element: Element, attributeName: string): boolean => {
+    return (element.getAttribute(attributeName) === null);
+};
+
 export const _buildComponentFromElement_ = (element: Element, __parent__: any):Component => {
-    const __shadowed_not_set = (element.getAttribute("shadowed") === null);
+    const __shadowed_not_set = __attributeNotSet_(element, "shadowed");
     const __tplsource_attr_not_set = (element.getAttribute("template-source") === null);
-    const shadowed = (element.getAttribute("shadowed") === "true");
-    const __cached_not_set = (element.getAttribute("cached") === null);
-    const cached = (element.getAttribute("cached") === "true");
+    const shadowed = __booleanAttribute_(element, "shadowed");
+    const __cached_not_set = __attributeNotSet_(element, "cached");
+    const cached = __booleanAttribute_(element, "cached");
     let tplextension = (typeof CONFIG.get("tplextension") !== "undefined") ? (CONFIG.get("tplextension")) : ("html");
     tplextension = (element.getAttribute("tplextension") !== null) ? (element.getAttribute("tplextension")) : (tplextension);
     let _componentName = element.getAttribute("name");
@@ -68,10 +90,11 @@ export const _buildComponentFromElement_ = (element: Element, __parent__: any):C
 
     const __create_component_instance_ = function ():Component {
         const __shadowed = (__shadowed_not_set) ? ((__classDefinition && __classDefinition.shadowed) || Component.shadowed) : (shadowed);
+        const __cached = (__cached_not_set) ? ((__classDefinition && __classDefinition.cached) ?? (Component.cached)) : (cached);
         const __definition = {
             __parent__,
             name: _componentName,
-            cached: (__cached_not_set) ? (Component.cached) : (cached),
+            cached: __cached,
             shadowed: __shadowed,
             tplextension,
             body: (CONFIG.get("preserveComponentBodyTag")) ? (_DOMCreateElement("componentBody")) : (element),

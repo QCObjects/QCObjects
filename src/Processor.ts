@@ -109,13 +109,13 @@ export class Processor extends InheritClass implements IProcessor {
           if (typeof obj[_k] === "object" && !Object.hasOwn(obj[_k], "call")) {
             obj[_k] = __instance__?.processObject.bind(__instance__)(obj[_k], component as IComponent);
           } else if (typeof obj[_k] === "string") {
-            obj[_k] = __instance__?.process.bind(__instance__)(obj[_k], component as IComponent);
+            obj[_k] = __instance__?.process.bind(__instance__)(obj[_k], component);
           }
           return _k;
         }
       );
     } else if (typeof obj === "string") {
-      obj = __instance__.process.bind(__instance__)(obj, component as IComponent);
+      obj = __instance__.process.bind(__instance__)(obj, component);
     }
     return obj;
   }

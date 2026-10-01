@@ -57,7 +57,7 @@ export { _Ready, ready, Ready } from "./Ready";
 export { captureFalseTouch } from "./captureFalseTouch";
 export { serviceLoader } from "./serviceLoader";
 export { componentLoader } from "./componentLoader";
-export { _buildComponentsFromElements_, ComponentURI } from "./ComponentFactory";
+export { _buildComponentsFromElements_, ComponentURI, __booleanAttribute_, __attributeNotSet_ } from "./ComponentFactory";
 export { NamespaceRef } from "./NamespaceRef";
 export { setDefaultProcessors } from "./defaultProcessors";
 export { Tag, TagElements } from "./Tag";

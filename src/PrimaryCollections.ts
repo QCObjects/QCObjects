@@ -13,8 +13,16 @@ export const __register_class__ = function (_class_: any, __namespace?: string):
     if (name.toLowerCase() === "function") {
         name = __classType;
     }
-    if (typeof _class_.__definition === "undefined") {
-        _class_.__definition = {};
+    /* force-inject an OWN __definition on every class, otherwise a subclass
+       would mutate the inherited one and every class would end up sharing
+       the same __classType (the last one registered wins) */
+    if (!Object.hasOwn(_class_, "__definition") || typeof _class_.__definition === "undefined") {
+        Object.defineProperty(_class_, "__definition", {
+            value: {},
+            writable: true,
+            enumerable: true,
+            configurable: true
+        });
     }
     _class_.__definition.__classType = __classType;
     if (typeof __namespace !== "undefined") {

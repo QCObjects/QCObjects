@@ -171,20 +171,20 @@ export const Class: TClass = (name?: string, _type?: unknown, _definition?: unkn
         return m;
       });
 
-      if (self.body) {
-        if (typeof self.__definition === "undefined" || (!Object.hasOwn(self.__definition, "body")) || typeof self.__definition.body === "undefined") {
-          try {
-            if (isBrowser) {
-              self.body = _DOMCreateElement(self.__definition.__classType);
-            } else {
-              self.body = {};
-            }
-          } catch (e: any) {
-            logger.debug(`An error ocurred: ${e}.`);
+      if (typeof self._body === "undefined" || self._body === null) {
+        /* the body tag must carry this instance's OWN class type;
+           __getType__ resolves the own name first and only falls back to
+           __definition.__classType (which resolves to the parent class) */
+        const __classType = __getType__(self) || "div";
+        try {
+          if (isBrowser) {
+            self.body = _DOMCreateElement(__classType);
+          } else {
             self.body = {};
           }
-        } else if (Object.hasOwn(self.__definition, "body")) {
-          self.body = self.__definition.body;
+        } catch (e: any) {
+          logger.debug(`An error ocurred: ${e}.`);
+          self.body = {};
         }
       }
 
