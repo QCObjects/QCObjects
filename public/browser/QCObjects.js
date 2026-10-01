@@ -142,8 +142,13 @@ var global = (() => {
         if (name.toLowerCase() === "function") {
           name = __classType;
         }
-        if (typeof _class_.__definition === "undefined") {
-          _class_.__definition = {};
+        if (!Object.hasOwn(_class_, "__definition") || typeof _class_.__definition === "undefined") {
+          Object.defineProperty(_class_, "__definition", {
+            value: {},
+            writable: true,
+            enumerable: true,
+            configurable: true
+          });
         }
         _class_.__definition.__classType = __classType;
         if (typeof __namespace !== "undefined") {
@@ -265,7 +270,7 @@ var global = (() => {
       init_Logger();
       isDeno = typeof window !== "undefined" && "Deno" in window;
       isBrowser = typeof window !== "undefined" && typeof window.self !== "undefined" && window === window.self && !isDeno;
-      isNodeCommonJS = typeof module !== "undefined";
+      isNodeCommonJS = typeof module !== "undefined" && typeof window === "undefined";
       deno_require = /* @__PURE__ */ __name((name) => {
       }, "deno_require");
       _require_ = /* @__PURE__ */ __name((name) => {
@@ -300,13 +305,15 @@ var global = (() => {
       init_Export();
       init_platform();
       Logger = class {
+        constructor() {
+          this.debugEnabled = true;
+          this.infoEnabled = true;
+          this.warnEnabled = true;
+          this.errorEnabled = true;
+        }
         static {
           __name(this, "Logger");
         }
-        debugEnabled = true;
-        infoEnabled = true;
-        warnEnabled = true;
-        errorEnabled = true;
         debug(message) {
           if (this.debugEnabled) {
             console.log("\x1B[35m%s\x1B[0m", `[DEBUG][${performance.now().toLocaleString()}] ${message}`);
@@ -580,16 +587,12 @@ var global = (() => {
         static {
           __name(this, "InheritClass");
         }
-        __definition;
-        _body;
         get body() {
           return this._body;
         }
         set body(value) {
           this._body = value;
         }
-        childs;
-        __instanceID;
         constructor(_o_) {
           if (typeof _o_ !== "undefined" && typeof _o_.__definition !== "undefined") {
             this.__definition = {
@@ -634,20 +637,17 @@ var global = (() => {
             self[m.name] = m.bind(self);
             return m;
           });
-          if (self.body) {
-            if (typeof self.__definition === "undefined" || !Object.hasOwn(self.__definition, "body") || typeof self.__definition.body === "undefined") {
-              try {
-                if (isBrowser) {
-                  self.body = _DOMCreateElement(self.__definition.__classType);
-                } else {
-                  self.body = {};
-                }
-              } catch (e) {
-                logger.debug(`An error ocurred: ${e}.`);
+          if (typeof self._body === "undefined" || self._body === null) {
+            const __classType = __getType__(self) || "div";
+            try {
+              if (isBrowser) {
+                self.body = _DOMCreateElement(__classType);
+              } else {
                 self.body = {};
               }
-            } else if (Object.hasOwn(self.__definition, "body")) {
-              self.body = self.__definition.body;
+            } catch (e) {
+              logger.debug(`An error ocurred: ${e}.`);
+              self.body = {};
             }
           }
           try {
@@ -685,7 +685,6 @@ var global = (() => {
           __hierarchy = __hierarchy.concat(__hierarchy__proto__(__class__.__proto__));
           return __hierarchy;
         }
-        __namespace;
         __new__(_o_) {
           _CastProps(_o_, this);
         }
@@ -912,13 +911,70 @@ var global = (() => {
           delete definition.__instanceID;
         }
         _QC_CLASSES[name] = class extends _types_[type.name] {
-          __instanceID;
-          __namespace;
-          __definition = {
-            ...definition
-          };
-          childs;
-          _body;
+          constructor(_o_) {
+            super(_o_ || {});
+            this.__definition = {
+              ...definition
+            };
+            const self = this;
+            IncrementInstanceID();
+            if (!self.__instanceID) {
+              Object.defineProperty(self, "__instanceID", {
+                value: __instanceID,
+                writable: false
+              });
+            }
+            if (typeof self.__definition !== "undefined") {
+              Object.keys(self.__definition).filter(function(k) {
+                return isNaN(k) && !["name", "__instanceID", "__classType", "__definition"].includes(k);
+              }).forEach(function(key) {
+                if (typeof self.__definition[key] === "function") {
+                  self[key] = self.__definition[key].bind(self);
+                } else {
+                  self[key] = self.__definition[key];
+                }
+              });
+            }
+            _methods_(_QC_CLASSES[self.__classType]).map(function(m) {
+              self[m.name] = m.bind(self);
+              return m;
+            });
+            _methods_(self.__definition).map(function(m) {
+              self[m.name] = m.bind(self);
+              return m;
+            });
+            if (typeof self._body === "undefined" || self._body === null) {
+              const __classType = __getType__(self) || "div";
+              try {
+                if (isBrowser) {
+                  self.body = _DOMCreateElement(__classType);
+                } else {
+                  self.body = {};
+                }
+              } catch (e) {
+                logger.debug(`An error ocurred: ${e}.`);
+                self.body = {};
+              }
+            }
+            try {
+              if (typeof self.__new__ === "function") {
+                self.__new__.call(self, _o_);
+              } else if (typeof super.__new__ === "function") {
+                self.__new__ = super.__new__.bind(self);
+                self.__new__.call(self, _o_);
+              }
+              if (typeof self === "object" && Object.hasOwn(self, "_new_") && typeof self._new_.isCalled === "undefined") {
+                try {
+                  self._new_(_o_);
+                  self._new_.isCalled = true;
+                } catch (e) {
+                  logger.warn(`${self.__classType}._new_() failed with error: ${e}`);
+                }
+              }
+            } catch (e) {
+              logger.warn(e);
+            }
+          }
           get body() {
             return this._body;
           }
@@ -948,70 +1004,6 @@ var global = (() => {
           }
           static getParentClass() {
             return Object.getPrototypeOf(this.prototype.constructor);
-          }
-          constructor(_o_) {
-            super(_o_ || {});
-            const self = this;
-            IncrementInstanceID();
-            if (!self.__instanceID) {
-              Object.defineProperty(self, "__instanceID", {
-                value: __instanceID,
-                writable: false
-              });
-            }
-            if (typeof self.__definition !== "undefined") {
-              Object.keys(self.__definition).filter(function(k) {
-                return isNaN(k) && !["name", "__instanceID", "__classType", "__definition"].includes(k);
-              }).forEach(function(key) {
-                if (typeof self.__definition[key] === "function") {
-                  self[key] = self.__definition[key].bind(self);
-                } else {
-                  self[key] = self.__definition[key];
-                }
-              });
-            }
-            _methods_(_QC_CLASSES[self.__classType]).map(function(m) {
-              self[m.name] = m.bind(self);
-              return m;
-            });
-            _methods_(self.__definition).map(function(m) {
-              self[m.name] = m.bind(self);
-              return m;
-            });
-            if (self.body) {
-              if (typeof self.__definition === "undefined" || !Object.hasOwn(self.__definition, "body") || typeof self.__definition.body === "undefined") {
-                try {
-                  if (isBrowser) {
-                    self.body = _DOMCreateElement(self.__definition.__classType);
-                  } else {
-                    self.body = {};
-                  }
-                } catch (e) {
-                  logger.debug(`An error ocurred: ${e}.`);
-                  self.body = {};
-                }
-              } else if (Object.hasOwn(self.__definition, "body")) {
-                self.body = self.__definition.body;
-              }
-            }
-            try {
-              if (typeof self.__new__ === "function") {
-                self.__new__.call(self, _o_);
-              } else if (typeof super.__new__ === "function") {
-                self.__new__ = super.__new__.bind(self);
-                self.__new__.call(self, _o_);
-              }
-              if (typeof self === "object" && Object.hasOwn(self, "_new_") && typeof self._new_.isCalled === "undefined") {
-                try {
-                  self._new_(_o_);
-                  self._new_.isCalled = true;
-                } catch (e) {
-                  logger.warn(`${self.__classType}._new_() failed with error: ${e}`);
-                }
-              }
-            } catch (e) {
-              logger.warn(e);
-            }
           }
           __new__(_o_) {
             _CastProps(_o_, this);
@@ -1140,7 +1132,9 @@ var global = (() => {
         static {
           __name(this, "Base64");
         }
-        static _keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+        static {
+          this._keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+        }
         static encode(e) {
           let t = "";
           let n, r, i, s, o, u, a;
@@ -1308,7 +1302,27 @@ var global = (() => {
       "use strict";
       New = /* @__PURE__ */ __name(function(__class__, args = {}) {
         args = arguments.length > 1 ? args : {};
-        return typeof __class__ === "undefined" ? new Object() : new __class__(args);
+        if (typeof __class__ === "undefined") {
+          return new Object();
+        }
+        const __instance__ = new __class__(args);
+        if (typeof args === "object" && args !== null) {
+          Object.keys(args).filter((__key__) => {
+            return isNaN(__key__) && !["__instanceID", "__classType", "__definition"].includes(__key__);
+          }).forEach((__key__) => {
+            if (typeof args[__key__] === "function") {
+              __instance__[__key__] = args[__key__].bind(__instance__);
+            } else {
+              __instance__[__key__] = args[__key__];
+            }
+          });
+        }
+        const __classDefinition__ = typeof __class__.__definition === "object" && __class__.__definition !== null ? __class__.__definition : {};
+        __instance__.__definition = Object.assign({}, __classDefinition__);
+        if (typeof __instance__.__classType === "string" && __instance__.__classType !== "") {
+          __instance__.__definition.__classType = __instance__.__classType;
+        }
+        return __instance__;
       }, "New");
       New.prototype.toString = function() {
         return "New(QCObjectsClassName, args) { [QCObjects native code] }";
@@ -1337,11 +1351,17 @@ var global = (() => {
       init_Package();
       init_secretKey();
       _Crypt = class __Crypt extends InheritClass {
+        constructor() {
+          super(...arguments);
+          this.string = "";
+          this.key = "";
+          this.last_string = "";
+          this.last_key = "";
+          this.construct = false;
+        }
         static {
           __name(this, "_Crypt");
         }
-        string = "";
-        key = "";
         // eslint-disable-next-line no-unused-vars
         encrypt(_string_, key) {
           throw new Error("Method not implemented.");
@@ -1350,9 +1370,6 @@ var global = (() => {
         decrypt(_string_, key) {
           throw new Error("Method not implemented.");
         }
-        last_string = "";
-        last_key = "";
-        construct = false;
         _new_(o) {
           const string = o.string;
           let key = Object.hasOwn(o, "key") ? o.key : "";
@@ -1427,26 +1444,28 @@ var global = (() => {
       init_InheritClass();
       init_Package();
       ConfigSettings = class _ConfigSettings extends InheritClass {
+        constructor() {
+          super(...arguments);
+          this._CONFIG = {
+            "relativeImportPath": "",
+            "remoteImportsPath": "",
+            "remoteSDKPath": "https://sdk.qcobjects.dev/",
+            "asynchronousImportsLoad": false,
+            "removePackageScriptAfterLoading": true,
+            "componentsBasePath": "",
+            "delayForReady": 0,
+            "preserveComponentBodyTag": false,
+            "useConfigService": false,
+            "routingWay": "hash",
+            "useSDK": true,
+            "useLocalSDK": false,
+            "basePath": _basePath_
+          };
+          this._CONFIG_ENC = "";
+        }
         static {
           __name(this, "ConfigSettings");
         }
-        _CONFIG = {
-          "relativeImportPath": "",
-          "remoteImportsPath": "",
-          "remoteSDKPath": "https://sdk.qcobjects.dev/",
-          "asynchronousImportsLoad": false,
-          "removePackageScriptAfterLoading": true,
-          "componentsBasePath": "",
-          "delayForReady": 0,
-          "preserveComponentBodyTag": false,
-          "useConfigService": false,
-          "routingWay": "hash",
-          "useSDK": true,
-          "useLocalSDK": false,
-          "basePath": _basePath_
-        };
-        static _instance;
-        _CONFIG_ENC = "";
         set(name, value) {
           this._CONFIG[name] = value;
         }
@@ -1539,7 +1558,6 @@ var global = (() => {
           }
           return processedValue || _default;
         }
-        static _instance;
         static get instance() {
           if (typeof _CONFIG._instance === "undefined") {
             _CONFIG._instance = new _CONFIG();
@@ -1568,27 +1586,26 @@ var global = (() => {
       init_top();
       init_Package();
       Processor = class _Processor extends InheritClass {
-        static {
-          __name(this, "Processor");
-        }
-        static _instance;
         constructor({ component, processors }) {
           super({ component });
+          this.processors = {
+            "config"(component, arg) {
+              return CONFIG.get(arg, "");
+            },
+            "ENV"(component, arg) {
+              return typeof process !== "undefined" ? process.env[arg] : "";
+            },
+            "global"(component, arg) {
+              return typeof _top !== "undefined" ? _top[arg] : "";
+            }
+          };
           if (typeof processors !== "undefined") {
             this.processors = Object.assign(processors, _Processor.instance.processors);
           }
         }
-        processors = {
-          "config"(component, arg) {
-            return CONFIG.get(arg, "");
-          },
-          "ENV"(component, arg) {
-            return typeof process !== "undefined" ? process.env[arg] : "";
-          },
-          "global"(component, arg) {
-            return typeof _top !== "undefined" ? _top[arg] : "";
-          }
-        };
+        static {
+          __name(this, "Processor");
+        }
         static get instance() {
           if (typeof _Processor._instance === "undefined") {
             _Processor._instance = new _Processor({ component: null });
@@ -1611,7 +1628,6 @@ var global = (() => {
         static getProcessorNames() {
           return Object.keys(_Processor.instance.processors);
         }
-        component;
         execute(component, processorName, args) {
           const processorHandler = typeof component !== "undefined" && component !== null ? component.processorHandler : this;
           return processorHandler?.processors[processorName].bind(processorHandler).apply(processorHandler, [component, args?.split(",")]);
@@ -1699,8 +1715,6 @@ var global = (() => {
       static {
         __name(this, "AsyncCallback");
       }
-      func;
-      args;
       constructor(callback2, args2 = []) {
         this.func = callback2;
         this.args = args2;
@@ -2402,54 +2416,6 @@ var global = (() => {
       init_tag_filter();
       init_componentLoader();
       Component = class _Component extends InheritClass {
-        static {
-          __name(this, "Component");
-        }
-        static shadowed = false;
-        static cached = true;
-        name;
-        templateURI;
-        url;
-        tplsource;
-        tplextension;
-        template;
-        validRoutingWays = ["pathname", "hash", "search"];
-        basePath = _basePath_;
-        domain = _domain_;
-        templateHandler = "DefaultTemplateHandler";
-        processorHandler;
-        routingWay = null;
-        routingNodes = [];
-        routings = [];
-        routingPath = "";
-        routingPaths = [];
-        _componentHelpers = [];
-        subcomponents = [];
-        splashScreenComponent = void 0;
-        controller = void 0;
-        routingController = void 0;
-        view = void 0;
-        effect = void 0;
-        effectClass;
-        method = "GET";
-        cached = true;
-        __promise__ = null;
-        data;
-        __namespace = void 0;
-        _parsedAssignmentText;
-        __shadowRoot;
-        _serviceClassName = null;
-        enableServiceClass = true;
-        serviceInstance;
-        serviceData;
-        shadowed = false;
-        container;
-        innerHTML;
-        reload;
-        static subcomponents;
-        assignRoutingParams = true;
-        responseTo;
-        static responseTo;
         constructor({
           __parent__,
           templateURI = "",
@@ -2501,6 +2467,30 @@ var global = (() => {
             controller,
             view
           });
+          this.validRoutingWays = ["pathname", "hash", "search"];
+          this.basePath = _basePath_;
+          this.domain = _domain_;
+          this.templateHandler = "DefaultTemplateHandler";
+          this.routingWay = null;
+          this.routingNodes = [];
+          this.routings = [];
+          this.routingPath = "";
+          this.routingPaths = [];
+          this._componentHelpers = [];
+          this.subcomponents = [];
+          this.splashScreenComponent = void 0;
+          this.controller = void 0;
+          this.routingController = void 0;
+          this.view = void 0;
+          this.effect = void 0;
+          this.method = "GET";
+          this.cached = true;
+          this.__promise__ = null;
+          this.__namespace = void 0;
+          this._serviceClassName = null;
+          this.enableServiceClass = true;
+          this.shadowed = false;
+          this.assignRoutingParams = true;
           const self = this;
           if (typeof name !== "undefined") {
             self.name = name;
@@ -2535,6 +2525,15 @@ var global = (() => {
           }).catch((e) => {
             throw Error(`Unexpected error. ${e}`);
           });
+        }
+        static {
+          __name(this, "Component");
+        }
+        static {
+          this.shadowed = false;
+        }
+        static {
+          this.cached = true;
         }
         set cacheIndex(value) {
           logger.debug("[cacheIndex] This property is readonly");
@@ -2688,12 +2687,12 @@ var global = (() => {
                 a.oldclick = a.onclick;
                 a.onclick = function(e) {
                   let _ret_ = true;
-                  if (!_top.get("routingPaths")) {
-                    _top.set("routingPaths", []);
+                  if (!get("routingPaths")) {
+                    set("routingPaths", []);
                   }
                   const routingWay = CONFIG.get("routingWay");
                   const routingPath = e.target[routingWay];
-                  if (_top.get("routingPaths").includes(routingPath) && e.target[routingWay] !== location[routingWay] && e.target.href !== document.location.href) {
+                  if (get("routingPaths").includes(routingPath) && e.target[routingWay] !== location[routingWay] && e.target.href !== document.location.href) {
                     logger.debug("A ROUTING WAS FOUND: " + routingPath);
                     window.history.pushState({
                       href: e.target.href
@@ -2877,7 +2876,7 @@ var global = (() => {
           const _component_ = this;
           let elementList = _component_.subtags;
           if (!rebuildObjects) {
-            elementList = elementList.filter((t) => t.getAttribute("loaded") !== "true");
+            elementList = elementList.filter((t) => !__booleanAttribute_(t, "loaded"));
           }
           if (typeof _component_ !== "undefined" || _component_.subcomponents.length < 1) {
             _component_.subcomponents = _buildComponentsFromElements_(elementList, _component_);
@@ -3219,11 +3218,11 @@ var global = (() => {
                     if (!component.routingPaths.includes(routing.path)) {
                       component.routingPaths.push(routing.path);
                     }
-                    if (!_top.get("routingPaths")) {
-                      _top.set("routingPaths", []);
+                    if (!get("routingPaths")) {
+                      set("routingPaths", []);
                     }
-                    if (!_top.get("routingPaths").includes(routing.path)) {
-                      _top.get("routingPaths").push(routing.path);
+                    if (!get("routingPaths").includes(routing.path)) {
+                      get("routingPaths").push(routing.path);
                     }
                     return routingNode;
                   });
@@ -3353,7 +3352,8 @@ var global = (() => {
                   }
                 });
               });
-              observer.observe(_componentRoot);
+              const __observeTarget__ = typeof _componentRoot !== "undefined" && _componentRoot !== null && typeof _componentRoot.getBoundingClientRect !== "function" ? _componentRoot.host ?? _componentRoot : _componentRoot;
+              observer.observe(__observeTarget__);
             } else {
               _applyEffect_();
             }
@@ -3393,7 +3393,7 @@ var global = (() => {
               const _componentRoot = component.componentRoot;
               const lang1 = CONFIG.get("lang", "en");
               const lang2 = navigator.language.slice(0, 2);
-              const i18n = _top.get("i18n");
+              const i18n = get("i18n");
               if (lang1 !== lang2 && (typeof i18n === "object" && Object.hasOwn(i18n, "messages"))) {
                 const callback_i18n = /* @__PURE__ */ __name(() => {
                   return new Promise(function(resolve) {
@@ -3456,7 +3456,7 @@ var global = (() => {
   });
 
   // src/ComponentFactory.ts
-  var ComponentURI, _buildComponentFromElement_, _buildComponentsFromElements_, buildComponents;
+  var ComponentURI, __booleanAttribute_, __attributeNotSet_, _buildComponentFromElement_, _buildComponentsFromElements_, buildComponents;
   var init_ComponentFactory = __esm({
     "src/ComponentFactory.ts"() {
       "use strict";
@@ -3475,12 +3475,23 @@ var global = (() => {
         const templateURI = TPL_SOURCE === "default" ? `${COMPONENTS_BASE_PATH}${COMPONENT_NAME}.${TPLEXTENSION}` : "";
         return templateURI;
       }, "ComponentURI");
+      __booleanAttribute_ = /* @__PURE__ */ __name((element, attributeName) => {
+        const __value__ = element.getAttribute(attributeName);
+        if (__value__ === null) {
+          return false;
+        }
+        const __normalized__ = __value__.trim().toLowerCase();
+        return __normalized__ !== "false" && __normalized__ !== "0";
+      }, "__booleanAttribute_");
+      __attributeNotSet_ = /* @__PURE__ */ __name((element, attributeName) => {
+        return element.getAttribute(attributeName) === null;
+      }, "__attributeNotSet_");
       _buildComponentFromElement_ = /* @__PURE__ */ __name((element, __parent__) => {
-        const __shadowed_not_set = element.getAttribute("shadowed") === null;
+        const __shadowed_not_set = __attributeNotSet_(element, "shadowed");
         const __tplsource_attr_not_set = element.getAttribute("template-source") === null;
-        const shadowed = element.getAttribute("shadowed") === "true";
-        const __cached_not_set = element.getAttribute("cached") === null;
-        const cached = element.getAttribute("cached") === "true";
+        const shadowed = __booleanAttribute_(element, "shadowed");
+        const __cached_not_set = __attributeNotSet_(element, "cached");
+        const cached = __booleanAttribute_(element, "cached");
         let tplextension = typeof CONFIG.get("tplextension") !== "undefined" ? CONFIG.get("tplextension") : "html";
         tplextension = element.getAttribute("tplextension") !== null ? element.getAttribute("tplextension") : tplextension;
         let _componentName = element.getAttribute("name");
@@ -3510,10 +3521,11 @@ var global = (() => {
         }
         const __create_component_instance_ = /* @__PURE__ */ __name(function() {
           const __shadowed = __shadowed_not_set ? __classDefinition && __classDefinition.shadowed || Component.shadowed : shadowed;
+          const __cached = __cached_not_set ? (__classDefinition && __classDefinition.cached) ?? Component.cached : cached;
           const __definition = {
             __parent__,
             name: _componentName,
-            cached: __cached_not_set ? Component.cached : cached,
+            cached: __cached,
             shadowed: __shadowed,
             tplextension,
             body: CONFIG.get("preserveComponentBodyTag") ? _DOMCreateElement("componentBody") : element,
@@ -3572,33 +3584,29 @@ var global = (() => {
       init_secretKey();
       init_CONFIG();
       Service = class extends InheritClass {
+        constructor() {
+          super(...arguments);
+          this.kind = "rest";
+          /* it can be rest, mockup, local */
+          this.domain = _domain_;
+          this.basePath = _basePath_;
+          this.url = "";
+          this.method = "GET";
+          this.data = {};
+          this.reload = false;
+          this.cached = false;
+        }
         static {
           __name(this, "Service");
         }
-        options;
-        withCredentials;
-        useHTTP2;
         // eslint-disable-next-line no-unused-vars
         mockup({ request, service }) {
           throw new Error("Method not implemented.");
         }
-        name;
-        responseHeaders;
         // eslint-disable-next-line no-unused-vars
         local({ request, service }) {
           throw new Error("Method not implemented.");
         }
-        kind = "rest";
-        /* it can be rest, mockup, local */
-        domain = _domain_;
-        basePath = _basePath_;
-        url = "";
-        method = "GET";
-        data = {};
-        reload = false;
-        cached = false;
-        headers;
-        template;
         // eslint-disable-next-line no-unused-vars
         done({ request, service }) {
           throw new Error("Method not implemented.");
@@ -3615,16 +3623,19 @@ var global = (() => {
         }
       };
       JSONService = class extends Service {
+        constructor() {
+          super(...arguments);
+          this.method = "GET";
+          this.cached = false;
+          this.headers = {
+            "Content-Type": "application/json",
+            "charset": "utf-8"
+          };
+          this.JSONresponse = void 0;
+        }
         static {
           __name(this, "JSONService");
         }
-        method = "GET";
-        cached = false;
-        headers = {
-          "Content-Type": "application/json",
-          "charset": "utf-8"
-        };
-        JSONresponse = void 0;
         done(result) {
           logger.debug("***** RECEIVED RESPONSE:");
           logger.debug(result.service.template);
@@ -3632,20 +3643,24 @@ var global = (() => {
         }
       };
       ConfigService = class extends JSONService {
+        constructor() {
+          super();
+          this.method = "GET";
+          this.cached = false;
+          this.configFileName = "config.json";
+          this.headers = {
+            "Content-Type": "application/json",
+            "charset": "utf-8"
+          };
+          this.JSONresponse = void 0;
+          this.set("url", `${this.get("basePath")}${this.get("configFileName")}`);
+        }
         static {
           __name(this, "ConfigService");
         }
-        method = "GET";
-        cached = false;
-        configFileName = "config.json";
-        headers = {
-          "Content-Type": "application/json",
-          "charset": "utf-8"
-        };
         configLoaded() {
           throw Error("Method not implemented.");
         }
-        JSONresponse = void 0;
         done(result) {
           logger.debug("***** CONFIG LOADED:");
           logger.debug(result.service.template);
@@ -3667,10 +3682,6 @@ var global = (() => {
           this.configLoaded().catch((e) => {
             throw new Error(`An error ocurred: ${e}`);
           });
-        }
-        constructor() {
-          super();
-          this.set("url", `${this.get("basePath")}${this.get("configFileName")}`);
         }
       };
       Package("com.qcobjects.api", [
@@ -3699,21 +3710,23 @@ var global = (() => {
       init_top();
       init_Service();
       GlobalSettings = class _GlobalSettings extends InheritClass {
+        constructor() {
+          super(...arguments);
+          this._GLOBAL = {};
+          this._logger = new Logger();
+        }
         static {
           __name(this, "GlobalSettings");
         }
         static __start__() {
           return _GlobalSettings.instance.__start__();
         }
-        _GLOBAL = {};
-        static _instance;
         static get instance() {
           if (typeof _GlobalSettings._instance === "undefined") {
             _GlobalSettings._instance = new _GlobalSettings();
           }
           return _GlobalSettings._instance;
         }
-        _logger = new Logger();
         get logger() {
           return this._logger;
         }
@@ -3849,9 +3862,9 @@ var global = (() => {
         return _top[name] || _defaultValue;
       }, "get");
       resetTop();
-      _define_props = /* @__PURE__ */ __name(function(_top2) {
-        if (!Object.hasOwn(_top2, "PackagesList")) {
-          Object.defineProperty(_top2, "PackagesList", {
+      _define_props = /* @__PURE__ */ __name(function(_top3) {
+        if (!Object.hasOwn(_top3, "PackagesList")) {
+          Object.defineProperty(_top3, "PackagesList", {
             // eslint-disable-next-line no-unused-vars
             set: /* @__PURE__ */ __name((value) => {
               logger.debug("PackagesList is readonly");
@@ -3861,8 +3874,8 @@ var global = (() => {
             }, "get")
           });
         }
-        if (!Object.hasOwn(_top2, "PackagesNameList")) {
-          Object.defineProperty(_top2, "PackagesNameList", {
+        if (!Object.hasOwn(_top3, "PackagesNameList")) {
+          Object.defineProperty(_top3, "PackagesNameList", {
             // eslint-disable-next-line no-unused-vars
             set: /* @__PURE__ */ __name((val) => {
               logger.debug("PackagesNameList is readonly");
@@ -3872,8 +3885,8 @@ var global = (() => {
             }, "get")
           });
         }
-        if (!Object.hasOwn(_top2, "ClassesList")) {
-          Object.defineProperty(_top2, "ClassesList", {
+        if (!Object.hasOwn(_top3, "ClassesList")) {
+          Object.defineProperty(_top3, "ClassesList", {
             // eslint-disable-next-line no-unused-vars
             set: /* @__PURE__ */ __name((value) => {
               logger.debug("ClassesList is readonly");
@@ -3883,8 +3896,8 @@ var global = (() => {
             }, "get")
           });
         }
-        if (!Object.hasOwn(_top2, "ClassesNameList")) {
-          Object.defineProperty(_top2, "ClassesNameList", {
+        if (!Object.hasOwn(_top3, "ClassesNameList")) {
+          Object.defineProperty(_top3, "ClassesNameList", {
             // eslint-disable-next-line no-unused-vars
             set(value) {
               logger.debug("ClassesNameList is readonly");
@@ -3963,12 +3976,12 @@ var global = (() => {
       init_top();
       init_range();
       setDefaultProcessors = /* @__PURE__ */ __name(() => {
-        (function(_top2) {
+        (function(_top3) {
           const mapper = /* @__PURE__ */ __name((componentInstance, componentName, valueName) => {
             if (typeof componentInstance === "undefined" || componentInstance === null) {
               throw Error(`mapper.${componentName}.${valueName} does not have a component instance or it is null.`);
             }
-            const globalValue = _top2.get(valueName);
+            const globalValue = get(valueName);
             const componentValue = componentInstance.get(valueName);
             const dataValue = componentInstance.data[valueName];
             const list = typeof dataValue !== "undefined" ? dataValue : typeof componentValue !== "undefined" ? componentValue : globalValue;
@@ -4063,25 +4076,33 @@ var global = (() => {
       findPackageNodePath = /* @__PURE__ */ __name(function(packagename) {
         let sdkPath = null;
         if (!isBrowser) {
+          let existsSync = null;
           try {
             const fs = __require("node:fs");
-            let sdkPaths = [
-              `${CONFIG.get("projectPath")}${CONFIG.get("relativeImportPath")}`,
-              `${CONFIG.get("basePath")}${CONFIG.get("relativeImportPath")}`,
-              `${CONFIG.get("projectPath")}`,
-              `${CONFIG.get("basePath")}`,
-              `${CONFIG.get("relativeImportPath")}`,
-              `${process.cwd()}${CONFIG.get("relativeImportPath")}`,
-              `${process.cwd()}/node_modules/` + packagename,
-              `${process.cwd()}/node_modules`,
-              `${process.cwd()}`,
-              "node_modules",
-              "./",
-              ""
-            ].concat(module.paths);
-            sdkPaths = sdkPaths.filter((p) => {
-              return fs.existsSync(p + "/" + packagename);
-            });
+            if (fs && typeof fs.existsSync === "function") {
+              existsSync = /* @__PURE__ */ __name((p) => fs.existsSync(p), "existsSync");
+            }
+          } catch (e) {
+            logger.debug(`findPackageNodePath could not load node:fs: ${e}`);
+          }
+          const __modulePaths__ = typeof module !== "undefined" && Array.isArray(module.paths) ? module.paths : [];
+          const cwd = typeof process !== "undefined" && typeof process.cwd === "function" ? process.cwd() : "";
+          let sdkPaths = [
+            `${CONFIG.get("projectPath")}${CONFIG.get("relativeImportPath")}`,
+            `${CONFIG.get("basePath")}${CONFIG.get("relativeImportPath")}`,
+            `${CONFIG.get("projectPath")}`,
+            `${CONFIG.get("basePath")}`,
+            `${CONFIG.get("relativeImportPath")}`,
+            `${cwd}${CONFIG.get("relativeImportPath")}`,
+            `${cwd}/node_modules/`,
+            `${cwd}/node_modules`,
+            `${cwd}`,
+            "node_modules",
+            "./",
+            ""
+          ].concat(__modulePaths__).filter((p) => typeof p === "string" && p !== "undefined");
+          if (existsSync !== null) {
+            sdkPaths = sdkPaths.filter((p) => existsSync(p + "/" + packagename));
             if (sdkPaths.length > 0) {
               sdkPath = sdkPaths[0];
               logger.info(packagename + " is Installed.");
@@ -4089,8 +4110,9 @@ var global = (() => {
               sdkPath = "";
               logger.info(`${packagename} is not in a standard path.`);
             }
-          } catch (e) {
-            console.log(e);
+          } else {
+            sdkPath = `${cwd}/node_modules`;
+            logger.debug(`findPackageNodePath could not verify ${packagename}, assuming ${sdkPath}`);
           }
         }
         return sdkPath;
@@ -4317,7 +4339,6 @@ var global = (() => {
         static {
           __name(this, "ArrayList");
         }
-        prototype;
         unique() {
           return this.filter(function(value, index, self) {
             return self.indexOf(value) === index;
@@ -4394,10 +4415,12 @@ var global = (() => {
         }
       };
       ArrayCollection = class {
+        constructor() {
+          this.source = New(ArrayList, []);
+        }
         static {
           __name(this, "ArrayCollection");
         }
-        source = New(ArrayList, []);
         changed(prop, value) {
           logger.debug("VALUE CHANGED");
           logger.debug(prop);
@@ -4703,10 +4726,10 @@ var global = (() => {
       init_globalSettings();
       init_loadSDK();
       init_range();
-      (/* @__PURE__ */ __name((function __qcobjects__(_top2) {
-        if (typeof Object.defineProperty !== "undefined" && typeof _top2 !== "undefined") {
+      (/* @__PURE__ */ __name((function __qcobjects__(_top3) {
+        if (typeof Object.defineProperty !== "undefined" && typeof _top3 !== "undefined") {
           try {
-            Object.defineProperty(_top2, "__qcobjects__", {
+            Object.defineProperty(_top3, "__qcobjects__", {
               enumerable: true,
               configurable: false,
               writable: false,
@@ -4714,13 +4737,13 @@ var global = (() => {
             });
           } catch (e) {
             logger.debug(`An error ocurred: ${e}`);
-            if (typeof _top2.__qcobjects__ !== "undefined") {
-              _top2.__qcobjects__.loaded = true;
+            if (typeof _top3.__qcobjects__ !== "undefined") {
+              _top3.__qcobjects__.loaded = true;
             }
           }
         }
-        if (typeof _top2.__qcobjects__.loaded === "undefined") {
-          _top2.__qcobjects__.loaded = true;
+        if (typeof _top3.__qcobjects__.loaded === "undefined") {
+          _top3.__qcobjects__.loaded = true;
           if (isBrowser) {
             Element.prototype.subelements = subelements;
             Document.prototype.subelements = subelements;
@@ -4971,7 +4994,7 @@ var global = (() => {
           if (isBrowser) {
             asyncLoad(function() {
               Ready(function() {
-                (function(_top3) {
+                (function(_top4) {
                   let ticking = false;
                   const scrollHeight = Math.max(
                     document.body.scrollHeight,
@@ -4990,8 +5013,8 @@ var global = (() => {
                     document.documentElement.clientWidth
                   );
                   function scrollDispatcher(event) {
-                    const percentY = Math.round(_top3.scrollY * 100 / scrollHeight);
-                    const percentX = Math.round(_top3.scrollX * 100 / scrollWidth);
+                    const percentY = Math.round(_top4.scrollY * 100 / scrollHeight);
+                    const percentX = Math.round(_top4.scrollX * 100 / scrollWidth);
                     const scrollPercentEventEvent = new CustomEvent("scrollpercent", {
                       detail: {
                         percentX,
@@ -5025,16 +5048,16 @@ var global = (() => {
                       ticking = true;
                     }
                   });
-                })(_top2);
+                })(_top3);
               });
             }, []);
           }
           if (!isBrowser) {
-            if (typeof _top2._fireAsyncLoad !== "undefined") {
-              _fireAsyncLoad.call(_top2);
+            if (typeof _top3._fireAsyncLoad !== "undefined") {
+              _fireAsyncLoad.call(_top3);
             }
-            if (typeof _top2.onload !== "undefined") {
-              _top2.onload.call(_top2);
+            if (typeof _top3.onload !== "undefined") {
+              _top3.onload.call(_top3);
             }
           }
           (function(isBrowser2) {
@@ -5110,6 +5133,8 @@ var global = (() => {
     _QC_PACKAGES_IMPORTED: () => _QC_PACKAGES_IMPORTED,
     _QC_READY_LISTENERS: () => _QC_READY_LISTENERS,
     _Ready: () => _Ready,
+    __attributeNotSet_: () => __attributeNotSet_,
+    __booleanAttribute_: () => __booleanAttribute_,
     __getType__: () => __getType__,
     __instanceID: () => __instanceID,
     __is_raw_class__: () => __is_raw_class__,
@@ -5231,10 +5256,6 @@ var global = (() => {
     static {
       __name(this, "BackendMicroservice");
     }
-    stream;
-    route;
-    headers;
-    request;
     constructor({
       domain = _domain_,
       basePath = _basePath_,
@@ -5446,16 +5467,17 @@ var global = (() => {
 
   // src/DefaultTemplateHandler.ts
   var DefaultTemplateHandler = class {
+    constructor({ component, template }) {
+      this.template = "";
+      this.__definition = {};
+      this.component = component;
+      this.template = template;
+    }
     static {
       __name(this, "DefaultTemplateHandler");
     }
-    template = "";
-    __definition = {};
-    static __definition = {};
-    component;
-    constructor({ component, template }) {
-      this.component = component;
-      this.template = template;
+    static {
+      this.__definition = {};
     }
     assign(data) {
       const templateInstance = this;
@@ -5505,20 +5527,21 @@ var global = (() => {
   init_Package();
   init_Logger();
   var SourceJS = class extends InheritClass {
-    static {
-      __name(this, "SourceJS");
-    }
-    domain = _domain_;
-    basePath = _basePath_;
-    type = "text/javascript";
-    containerTag = "body";
-    url = "";
-    data = {};
-    async = false;
-    external = false;
     constructor(o) {
       super(o);
+      this.domain = _domain_;
+      this.basePath = _basePath_;
+      this.type = "text/javascript";
+      this.containerTag = "body";
+      this.url = "";
+      this.data = {};
+      this.async = false;
+      this.external = false;
+      this.status = false;
       this.body = _DOMCreateElement("script");
+    }
+    static {
+      __name(this, "SourceJS");
     }
     set(name, value) {
       this[name] = value;
@@ -5526,7 +5549,6 @@ var global = (() => {
     get(name, _default) {
       return this[name] || _default;
     }
-    status = false;
     done() {
     }
     fail() {
@@ -5587,18 +5609,18 @@ var global = (() => {
   init_platform();
   init_Package();
   var SourceCSS = class extends InheritClass {
-    static {
-      __name(this, "SourceCSS");
-    }
-    domain = _domain_;
-    basePath = _basePath_;
-    url = "";
-    data = {};
-    async = false;
-    external = false;
     constructor(o) {
       super(o);
+      this.domain = _domain_;
+      this.basePath = _basePath_;
+      this.url = "";
+      this.data = {};
+      this.async = false;
+      this.external = false;
       this.body = _DOMCreateElement("link");
+    }
+    static {
+      __name(this, "SourceCSS");
     }
     fail() {
       throw new Error("Method not implemented.");
@@ -5655,29 +5677,6 @@ var global = (() => {
     static {
       __name(this, "QCObjectsWidgetNode");
     }
-    writingSuggestions;
-    currentCSSZoom;
-    ariaColIndexText;
-    ariaRowIndexText;
-    accessKey;
-    accessKeyLabel;
-    autocapitalize;
-    dir;
-    draggable;
-    hidden;
-    inert;
-    innerText;
-    lang;
-    offsetHeight;
-    offsetLeft;
-    offsetParent;
-    offsetTop;
-    offsetWidth;
-    outerText;
-    popover;
-    spellcheck;
-    title;
-    translate;
     attachInternals() {
       throw new Error("Method not implemented.");
     }
@@ -5699,30 +5698,6 @@ var global = (() => {
     removeEventListener(type, listener, options) {
       throw new Error("Method not implemented.");
     }
-    attributes;
-    classList;
-    className;
-    clientHeight;
-    clientLeft;
-    clientTop;
-    clientWidth;
-    id;
-    innerHTML;
-    localName;
-    namespaceURI;
-    onfullscreenchange;
-    onfullscreenerror;
-    outerHTML;
-    ownerDocument;
-    part;
-    prefix;
-    scrollHeight;
-    scrollLeft;
-    scrollTop;
-    scrollWidth;
-    shadowRoot;
-    slot;
-    tagName;
     attachShadow(init) {
       throw new Error("Method not implemented.");
     }
@@ -5846,19 +5821,6 @@ var global = (() => {
     webkitMatchesSelector(selectors) {
       throw new Error("Method not implemented.");
     }
-    baseURI;
-    childNodes;
-    firstChild;
-    isConnected;
-    lastChild;
-    nextSibling;
-    nodeName;
-    nodeType;
-    nodeValue;
-    parentElement;
-    parentNode;
-    previousSibling;
-    textContent;
     appendChild(node) {
       throw new Error("Method not implemented.");
     }
@@ -5904,68 +5866,9 @@ var global = (() => {
     replaceChild(node, child) {
       throw new Error("Method not implemented.");
     }
-    ELEMENT_NODE;
-    ATTRIBUTE_NODE;
-    TEXT_NODE;
-    CDATA_SECTION_NODE;
-    ENTITY_REFERENCE_NODE;
-    ENTITY_NODE;
-    PROCESSING_INSTRUCTION_NODE;
-    COMMENT_NODE;
-    DOCUMENT_NODE;
-    DOCUMENT_TYPE_NODE;
-    DOCUMENT_FRAGMENT_NODE;
-    NOTATION_NODE;
-    DOCUMENT_POSITION_DISCONNECTED;
-    DOCUMENT_POSITION_PRECEDING;
-    DOCUMENT_POSITION_FOLLOWING;
-    DOCUMENT_POSITION_CONTAINS;
-    DOCUMENT_POSITION_CONTAINED_BY;
-    DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC;
     dispatchEvent(event) {
       throw new Error("Method not implemented.");
     }
-    ariaAtomic;
-    ariaAutoComplete;
-    ariaBrailleLabel;
-    ariaBrailleRoleDescription;
-    ariaBusy;
-    ariaChecked;
-    ariaColCount;
-    ariaColIndex;
-    ariaColSpan;
-    ariaCurrent;
-    ariaDescription;
-    ariaDisabled;
-    ariaExpanded;
-    ariaHasPopup;
-    ariaHidden;
-    ariaInvalid;
-    ariaKeyShortcuts;
-    ariaLabel;
-    ariaLevel;
-    ariaLive;
-    ariaModal;
-    ariaMultiLine;
-    ariaMultiSelectable;
-    ariaOrientation;
-    ariaPlaceholder;
-    ariaPosInSet;
-    ariaPressed;
-    ariaReadOnly;
-    ariaRequired;
-    ariaRoleDescription;
-    ariaRowCount;
-    ariaRowIndex;
-    ariaRowSpan;
-    ariaSelected;
-    ariaSetSize;
-    ariaSort;
-    ariaValueMax;
-    ariaValueMin;
-    ariaValueNow;
-    ariaValueText;
-    role;
     animate(keyframes, options) {
       throw new Error("Method not implemented.");
     }
@@ -5984,12 +5887,6 @@ var global = (() => {
     replaceWith(...nodes) {
       throw new Error("Method not implemented.");
     }
-    nextElementSibling;
-    previousElementSibling;
-    childElementCount;
-    children;
-    firstElementChild;
-    lastElementChild;
     append(...nodes) {
       throw new Error("Method not implemented.");
     }
@@ -6005,115 +5902,6 @@ var global = (() => {
     replaceChildren(...nodes) {
       throw new Error("Method not implemented.");
     }
-    assignedSlot;
-    attributeStyleMap;
-    style;
-    contentEditable;
-    enterKeyHint;
-    inputMode;
-    isContentEditable;
-    onabort;
-    onanimationcancel;
-    onanimationend;
-    onanimationiteration;
-    onanimationstart;
-    onauxclick;
-    onbeforeinput;
-    onbeforetoggle;
-    onblur;
-    oncancel;
-    oncanplay;
-    oncanplaythrough;
-    onchange;
-    onclick;
-    onclose;
-    oncontextlost;
-    oncontextmenu;
-    oncontextrestored;
-    oncopy;
-    oncuechange;
-    oncut;
-    ondblclick;
-    ondrag;
-    ondragend;
-    ondragenter;
-    ondragleave;
-    ondragover;
-    ondragstart;
-    ondrop;
-    ondurationchange;
-    onemptied;
-    onended;
-    onerror;
-    onfocus;
-    onformdata;
-    ongotpointercapture;
-    oninput;
-    oninvalid;
-    onkeydown;
-    onkeypress;
-    onkeyup;
-    onload;
-    onloadeddata;
-    onloadedmetadata;
-    onloadstart;
-    onlostpointercapture;
-    onmousedown;
-    onmouseenter;
-    onmouseleave;
-    onmousemove;
-    onmouseout;
-    onmouseover;
-    onmouseup;
-    onpaste;
-    onpause;
-    onplay;
-    onplaying;
-    onpointercancel;
-    onpointerdown;
-    onpointerenter;
-    onpointerleave;
-    onpointermove;
-    onpointerout;
-    onpointerover;
-    onpointerup;
-    onprogress;
-    onratechange;
-    onreset;
-    onresize;
-    onscroll;
-    onscrollend;
-    onsecuritypolicyviolation;
-    onseeked;
-    onseeking;
-    onselect;
-    onselectionchange;
-    onselectstart;
-    onslotchange;
-    onstalled;
-    onsubmit;
-    onsuspend;
-    ontimeupdate;
-    ontoggle;
-    ontouchcancel;
-    ontouchend;
-    ontouchmove;
-    ontouchstart;
-    ontransitioncancel;
-    ontransitionend;
-    ontransitionrun;
-    ontransitionstart;
-    onvolumechange;
-    onwaiting;
-    onwebkitanimationend;
-    onwebkitanimationiteration;
-    onwebkitanimationstart;
-    onwebkittransitionend;
-    onwheel;
-    autofocus;
-    dataset;
-    nonce;
-    tabIndex;
     blur() {
       throw new Error("Method not implemented.");
     }
@@ -6204,21 +5992,20 @@ var global = (() => {
   init_Package();
   init_platform();
   var Controller = class extends InheritClass {
-    static {
-      __name(this, "Controller");
-    }
-    component;
-    dependencies = [];
     constructor({
       component,
       dependencies
     }) {
       super({ component, dependencies });
+      this.dependencies = [];
       this.component = component;
       this.dependencies = dependencies;
       if (typeof this.component === "undefined" || this.component === null) {
         throw Error(`${__getType__(this)} must be called with a component`);
       }
+    }
+    static {
+      __name(this, "Controller");
     }
     // eslint-disable-next-line no-unused-vars
     fail(...args) {
@@ -6314,7 +6101,11 @@ var global = (() => {
   init_Package();
   init_introspection();
   init_ClassFactory();
-  var Effect = class extends InheritClass {
+  var Effect = class _Effect extends InheritClass {
+    constructor() {
+      super(...arguments);
+      this.duration = 1e3;
+    }
     static {
       __name(this, "Effect");
     }
@@ -6326,7 +6117,15 @@ var global = (() => {
     apply(...args) {
       throw new Error("Method not implemented.");
     }
-    duration = 1e3;
+    /**
+     * Static bridge for animate().
+     * Effect subclasses in the SDK declare apply() as a static method and invoke
+     * super.animate(...) from it; in a static context `super` resolves against the
+     * constructor, so without this static member those calls land on undefined.
+     */
+    static animate(params) {
+      _Effect.prototype.animate.call({}, params);
+    }
     animate({
       timing,
       draw,
@@ -6362,24 +6161,25 @@ var global = (() => {
   init_Package();
   init_ClassFactory();
   var TransitionEffect = class extends Effect {
+    constructor() {
+      super(...arguments);
+      this.duration = 385;
+      this.defaultParams = {
+        alphaFrom: 0,
+        alphaTo: 1,
+        angleFrom: 180,
+        angleTo: 0,
+        radiusFrom: 0,
+        radiusTo: 30,
+        scaleFrom: 0,
+        scaleTo: 1
+      };
+      this.fitToHeight = false;
+      this.fitToWidth = false;
+    }
     static {
       __name(this, "TransitionEffect");
     }
-    duration = 385;
-    defaultParams = {
-      alphaFrom: 0,
-      alphaTo: 1,
-      angleFrom: 180,
-      angleTo: 0,
-      radiusFrom: 0,
-      radiusTo: 30,
-      scaleFrom: 0,
-      scaleTo: 1
-    };
-    fitToHeight = false;
-    fitToWidth = false;
-    component;
-    effects;
     apply({
       alphaFrom,
       alphaTo,
@@ -6393,12 +6193,13 @@ var global = (() => {
       const _transition_ = this;
       logger.info("EXECUTING TransitionEffect  ");
       const componentRoot = _transition_.component.componentRoot;
+      const __measureTarget__ = typeof componentRoot !== "undefined" && componentRoot !== null && typeof componentRoot.getBoundingClientRect !== "function" ? componentRoot.host ?? componentRoot : componentRoot;
       if (typeof componentRoot !== "undefined" && componentRoot !== null) {
         if (_transition_.fitToHeight) {
-          componentRoot.height = typeof componentRoot.offsetParent === "object" && componentRoot.offsetParent !== null ? componentRoot.offsetParent?.scrollHeight : componentRoot.getBoundingClientRect().height;
+          __measureTarget__.height = typeof __measureTarget__.offsetParent === "object" && __measureTarget__.offsetParent !== null ? __measureTarget__.offsetParent?.scrollHeight : __measureTarget__.getBoundingClientRect().height;
         }
         if (_transition_.fitToWidth) {
-          componentRoot.width = typeof componentRoot.offsetParent === "object" && componentRoot.offsetParent !== null ? componentRoot.offsetParent?.scrollWidth : componentRoot.getBoundingClientRect().width;
+          __measureTarget__.width = typeof __measureTarget__.offsetParent === "object" && __measureTarget__.offsetParent !== null ? __measureTarget__.offsetParent?.scrollWidth : __measureTarget__.getBoundingClientRect().width;
         }
         if (_transition_.component.shadowed) {
           componentRoot.host.style.display = "block";
@@ -6407,8 +6208,30 @@ var global = (() => {
         }
         _transition_.effects.map((effectClassName) => {
           const __effectClass__ = ClassFactory(effectClassName);
-          const effectObj = new __effectClass__({});
-          const effectClassMethod = effectObj.apply.bind(_transition_);
+          if (typeof __effectClass__ === "undefined") {
+            logger.debug(`Transition effect ${effectClassName} was not found`);
+            return effectClassName;
+          }
+          const __staticApply__ = __effectClass__.apply;
+          let effectClassMethod = void 0;
+          let effectScope = _transition_;
+          if (typeof __staticApply__ === "function") {
+            effectClassMethod = __staticApply__;
+          } else {
+            try {
+              const __effectInstance__ = new __effectClass__({});
+              if (typeof __effectInstance__.apply === "function") {
+                effectClassMethod = __effectInstance__.apply.bind(__effectInstance__);
+                effectScope = __effectInstance__;
+              }
+            } catch (e) {
+              logger.debug(`Transition effect ${effectClassName} could not be instantiated: ${e}`);
+            }
+          }
+          if (typeof effectClassMethod !== "function") {
+            logger.debug(`Transition effect ${effectClassName} does not declare an apply() method`);
+            return effectClassName;
+          }
           const componentHost = _transition_.component.shadowed ? componentRoot.host : componentRoot;
           const effectParams = {
             alphaFrom,
@@ -6420,7 +6243,7 @@ var global = (() => {
             scaleFrom,
             scaleTo
           };
-          effectClassMethod(componentHost, ...Object.values(effectParams));
+          effectClassMethod.call(effectScope, componentHost, ...Object.values(effectParams));
           return effectClassName;
         });
       }
@@ -6434,11 +6257,14 @@ var global = (() => {
   init_InheritClass();
   init_Package();
   var Timer = class extends InheritClass {
+    constructor() {
+      super(...arguments);
+      this.duration = 1e3;
+      this.alive = true;
+    }
     static {
       __name(this, "Timer");
     }
-    duration = 1e3;
-    alive = true;
     thread({
       timing,
       intervalInterceptor,
@@ -6545,18 +6371,18 @@ var global = (() => {
   init_Logger();
   init_Package();
   var Toggle = class extends InheritClass {
-    static {
-      __name(this, "Toggle");
-    }
-    _toggle = false;
-    _inverse = true;
-    _positive = null;
-    _negative = null;
-    _dispatched = null;
-    _args = {};
     constructor(positive, negative, args) {
       super({ positive, negative, args });
+      this._toggle = false;
+      this._inverse = true;
+      this._positive = null;
+      this._negative = null;
+      this._dispatched = null;
+      this._args = {};
       this._new_({ positive, negative, args });
+    }
+    static {
+      __name(this, "Toggle");
     }
     changeToggle() {
       this._toggle = !this._toggle;
