@@ -3855,9 +3855,9 @@ var init_top = __esm({
       return _top[name] || _defaultValue;
     }, "get");
     resetTop();
-    _define_props = /* @__PURE__ */ __name(function(_top3) {
-      if (!Object.hasOwn(_top3, "PackagesList")) {
-        Object.defineProperty(_top3, "PackagesList", {
+    _define_props = /* @__PURE__ */ __name(function(_top2) {
+      if (!Object.hasOwn(_top2, "PackagesList")) {
+        Object.defineProperty(_top2, "PackagesList", {
           // eslint-disable-next-line no-unused-vars
           set: /* @__PURE__ */ __name((value) => {
             logger.debug("PackagesList is readonly");
@@ -3867,8 +3867,8 @@ var init_top = __esm({
           }, "get")
         });
       }
-      if (!Object.hasOwn(_top3, "PackagesNameList")) {
-        Object.defineProperty(_top3, "PackagesNameList", {
+      if (!Object.hasOwn(_top2, "PackagesNameList")) {
+        Object.defineProperty(_top2, "PackagesNameList", {
           // eslint-disable-next-line no-unused-vars
           set: /* @__PURE__ */ __name((val) => {
             logger.debug("PackagesNameList is readonly");
@@ -3878,8 +3878,8 @@ var init_top = __esm({
           }, "get")
         });
       }
-      if (!Object.hasOwn(_top3, "ClassesList")) {
-        Object.defineProperty(_top3, "ClassesList", {
+      if (!Object.hasOwn(_top2, "ClassesList")) {
+        Object.defineProperty(_top2, "ClassesList", {
           // eslint-disable-next-line no-unused-vars
           set: /* @__PURE__ */ __name((value) => {
             logger.debug("ClassesList is readonly");
@@ -3889,8 +3889,8 @@ var init_top = __esm({
           }, "get")
         });
       }
-      if (!Object.hasOwn(_top3, "ClassesNameList")) {
-        Object.defineProperty(_top3, "ClassesNameList", {
+      if (!Object.hasOwn(_top2, "ClassesNameList")) {
+        Object.defineProperty(_top2, "ClassesNameList", {
           // eslint-disable-next-line no-unused-vars
           set(value) {
             logger.debug("ClassesNameList is readonly");
@@ -3969,7 +3969,7 @@ var init_defaultProcessors = __esm({
     init_top();
     init_range();
     setDefaultProcessors = /* @__PURE__ */ __name(() => {
-      (function(_top3) {
+      (function() {
         const mapper = /* @__PURE__ */ __name((componentInstance, componentName, valueName) => {
           if (typeof componentInstance === "undefined" || componentInstance === null) {
             throw Error(`mapper.${componentName}.${valueName} does not have a component instance or it is null.`);
@@ -4052,7 +4052,7 @@ var init_defaultProcessors = __esm({
           ).join("");
         }, "repeat");
         GlobalProcessor.setProcessor(repeat);
-      })(_top);
+      })();
     }, "setDefaultProcessors");
   }
 });
@@ -4069,11 +4069,11 @@ var init_findPackageNodePath = __esm({
     findPackageNodePath = /* @__PURE__ */ __name(function(packagename) {
       let sdkPath = null;
       if (!isBrowser) {
-        let existsSync = null;
+        let __fs__ = null;
         try {
           const fs = require("node:fs");
           if (fs && typeof fs.existsSync === "function") {
-            existsSync = /* @__PURE__ */ __name((p) => fs.existsSync(p), "existsSync");
+            __fs__ = fs;
           }
         } catch (e) {
           logger.debug(`findPackageNodePath could not load node:fs: ${e}`);
@@ -4094,8 +4094,8 @@ var init_findPackageNodePath = __esm({
           "./",
           ""
         ].concat(__modulePaths__).filter((p) => typeof p === "string" && p !== "undefined");
-        if (existsSync !== null) {
-          sdkPaths = sdkPaths.filter((p) => existsSync(p + "/" + packagename));
+        if (__fs__ !== null) {
+          sdkPaths = sdkPaths.filter((p) => __fs__.existsSync(p + "/" + packagename));
           if (sdkPaths.length > 0) {
             sdkPath = sdkPaths[0];
             logger.info(packagename + " is Installed.");
@@ -4719,10 +4719,10 @@ var require_MainProcess = __commonJS({
     init_globalSettings();
     init_loadSDK();
     init_range();
-    (/* @__PURE__ */ __name((function __qcobjects__(_top3) {
-      if (typeof Object.defineProperty !== "undefined" && typeof _top3 !== "undefined") {
+    (/* @__PURE__ */ __name((function __qcobjects__(_top2) {
+      if (typeof Object.defineProperty !== "undefined" && typeof _top2 !== "undefined") {
         try {
-          Object.defineProperty(_top3, "__qcobjects__", {
+          Object.defineProperty(_top2, "__qcobjects__", {
             enumerable: true,
             configurable: false,
             writable: false,
@@ -4730,13 +4730,13 @@ var require_MainProcess = __commonJS({
           });
         } catch (e) {
           logger.debug(`An error ocurred: ${e}`);
-          if (typeof _top3.__qcobjects__ !== "undefined") {
-            _top3.__qcobjects__.loaded = true;
+          if (typeof _top2.__qcobjects__ !== "undefined") {
+            _top2.__qcobjects__.loaded = true;
           }
         }
       }
-      if (typeof _top3.__qcobjects__.loaded === "undefined") {
-        _top3.__qcobjects__.loaded = true;
+      if (typeof _top2.__qcobjects__.loaded === "undefined") {
+        _top2.__qcobjects__.loaded = true;
         if (isBrowser) {
           Element.prototype.subelements = subelements;
           Document.prototype.subelements = subelements;
@@ -4987,7 +4987,7 @@ var require_MainProcess = __commonJS({
         if (isBrowser) {
           asyncLoad(function() {
             Ready(function() {
-              (function(_top4) {
+              (function(_top3) {
                 let ticking = false;
                 const scrollHeight = Math.max(
                   document.body.scrollHeight,
@@ -5006,8 +5006,8 @@ var require_MainProcess = __commonJS({
                   document.documentElement.clientWidth
                 );
                 function scrollDispatcher(event) {
-                  const percentY = Math.round(_top4.scrollY * 100 / scrollHeight);
-                  const percentX = Math.round(_top4.scrollX * 100 / scrollWidth);
+                  const percentY = Math.round(_top3.scrollY * 100 / scrollHeight);
+                  const percentX = Math.round(_top3.scrollX * 100 / scrollWidth);
                   const scrollPercentEventEvent = new CustomEvent("scrollpercent", {
                     detail: {
                       percentX,
@@ -5041,16 +5041,16 @@ var require_MainProcess = __commonJS({
                     ticking = true;
                   }
                 });
-              })(_top3);
+              })(_top2);
             });
           }, []);
         }
         if (!isBrowser) {
-          if (typeof _top3._fireAsyncLoad !== "undefined") {
-            _fireAsyncLoad.call(_top3);
+          if (typeof _top2._fireAsyncLoad !== "undefined") {
+            _fireAsyncLoad.call(_top2);
           }
-          if (typeof _top3.onload !== "undefined") {
-            _top3.onload.call(_top3);
+          if (typeof _top2.onload !== "undefined") {
+            _top2.onload.call(_top2);
           }
         }
         (function(isBrowser2) {
