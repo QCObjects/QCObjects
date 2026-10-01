@@ -36,13 +36,18 @@ export class TransitionEffect extends Effect implements ITransitionEffect{
     const _transition_ = this;
     logger.info("EXECUTING TransitionEffect  ");
     const componentRoot =_transition_.component.componentRoot;
+    /* when the component is shadowed, componentRoot is the ShadowRoot itself,
+       which carries no layout box, so measure its host element instead */
+    const __measureTarget__:HTMLElement = (typeof componentRoot !== "undefined" && componentRoot !== null && typeof (componentRoot as any).getBoundingClientRect !== "function")
+      ? (((componentRoot as ShadowRoot).host ?? componentRoot) as HTMLElement)
+      : (componentRoot as HTMLElement);
 
     if (typeof componentRoot !== "undefined" && componentRoot !== null){
       if (_transition_.fitToHeight) {
-        (componentRoot as any).height = (typeof (componentRoot as HTMLElement).offsetParent === "object" && (componentRoot as HTMLElement).offsetParent !== null) ? ((componentRoot as HTMLElement).offsetParent?.scrollHeight) : ((componentRoot as HTMLElement).getBoundingClientRect().height);
+        (__measureTarget__ as any).height = (typeof __measureTarget__.offsetParent === "object" && __measureTarget__.offsetParent !== null) ? (__measureTarget__.offsetParent?.scrollHeight) : (__measureTarget__.getBoundingClientRect().height);
       }
       if (_transition_.fitToWidth) {
-        (componentRoot as any).width = (typeof (componentRoot as HTMLElement).offsetParent === "object" && (componentRoot as HTMLElement).offsetParent !== null) ? ((componentRoot as HTMLElement).offsetParent?.scrollWidth) : ((componentRoot as HTMLElement).getBoundingClientRect().width);
+        (__measureTarget__ as any).width = (typeof __measureTarget__.offsetParent === "object" && __measureTarget__.offsetParent !== null) ? (__measureTarget__.offsetParent?.scrollWidth) : (__measureTarget__.getBoundingClientRect().width);
       }
       if (_transition_.component.shadowed){
         ((componentRoot as ShadowRoot).host as HTMLElement).style.display = "block";
@@ -52,8 +57,34 @@ export class TransitionEffect extends Effect implements ITransitionEffect{
       _transition_.effects.map( (effectClassName:string):string => {
 
         const __effectClass__ = ClassFactory(effectClassName) as unknown as typeof Effect;
-        const effectObj = new __effectClass__({});
-        const effectClassMethod = effectObj.apply.bind(_transition_);
+        if (typeof __effectClass__ === "undefined") {
+          logger.debug(`Transition effect ${effectClassName} was not found`);
+          return effectClassName;
+        }
+        /* Effect classes declare apply() either as a STATIC method (Move, MoveYInFromBottom)
+           or as an INSTANCE method (Fade). ES5 resolved it statically via _super_(),
+           so prefer the static one and fall back to an instance. Reading apply from
+           a bare instance falls through to the abstract Effect.prototype.apply */
+        const __staticApply__ = (__effectClass__ as any).apply;
+        let effectClassMethod: any = undefined;
+        let effectScope: any = _transition_;
+        if (typeof __staticApply__ === "function") {
+          effectClassMethod = __staticApply__;
+        } else {
+          try {
+            const __effectInstance__ = new (__effectClass__ as any)({});
+            if (typeof __effectInstance__.apply === "function") {
+              effectClassMethod = __effectInstance__.apply.bind(__effectInstance__);
+              effectScope = __effectInstance__;
+            }
+          } catch (e: any) {
+            logger.debug(`Transition effect ${effectClassName} could not be instantiated: ${e}`);
+          }
+        }
+        if (typeof effectClassMethod !== "function") {
+          logger.debug(`Transition effect ${effectClassName} does not declare an apply() method`);
+          return effectClassName;
+        }
         const componentHost = (_transition_.component.shadowed)? ((componentRoot as ShadowRoot).host) : (componentRoot);
         const effectParams = {
           alphaFrom,
@@ -65,7 +96,7 @@ export class TransitionEffect extends Effect implements ITransitionEffect{
           scaleFrom,
           scaleTo
         };        
-        effectClassMethod(componentHost,...Object.values(effectParams));
+        effectClassMethod.call(effectScope, componentHost,...Object.values(effectParams));
         return effectClassName;
       });
   

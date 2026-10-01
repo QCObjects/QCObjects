@@ -17,7 +17,7 @@ export function asyncLoad(callback: TAsyncLoadCallback, args?: any[]): any {
       ((this as AsyncCallback).func as Function).apply(this, ...args as [], this);
     }
   }
-  _asyncLoad.push((new AsyncCallback(callback, args)) as unknown as never);
+  _asyncLoad.push((new AsyncCallback(callback, args)));
   return AsyncCallback;
 }
 

@@ -2,7 +2,7 @@ import { Base64 } from "./Base64";
 import { _basePath_ } from "./basePath";
 import { _Cast } from "./Cast";
 import { ClassFactory } from "./ClassFactory";
-import { _buildComponentsFromElements_, ComponentURI } from "./ComponentFactory";
+import { _buildComponentsFromElements_, ComponentURI, __booleanAttribute_ } from "./ComponentFactory";
 import { _DataStringify } from "./DataStringify";
 import { _domain_ } from "./domain";
 import { _DOMCreateElement } from "./DOMCreateElement";
@@ -17,7 +17,7 @@ import { Package } from "./Package";
 import { isBrowser } from "./platform";
 import { Processor } from "./Processor";
 import { __routing_params__, __valid_routing_way__, __valid_routings__ } from "./routings";
-import { _top, componentsStack } from "./top";
+import { componentsStack, get, set } from "./top";
 import { CONFIG } from "./CONFIG";
 import { serviceLoader } from "./serviceLoader";
 import { _tag_filter_ } from "./tag_filter";
@@ -358,12 +358,12 @@ export class Component extends InheritClass implements IComponent {
                     (a as any).oldclick = a.onclick;
                     a.onclick = function (e) {
                         let _ret_ = true;
-                        if (!_top.get("routingPaths")) {
-                            _top.set("routingPaths", []);
+                        if (!get("routingPaths")) {
+                            set("routingPaths", []);
                         }
                         const routingWay = CONFIG.get("routingWay");
                         const routingPath = (e.target as any)[routingWay];
-                        if (_top.get("routingPaths").includes(routingPath) &&
+                        if (get("routingPaths").includes(routingPath) &&
                             (e.target as any)[routingWay] !== (location as any)[routingWay] &&
                             (e.target as HTMLAnchorElement).href !== document.location.href
                         ) {
@@ -566,10 +566,10 @@ export class Component extends InheritClass implements IComponent {
     }
 
     __buildSubComponents__(rebuildObjects = false): any {
-        const _component_: Component = this as Component;
+        const _component_: Component = this;
         let elementList = _component_.subtags;
         if (!rebuildObjects) {
-            elementList = (elementList as HTMLElement[]).filter((t: HTMLElement) => t.getAttribute("loaded") !== "true") as unknown[] as IQCObjectsElement[];
+            elementList = (elementList as HTMLElement[]).filter((t: HTMLElement) => !__booleanAttribute_(t, "loaded")) as unknown[] as IQCObjectsElement[];
         }
         if ((typeof _component_ !== "undefined") || (_component_ as Component).subcomponents.length < 1) {
             _component_.subcomponents = _buildComponentsFromElements_(elementList as HTMLElement[], _component_);
@@ -930,24 +930,24 @@ export class Component extends InheritClass implements IComponent {
                         component.routingNodes = (componentBody as IQCObjectsElement)?.subelements("routing");
                         component.routings = [];
                         component.routingNodes.map((routingNode): any => {
-                            const attributeNames = (routingNode as HTMLElement).getAttributeNames();
+                            const attributeNames = (routingNode).getAttributeNames();
                             const routing = {} as TComponentRouting;
                             attributeNames.map((attributeName: any, a: string | number): any => {
-                                (routing as any)[attributeNames[a as any]] = (routingNode as HTMLElement).getAttribute(attributeNames[a as any]);
+                                (routing as any)[attributeNames[a as any]] = (routingNode).getAttribute(attributeNames[a as any]);
                                 return attributeName;
                             });
-                            component.routings.push(routing as never);
+                            component.routings.push(routing);
                             if (!component.routingPaths) {
                                 component.routingPaths = [];
                             }
-                            if (!component.routingPaths.includes(routing.path as never)) {
-                                component.routingPaths.push(routing.path as never);
+                            if (!component.routingPaths.includes(routing.path)) {
+                                component.routingPaths.push(routing.path);
                             }
-                            if (!_top.get("routingPaths")) {
-                                _top.set("routingPaths", []);
+                            if (!get("routingPaths")) {
+                                set("routingPaths", []);
                             }
-                            if (!_top.get("routingPaths").includes(routing.path)) {
-                                _top.get("routingPaths").push(routing.path);
+                            if (!get("routingPaths").includes(routing.path)) {
+                                get("routingPaths").push(routing.path);
                             }
                             return routingNode;
                         });
@@ -1086,7 +1086,12 @@ export class Component extends InheritClass implements IComponent {
                         }
                     });
                 });
-                observer.observe(_componentRoot as Element);
+                /* IntersectionObserver.observe() only accepts an Element, and
+                   componentRoot is a ShadowRoot for shadowed components */
+                const __observeTarget__:Element = (typeof _componentRoot !== "undefined" && _componentRoot !== null && typeof (_componentRoot as unknown as Element).getBoundingClientRect !== "function")
+                    ? ((_componentRoot as unknown as ShadowRoot).host ?? _componentRoot)
+                    : (_componentRoot as unknown as Element);
+                observer.observe(__observeTarget__);
             } else {
                 _applyEffect_();
             }
@@ -1132,7 +1137,7 @@ export class Component extends InheritClass implements IComponent {
                 const _componentRoot = component.componentRoot as IQCObjectsShadowedElement;
                 const lang1 = CONFIG.get("lang", "en");
                 const lang2 = navigator.language.slice(0, 2);
-                const i18n = _top.get("i18n");
+                const i18n = get("i18n");
                 if ((lang1 !== lang2) && (typeof i18n === "object" && Object.hasOwn(i18n, "messages"))) {
                     const callback_i18n = () => {
                         return new Promise<void>(function (resolve) {

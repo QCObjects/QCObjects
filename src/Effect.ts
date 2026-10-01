@@ -16,6 +16,16 @@ class Effect extends InheritClass implements IEffect {
   duration = 1000;
 
 
+  /**
+   * Static bridge for animate().
+   * Effect subclasses in the SDK declare apply() as a static method and invoke
+   * super.animate(...) from it; in a static context `super` resolves against the
+   * constructor, so without this static member those calls land on undefined.
+   */
+  static animate(params: TEffectParams): void {
+    Effect.prototype.animate.call({}, params);
+  }
+
   animate({
     timing,
     draw,

@@ -1,12 +1,12 @@
 import { logger } from "./Logger";
 import { GlobalProcessor as Processor } from "./Processor";
-import { _top } from "./top";
+import { get } from "./top";
 import { range } from "./range";
 import { IComponent } from "types";
 
 // Set Processors
 export const setDefaultProcessors = ():void => {
-    (function (_top):void {
+    (function ():void {
 
         const mapper = (componentInstance:IComponent, componentName:string, valueName:string):string => {
             /*
@@ -22,7 +22,7 @@ export const setDefaultProcessors = ():void => {
             if (typeof componentInstance === "undefined" || componentInstance === null) {
                 throw Error(`mapper.${componentName}.${valueName} does not have a component instance or it is null.`);
             }
-            const globalValue = _top.get(valueName);
+            const globalValue = get(valueName);
             const componentValue = componentInstance.get(valueName);
             const dataValue = componentInstance.data[valueName];
             const list = (typeof dataValue !== "undefined") ? (dataValue) : ((typeof componentValue !== "undefined") ? (componentValue) : (globalValue));
@@ -139,7 +139,7 @@ export const setDefaultProcessors = ():void => {
     
         Processor.setProcessor(repeat);
     
-    })(_top);
+    })();
     
 };
 
