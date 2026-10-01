@@ -533,16 +533,32 @@ export class Component extends InheritClass implements IComponent {
 
     }
 
-    hostElements(tagFilter: string): (IQCObjectsElement | HTMLElement | IQCObjectsShadowedElement)[] {
+hostElements(tagFilter: string): (IQCObjectsElement | HTMLElement | IQCObjectsShadowedElement)[] {
         const _component_ = this;
         let elementList: (IQCObjectsElement | HTMLElement | IQCObjectsShadowedElement)[] = [];
         if (isBrowser) {
-            elementList = (_component_.shadowed && (typeof _component_.shadowRoot !== "undefined")) ? (
-                _component_.shadowRoot.subelements(tagFilter) as IQCObjectsShadowedElement[]
-            ) : (
-                (_component_.body as IQCObjectsElement).subelements(tagFilter)
-            );
-
+            const __shadowed__ = _component_.shadowed && (typeof _component_.shadowRoot !== "undefined") && (_component_.shadowRoot !== null);
+            if (__shadowed__) {
+                elementList = _component_.shadowRoot.subelements(tagFilter) as IQCObjectsShadowedElement[];
+                /* Nodes assigned to a slot are light DOM children of the shadow
+                   host, not members of the shadow root, so anything a component
+                   exposes through a slot is invisible to the search above.
+                   feedComponent() relocates them onto div.shadowHost, so pick
+                   them up from there too. Without this, a component placed in a
+                   slot is never discovered and silently never builds. */
+                const __container__ = (_component_.container ?? _component_.body) as unknown as HTMLElement;
+                const __shadowHost__ = (typeof __container__ !== "undefined" && __container__ !== null) ? (__container__.querySelector(".shadowHost") as unknown as IQCObjectsElement) : null;
+                if (__shadowHost__ !== null && typeof __shadowHost__ !== "undefined") {
+                    const __slotted__ = __shadowHost__.subelements(tagFilter) as HTMLElement[];
+                    __slotted__.forEach((__el__: HTMLElement): void => {
+                        if (!(elementList as HTMLElement[]).includes(__el__)) {
+                            elementList.push(__el__);
+                        }
+                    });
+                }
+            } else {
+                elementList = (_component_.body as IQCObjectsElement).subelements(tagFilter);
+            }
         }
         return elementList;
     }
