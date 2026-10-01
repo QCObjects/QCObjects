@@ -3,8 +3,18 @@ import { findPackageNodePath } from "./findPackageNodePath";
 import { Import } from "./Import";
 import { logger } from "./Logger";
 import { _require_, isBrowser, isNodeCommonJS } from "./platform";
+import { _top } from "./top";
 
 const loadSDK = ():void => {
+    /* The SDK announces itself on the shared context (_top._sdk_) when it is
+       statically bundled with the application, as it is in a full bundle built
+       by esbuild. There is then nothing left to import, and attempting it would
+       both duplicate the SDK and read useLocalSDK before the application has had
+       a chance to configure it. */
+    if (typeof _top._sdk_ !== "undefined") {
+        logger.debug("The SDK is already present in this bundle, skipping the dynamic import");
+        return;
+    }
     if (CONFIG.get("useSDK")) {
         (function () {
             const remoteImportsPath = CONFIG.get("remoteImportsPath");
