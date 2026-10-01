@@ -1592,9 +1592,7 @@ var init_Processor = __esm({
             return typeof _top !== "undefined" ? _top[arg] : "";
           }
         };
-        if (typeof processors !== "undefined") {
-          this.processors = Object.assign(processors, _Processor.instance.processors);
-        }
+        this.processors = Object.assign({}, this.processors, _Processor._instance?.processors, processors);
       }
       static {
         __name(this, "Processor");
@@ -1623,7 +1621,8 @@ var init_Processor = __esm({
       }
       execute(component, processorName, args) {
         const processorHandler = typeof component !== "undefined" && component !== null ? component.processorHandler : this;
-        return processorHandler?.processors[processorName].bind(processorHandler).apply(processorHandler, [component, args?.split(",")]);
+        const __args__ = typeof args === "string" ? args.split(",").map((a) => a.trim()) : [];
+        return processorHandler?.processors[processorName].apply(processorHandler, [component, ...__args__]);
       }
       static process(template, component = null) {
         return _Processor.instance.process(template, component);
@@ -4624,7 +4623,12 @@ var init_loadSDK = __esm({
     init_Import();
     init_Logger();
     init_platform();
+    init_top();
     loadSDK = /* @__PURE__ */ __name(() => {
+      if (typeof _top._sdk_ !== "undefined") {
+        logger.debug("The SDK is already present in this bundle, skipping the dynamic import");
+        return;
+      }
       if (CONFIG.get("useSDK")) {
         (function() {
           const remoteImportsPath = CONFIG.get("remoteImportsPath");
@@ -4966,6 +4970,11 @@ var require_MainProcess = __commonJS({
         _protected_code_(String.prototype.list);
         setDefaultProcessors();
         Ready(function() {
+          if (typeof _top2._sdk_ !== "undefined") {
+            logger.debug("The SDK is already present in this bundle, skipping the dynamic import");
+          } else {
+            loadSDK_default();
+          }
           if (!CONFIG.get("useSDK")) {
             GlobalSettings.__start__().catch((e) => {
               throw Error(e);
@@ -4983,7 +4992,6 @@ var require_MainProcess = __commonJS({
         Export(isBrowser);
         Export(_methods_);
         Export(GlobalSettings);
-        loadSDK_default();
         if (isBrowser) {
           asyncLoad(function() {
             Ready(function() {

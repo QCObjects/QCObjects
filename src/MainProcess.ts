@@ -398,6 +398,14 @@ import { range } from "./range";
      * Load every component tag declared in the body
      **/
     Ready(function () {
+      if (typeof _top._sdk_ !== "undefined") {
+        /* The SDK is statically bundled and has already registered itself, so
+           there is nothing to import. Attempting it anyway duplicated the SDK
+           and read useLocalSDK before the application configured it. */
+        logger.debug("The SDK is already present in this bundle, skipping the dynamic import");
+      } else {
+        (loadSDK)();
+      }
       if (!CONFIG.get("useSDK")) {
         GlobalSettings.__start__()
           .catch((e: any) => {
@@ -421,8 +429,6 @@ import { range } from "./range";
     Export(_methods_);
     Export(GlobalSettings);
 
-
-    (loadSDK)();
 
     if (isBrowser) {
       asyncLoad(function (): any {
