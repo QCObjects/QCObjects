@@ -2837,7 +2837,22 @@ var init_Component = __esm({
         const _component_ = this;
         let elementList = [];
         if (isBrowser) {
-          elementList = _component_.shadowed && typeof _component_.shadowRoot !== "undefined" ? _component_.shadowRoot.subelements(tagFilter) : _component_.body.subelements(tagFilter);
+          const __shadowed__ = _component_.shadowed && typeof _component_.shadowRoot !== "undefined" && _component_.shadowRoot !== null;
+          if (__shadowed__) {
+            elementList = _component_.shadowRoot.subelements(tagFilter);
+            const __container__ = _component_.container ?? _component_.body;
+            const __shadowHost__ = typeof __container__ !== "undefined" && __container__ !== null ? __container__.querySelector(".shadowHost") : null;
+            if (__shadowHost__ !== null && typeof __shadowHost__ !== "undefined") {
+              const __slotted__ = __shadowHost__.subelements(tagFilter);
+              __slotted__.forEach((__el__) => {
+                if (!elementList.includes(__el__)) {
+                  elementList.push(__el__);
+                }
+              });
+            }
+          } else {
+            elementList = _component_.body.subelements(tagFilter);
+          }
         }
         return elementList;
       }
