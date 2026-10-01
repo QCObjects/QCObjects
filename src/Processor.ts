@@ -10,9 +10,11 @@ export class Processor extends InheritClass implements IProcessor {
   protected static _instance: IProcessor | undefined;
   constructor({ component, processors }: { component: IComponent | null, processors?: any }) {
     super({ component });
-    if (typeof processors !== "undefined") {
-      this.processors = Object.assign(processors, Processor.instance.processors);
-    }
+    /* seed from the global registry so processors registered later through
+       setProcessor() (mapper, layout, repeat...) are visible to every handler.
+       Processor._instance is read directly rather than through the getter,
+       because the getter builds this very instance and would recurse. */
+    this.processors = Object.assign({}, this.processors, Processor._instance?.processors, processors);
   }
 
   processors: any = {
@@ -58,7 +60,11 @@ export class Processor extends InheritClass implements IProcessor {
 
   execute(component: IComponent, processorName: string, args: string): string {
     const processorHandler = (typeof component !== "undefined" && component !== null) ? (component.processorHandler) : (this);
-    return processorHandler?.processors[processorName].bind(processorHandler).apply(processorHandler, [component, args?.split(",")]) as string;
+    /* the directive supplies its own arguments ($mapper(componentName,valueName)),
+       so they must be spread after the component: processors are declared as
+       (componentInstance, ...declaredArgs) */
+    const __args__: any[] = (typeof args === "string") ? args.split(",").map((a: string): string => a.trim()) : [];
+    return processorHandler?.processors[processorName].apply(processorHandler, [component, ...__args__]) as string;
   }
 
   static process(template: string, component: IComponent | null = null):string {
