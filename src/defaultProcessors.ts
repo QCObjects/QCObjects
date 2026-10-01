@@ -1,12 +1,12 @@
 import { logger } from "./Logger";
 import { GlobalProcessor as Processor } from "./Processor";
-import { _top, get, set } from "./top";
+import { get } from "./top";
 import { range } from "./range";
 import { IComponent } from "types";
 
 // Set Processors
 export const setDefaultProcessors = ():void => {
-    (function (_top):void {
+    (function ():void {
 
         const mapper = (componentInstance:IComponent, componentName:string, valueName:string):string => {
             /*
@@ -139,7 +139,7 @@ export const setDefaultProcessors = ():void => {
     
         Processor.setProcessor(repeat);
     
-    })(_top);
+    })();
     
 };
 

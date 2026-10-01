@@ -17,7 +17,7 @@ import { Package } from "./Package";
 import { isBrowser } from "./platform";
 import { Processor } from "./Processor";
 import { __routing_params__, __valid_routing_way__, __valid_routings__ } from "./routings";
-import { _top, componentsStack, get, set } from "./top";
+import { componentsStack, get, set } from "./top";
 import { CONFIG } from "./CONFIG";
 import { serviceLoader } from "./serviceLoader";
 import { _tag_filter_ } from "./tag_filter";
@@ -566,7 +566,7 @@ export class Component extends InheritClass implements IComponent {
     }
 
     __buildSubComponents__(rebuildObjects = false): any {
-        const _component_: Component = this as Component;
+        const _component_: Component = this;
         let elementList = _component_.subtags;
         if (!rebuildObjects) {
             elementList = (elementList as HTMLElement[]).filter((t: HTMLElement) => !__booleanAttribute_(t, "loaded")) as unknown[] as IQCObjectsElement[];
@@ -930,18 +930,18 @@ export class Component extends InheritClass implements IComponent {
                         component.routingNodes = (componentBody as IQCObjectsElement)?.subelements("routing");
                         component.routings = [];
                         component.routingNodes.map((routingNode): any => {
-                            const attributeNames = (routingNode as HTMLElement).getAttributeNames();
+                            const attributeNames = (routingNode).getAttributeNames();
                             const routing = {} as TComponentRouting;
                             attributeNames.map((attributeName: any, a: string | number): any => {
-                                (routing as any)[attributeNames[a as any]] = (routingNode as HTMLElement).getAttribute(attributeNames[a as any]);
+                                (routing as any)[attributeNames[a as any]] = (routingNode).getAttribute(attributeNames[a as any]);
                                 return attributeName;
                             });
-                            component.routings.push(routing as never);
+                            component.routings.push(routing);
                             if (!component.routingPaths) {
                                 component.routingPaths = [];
                             }
-                            if (!component.routingPaths.includes(routing.path as never)) {
-                                component.routingPaths.push(routing.path as never);
+                            if (!component.routingPaths.includes(routing.path)) {
+                                component.routingPaths.push(routing.path);
                             }
                             if (!get("routingPaths")) {
                                 set("routingPaths", []);
@@ -1089,7 +1089,7 @@ export class Component extends InheritClass implements IComponent {
                 /* IntersectionObserver.observe() only accepts an Element, and
                    componentRoot is a ShadowRoot for shadowed components */
                 const __observeTarget__:Element = (typeof _componentRoot !== "undefined" && _componentRoot !== null && typeof (_componentRoot as unknown as Element).getBoundingClientRect !== "function")
-                    ? (((_componentRoot as unknown as ShadowRoot).host ?? _componentRoot) as unknown as Element)
+                    ? ((_componentRoot as unknown as ShadowRoot).host ?? _componentRoot)
                     : (_componentRoot as unknown as Element);
                 observer.observe(__observeTarget__);
             } else {

@@ -42,7 +42,7 @@ export class Toggle extends InheritClass {
         resolve.call(_promise, toggle);
       } else {
         logger.debug("Toggle functions are not declared");
-        reject.call(_promise, toggle as Toggle);
+        reject.call(_promise, toggle);
       }
       return toggle;
     }).then(function (toggle:Toggle) {

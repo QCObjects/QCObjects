@@ -18,7 +18,7 @@ export class CONFIG extends InheritClass implements ICONFIG {
   }
 
   get _CONFIG(): unknown {
-    return ConfigSettings.instance._CONFIG as unknown;
+    return ConfigSettings.instance._CONFIG;
   }
 
   set(name: string, value: unknown):void {

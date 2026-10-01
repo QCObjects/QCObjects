@@ -35,20 +35,20 @@
             })
             .forEach((__key__:string):void => {
               if (typeof args[__key__] === "function") {
-                (__instance__ as any)[__key__] = args[__key__].bind(__instance__);
+                (__instance__)[__key__] = args[__key__].bind(__instance__);
               } else {
-                (__instance__ as any)[__key__] = args[__key__];
+                (__instance__)[__key__] = args[__key__];
               }
             });
         }
 
         /* rule 6: __definition mirrors the class declaration values */
-        const __classDefinition__ = (typeof (__class__ as any).__definition === "object" && (__class__ as any).__definition !== null)
-          ? (__class__ as any).__definition
+        const __classDefinition__ = (typeof (__class__).__definition === "object" && (__class__).__definition !== null)
+          ? (__class__).__definition
           : {};
-        (__instance__ as any).__definition = Object.assign({}, __classDefinition__);
-        if (typeof (__instance__ as any).__classType === "string" && (__instance__ as any).__classType !== "") {
-          (__instance__ as any).__definition.__classType = (__instance__ as any).__classType;
+        (__instance__).__definition = Object.assign({}, __classDefinition__);
+        if (typeof (__instance__).__classType === "string" && (__instance__).__classType !== "") {
+          (__instance__).__definition.__classType = (__instance__).__classType;
         }
 
         return __instance__;

@@ -8,18 +8,18 @@ export const findPackageNodePath = function (packagename:string):string|null {
     if (!isBrowser) {
         /* require() does not exist in ESM builds and module.paths is undefined
            there and inside bundles, so both must be resolved defensively */
-        let existsSync:((p:string)=>boolean) | null = null;
+        let __fs__: any = null;
         try {
             // eslint-disable-next-line @typescript-eslint/no-require-imports
             const fs = require("node:fs");
             if (fs && typeof fs.existsSync === "function") {
-                existsSync = (p:string):boolean => fs.existsSync(p);
+                __fs__ = fs;
             }
         } catch (e: any) {
             logger.debug(`findPackageNodePath could not load node:fs: ${e}`);
         }
 
-        const __modulePaths__:string[] = (typeof module !== "undefined" && Array.isArray(module.paths)) ? (module.paths as string[]) : [];
+        const __modulePaths__:string[] = (typeof module !== "undefined" && Array.isArray(module.paths)) ? (module.paths) : [];
         const cwd:string = (typeof process !== "undefined" && typeof process.cwd === "function") ? process.cwd() : "";
         let sdkPaths = [
             `${CONFIG.get("projectPath")}${CONFIG.get("relativeImportPath")}`,
@@ -36,8 +36,8 @@ export const findPackageNodePath = function (packagename:string):string|null {
             ""
         ].concat(__modulePaths__).filter((p:any):boolean => typeof p === "string" && p !== "undefined");
 
-        if (existsSync !== null) {
-            sdkPaths = sdkPaths.filter(p => existsSync!(p + "/" + packagename));
+        if (__fs__ !== null) {
+            sdkPaths = sdkPaths.filter((p:string):boolean => __fs__.existsSync(p + "/" + packagename));
             if (sdkPaths.length > 0) {
                 sdkPath = sdkPaths[0];
                 logger.info(packagename + " is Installed.");
