@@ -190,12 +190,29 @@ declare module "domain" {
 }
 declare module "New" {
     /**
-     * Creates an object from a Class definition
-     *
-     * @param {QC_Object} o
-     * @param {Object} args
-     */
-    export const New: (__class__: any, args?: {}) => any;
+         * Creates an object from a Class definition
+         *
+         * Canonical precedence, from highest to lowest:
+         *   1. attribute tag values
+         *   2. instance property values passed to the constructor
+         *   3. inherited class property declaration values
+         *   4. base class instance constructor values
+         *   5. base class property declaration values
+         *   6. __definition, the mirror of the class declaration values
+         *   7. the static __definition object, mirroring the static declarations
+         *
+         * Native class field initializers (rules 3-5) are emitted by the compiler
+         * inside the constructor, right after super() returns, so they always land
+         * *after* the definition has been handed to the constructor. Rules 1-2 are
+         * therefore re-applied here, once the whole prototype chain has settled, so
+         * that tag and constructor values can never be clobbered by a field
+         * initializer. This keeps the ordering correct for every subclass, including
+         * third party ones, without having to strip their field initializers.
+         *
+         * @param {QC_Object} o
+         * @param {Object} args
+         */
+    export const New: (__class__: any, args?: any) => any;
 }
 declare module "secretKey" {
     export const _secretKey: string;
@@ -468,6 +485,17 @@ declare module "ComponentFactory" {
      * @param params an object with the params to build the uri path
      */
     export const ComponentURI: ({ TPL_SOURCE, COMPONENTS_BASE_PATH, COMPONENT_NAME, TPLEXTENSION }: TComponentURIParams) => string;
+    /**
+     * Reads an HTML boolean attribute.
+     * A valueless attribute (getAttribute returns "") means true, as do any values
+     * other than an explicit negation. Only absence means false.
+     *
+     * Exported so the SDK and application code resolve boolean attributes with the
+     * same semantics the framework uses, instead of duplicating the comparison.
+     */
+    export const __booleanAttribute_: (element: Element, attributeName: string) => boolean;
+    /** True when the attribute is not present in the tag at all. */
+    export const __attributeNotSet_: (element: Element, attributeName: string) => boolean;
     export const _buildComponentFromElement_: (element: Element, __parent__: any) => Component;
     export const _buildComponentsFromElements_: (elements: HTMLElement[], __parent__: Component | null) => Component[];
     export const buildComponents: (element: HTMLElement) => Component[];
@@ -773,6 +801,13 @@ declare module "Effect" {
         done(...args: any[]): any;
         apply(...args: any[]): void;
         duration: number;
+        /**
+         * Static bridge for animate().
+         * Effect subclasses in the SDK declare apply() as a static method and invoke
+         * super.animate(...) from it; in a static context `super` resolves against the
+         * constructor, so without this static member those calls land on undefined.
+         */
+        static animate(params: TEffectParams): void;
         animate({ timing, draw, duration }: TEffectParams): void;
     }
     export { Effect };
@@ -1018,7 +1053,7 @@ declare module "QCObjects" {
     export { captureFalseTouch } from "captureFalseTouch";
     export { serviceLoader } from "serviceLoader";
     export { componentLoader } from "componentLoader";
-    export { _buildComponentsFromElements_, ComponentURI } from "ComponentFactory";
+    export { _buildComponentsFromElements_, ComponentURI, __booleanAttribute_, __attributeNotSet_ } from "ComponentFactory";
     export { NamespaceRef } from "NamespaceRef";
     export { setDefaultProcessors } from "defaultProcessors";
     export { Tag, TagElements } from "Tag";
@@ -1063,4 +1098,7 @@ declare module "uniqueID" {
     export const uniqueId: Function;
 }
 //# sourceMappingURL=index.d.ts.map
-export {};
+
+declare module "qcobjects" {
+    export * from "QCObjects";
+}
