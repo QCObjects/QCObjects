@@ -1098,6 +1098,7 @@ declare module "uniqueID" {
     export const uniqueId: Function;
 }
 //# sourceMappingURL=index.d.ts.map
+
 declare module "qcobjects" {
     export * from "QCObjects";
 }
