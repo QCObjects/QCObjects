@@ -37,7 +37,7 @@ export const componentLoader = function (component: IComponent, _async: boolean)
                         logger.debug("CREATING COMPONENT {{NAME}}".replace("{{NAME}}", component.name));
                         component.template = response;
                         if (component.cached && (typeof cache !== "undefined")) {
-                            cache.save(component.name, component.template);
+                            cache.save(component.cacheIndex, component.template);
                         }
                         _feedComponent_(component);
                     } else {
@@ -171,7 +171,7 @@ export const componentLoader = function (component: IComponent, _async: boolean)
                     logger.debug("CREATING COMPONENT {{NAME}}".replace("{{NAME}}", component.name));
                     component.template = response;
                     if (component.cached && (typeof cache !== "undefined")) {
-                        cache.save(component.name, component.template);
+                        cache.save(component.cacheIndex, component.template);
                     }
                     _feedComponent_(component);
                 } else {

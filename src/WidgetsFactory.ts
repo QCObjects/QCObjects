@@ -517,7 +517,16 @@ if (isBrowser) {
         element.remove();
       });
   
-      componentWidget.append(componentBody);
+      /* Replace the widget tag with the component instead of nesting the component
+         inside it. Nesting leaves the consumed tag in the markup, so every
+         re-parse of that markup builds another component; removing the tag
+         leaves only the component behind. */
+      if (componentWidget.parentElement) {
+        componentWidget.parentElement?.append(componentBody);
+        componentWidget.remove();
+      } else {
+        componentWidget.append(componentBody);
+      }
     }
   };
   
