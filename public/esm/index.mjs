@@ -2173,7 +2173,7 @@ var init_componentLoader = __esm({
                 logger.debug("CREATING COMPONENT {{NAME}}".replace("{{NAME}}", component2.name));
                 component2.template = response;
                 if (component2.cached && typeof cache !== "undefined") {
-                  cache.save(component2.name, component2.template);
+                  cache.save(component2.cacheIndex, component2.template);
                 }
                 _feedComponent_(component2);
               } else {
@@ -2304,7 +2304,7 @@ var init_componentLoader = __esm({
               logger.debug("CREATING COMPONENT {{NAME}}".replace("{{NAME}}", component2.name));
               component2.template = response;
               if (component2.cached && typeof cache !== "undefined") {
-                cache.save(component2.name, component2.template);
+                cache.save(component2.cacheIndex, component2.template);
               }
               _feedComponent_(component2);
             } else {
@@ -5866,7 +5866,12 @@ if (isBrowser) {
         componentBody.appendChild(element.cloneNode(true));
         element.remove();
       });
-      componentWidget.append(componentBody);
+      if (componentWidget.parentElement) {
+        componentWidget.parentElement?.append(componentBody);
+        componentWidget.remove();
+      } else {
+        componentWidget.append(componentBody);
+      }
     }
   };
 } else {
